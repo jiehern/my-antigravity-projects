@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>ClassLogger • Apple Clock Rotary Dial Class Tracker</title>
+  <meta name="description" content="A sleek Apple Clock-style class logging tool with authentic 3D rotary drum dial picker, category management, and local database storage.">
+  <link rel="icon" type="image/jpeg" href="assets/app-icon.jpg">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="brand-wrapper">
+        <div class="brand-icon-wrapper">
+          <img src="assets/app-icon.jpg" alt="ClassLogger Icon" class="brand-icon-img" id="app-logo">
+        </div>
+        <div>
+          <h1 class="brand-title">
+            ClassLogger
+            <span class="brand-badge">Apple Dial</span>
+          </h1>
+          <p class="brand-subtitle">Rotary dial class tracker with local offline database</p>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <div class="db-status-pill" id="db-status" title="Your classes are saved directly on this computer in a local browser database">
+          <span class="status-dot"></span>
+          <span id="db-status-text">Local DB: IndexedDB</span>
+        </div>
+
+        <label class="quick-pill-btn primary" style="cursor: pointer; margin: 0; padding: 7px 14px; font-size: 0.8rem; display: flex; align-items: center; gap: 6px;" title="Import coach timesheet Excel spreadsheet (.xlsx)">
+          <span>📥 Import Excel (.xlsx)</span>
+          <input type="file" id="import-excel-btn" accept=".xlsx, .xls" style="display: none;">
+        </label>
+
+        <button type="button" class="icon-btn" id="sound-toggle-btn" title="Toggle Mechanical Tick Sound" aria-label="Toggle Sound">
+          <span id="sound-icon">🔊</span>
+        </button>
+
+        <button type="button" class="icon-btn" id="data-menu-btn" title="Backup & Export Database" aria-label="Database Settings">
+          <span>⚙️</span>
+        </button>
+      </div>
+    </header>
+
+
+    <!-- Main Content Grid -->
+    <main class="main-grid">
+      <!-- Left Panel: Logging Form & Rotary Dial -->
+      <section class="panel-card" aria-label="Log Class Form">
+        <div class="panel-header">
+          <h2 class="panel-title" id="form-heading">
+            <span>⏱️</span> Log Class Session
+          </h2>
+          <span class="panel-tag" id="mode-tag">New Entry</span>
+        </div>
+
+        <form id="class-form" onsubmit="return false;">
+          <!-- 1. Rotary Dial Time & Date Picker -->
+          <div class="form-section">
+            <div class="section-label-row">
+              <label class="section-label">
+                <span>🕒</span> Date & Time (Rotary Dial)
+              </label>
+              <span style="font-size: 0.72rem; color: var(--text-tertiary);">Drag or scroll wheels</span>
+            </div>
+
+            <div class="rotary-picker-container">
+              <!-- Live Selected Badge -->
+              <div class="rotary-display-badge">
+                <span class="rotary-live-date" id="rotary-date-display">Today</span>
+                <span class="rotary-live-time" id="rotary-time-display">12:00 PM</span>
+              </div>
+
+              <!-- Mount Point for the 3D Apple Clock Drum Wheel Picker -->
+              <div id="rotary-picker-mount"></div>
+
+              <!-- Quick Action Pills -->
+              <div class="rotary-quick-actions">
+                <button type="button" class="quick-pill-btn primary" id="btn-set-now">
+                  <span>⚡</span> Set to Current Time
+                </button>
+                <button type="button" class="quick-pill-btn" id="btn-minus-hour">
+                  <span>-1h</span>
+                </button>
+                <button type="button" class="quick-pill-btn" id="btn-plus-hour">
+                  <span>+1h</span>
+                </button>
+                <button type="button" class="quick-pill-btn" id="btn-calendar-jump">
+                  <span>📅 Calendar Jump</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. Class Category Selector -->
+          <div class="form-section">
+            <div class="section-label-row">
+              <label class="section-label">
+                <span>🏷️</span> Class Category
+              </label>
+              <button type="button" class="quick-pill-btn" id="btn-manage-categories" style="font-size: 0.72rem; padding: 2px 8px;">
+                <span>+ Custom Type</span>
+              </button>
+            </div>
+
+            <div class="category-grid" id="category-picker-grid">
+              <!-- Populated dynamically via JS: Coach Allen, Aerosplash, Charles, etc. -->
+            </div>
+          </div>
+
+          <!-- 3. Class Duration -->
+          <div class="form-section">
+            <div class="section-label-row">
+              <label class="section-label">
+                <span>⏳</span> Duration
+              </label>
+              <span id="selected-duration-label" style="font-size: 0.75rem; color: var(--text-secondary); font-weight: 600;">60 mins</span>
+            </div>
+
+            <div class="duration-pills" id="duration-pills-container">
+              <button type="button" class="duration-pill" data-mins="30">30m</button>
+              <button type="button" class="duration-pill" data-mins="45">45m</button>
+              <button type="button" class="duration-pill is-active" data-mins="60">60m</button>
+              <button type="button" class="duration-pill" data-mins="75">75m</button>
+              <button type="button" class="duration-pill" data-mins="90">90m</button>
+              <button type="button" class="duration-pill" data-mins="120">2h</button>
+            </div>
+          </div>
+
+          <!-- 4. Notes Field -->
+          <div class="form-section">
+            <div class="section-label-row">
+              <label class="section-label" for="class-notes-input">
+                <span>📝</span> Session Note
+              </label>
+              <span style="font-size: 0.72rem; color: var(--text-tertiary);">Extra information & highlights</span>
+            </div>
+
+            <div class="note-container">
+              <textarea 
+                id="class-notes-input" 
+                class="note-textarea" 
+                placeholder="What did you focus on today? (e.g., Laps completed, coach feedback, personal records, techniques...)"
+              ></textarea>
+
+              <div class="quick-note-tags" id="quick-note-tags">
+                <button type="button" class="note-tag-chip" data-tag="🏊 Form & Technique Drills">🏊 Form Drills</button>
+                <button type="button" class="note-tag-chip" data-tag="💪 High Intensity Intervals">💪 High Intensity</button>
+                <button type="button" class="note-tag-chip" data-tag="🎯 Personal Best Record">🎯 Personal Best</button>
+                <button type="button" class="note-tag-chip" data-tag="🥊 Sparring & Combos">🥊 Sparring</button>
+                <button type="button" class="note-tag-chip" data-tag="🧘 Recovery & Stretching">🧘 Recovery</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Submit Buttons -->
+          <button type="submit" class="submit-btn" id="btn-submit-class">
+            <span id="btn-submit-icon">✓</span>
+            <span id="btn-submit-text">Enter Class Into Database</span>
+          </button>
+
+          <button type="button" class="cancel-edit-btn" id="btn-cancel-edit" style="display: none;">
+            Cancel Editing
+          </button>
+        </form>
+      </section>
+
+      <!-- Right Panel: Logged Classes History & Search -->
+      <section class="panel-card" aria-label="Logged Classes History">
+        <div class="panel-header">
+          <h2 class="panel-title">
+            <span>📋</span> Class Log History
+          </h2>
+          <span class="panel-tag" id="log-count-tag">0 sessions</span>
+        </div>
+
+        <div class="history-controls">
+          <!-- Search box -->
+          <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input 
+              type="text" 
+              class="search-input" 
+              id="history-search-input" 
+              placeholder="Search notes, categories, or dates..."
+              autocomplete="off"
+            >
+          </div>
+
+          <!-- Category filter tabs -->
+          <div class="category-filter-tabs" id="history-filter-tabs">
+            <button type="button" class="filter-tab is-active" data-cat="all">
+              All Classes <span class="filter-count" id="count-cat-all">0</span>
+            </button>
+            <!-- Populated via JS -->
+          </div>
+        </div>
+
+        <!-- Class List -->
+        <div class="classes-list-container" id="classes-list">
+          <!-- Class cards or empty state inserted here -->
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Modal: Custom Category Manager -->
+  <div class="modal-overlay" id="modal-category">
+    <div class="modal-window">
+      <div class="modal-header">
+        <h3 class="modal-title">Create Class Category</h3>
+        <button type="button" class="modal-close-btn" id="btn-close-cat-modal">✕</button>
+      </div>
+      <form id="category-form" onsubmit="return false;">
+        <div class="form-group">
+          <label for="new-cat-name">Category Name</label>
+          <input type="text" id="new-cat-name" class="form-input" placeholder="e.g. Kickboxing, Pilates, Spin..." required>
+        </div>
+        <div class="form-group">
+          <label for="new-cat-icon">Emoji Icon</label>
+          <input type="text" id="new-cat-icon" class="form-input" value="⚡" maxlength="4">
+        </div>
+        <div class="form-group">
+          <label>Theme Accent Color</label>
+          <div class="color-palette-options" id="color-palette-options">
+            <div class="color-option is-selected" data-color="#ff9f0a" style="background: #ff9f0a;"></div>
+            <div class="color-option" data-color="#0a84ff" style="background: #0a84ff;"></div>
+            <div class="color-option" data-color="#30d158" style="background: #30d158;"></div>
+            <div class="color-option" data-color="#bf5af2" style="background: #bf5af2;"></div>
+            <div class="color-option" data-color="#ff453a" style="background: #ff453a;"></div>
+            <div class="color-option" data-color="#64d2ff" style="background: #64d2ff;"></div>
+            <div class="color-option" data-color="#ffd60a" style="background: #ffd60a;"></div>
+          </div>
+        </div>
+        <button type="submit" class="submit-btn" id="btn-save-category" style="margin-top: 16px;">
+          Add Category
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Data Management & Backups -->
+  <div class="modal-overlay" id="modal-data">
+    <div class="modal-window">
+      <div class="modal-header">
+        <h3 class="modal-title">Database & Backup Manager</h3>
+        <button type="button" class="modal-close-btn" id="btn-close-data-modal">✕</button>
+      </div>
+      <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 20px;">
+        All your class sessions are stored locally in your browser's IndexedDB database. You can export or import backups at any time.
+      </p>
+
+      <div style="display: flex; flex-direction: column; gap: 10px;">
+        <button type="button" class="submit-btn" id="btn-export-csv" style="background: var(--bg-surface-2); color: #fff; box-shadow: none; border: 1px solid var(--border-medium);">
+          📊 Export as CSV (Excel / Numbers)
+        </button>
+        <button type="button" class="submit-btn" id="btn-export-json" style="background: var(--bg-surface-2); color: #fff; box-shadow: none; border: 1px solid var(--border-medium);">
+          💾 Backup Full Database (JSON)
+        </button>
+        
+        <label class="submit-btn" style="background: var(--bg-surface-2); color: #fff; box-shadow: none; border: 1px solid var(--border-medium); cursor: pointer;">
+          📥 Restore from Backup (JSON)
+          <input type="file" id="import-json-input" accept=".json" style="display: none;">
+        </label>
+
+        <label class="submit-btn" style="background: rgba(100, 210, 255, 0.15); color: var(--apple-cyan); box-shadow: none; border: 1px solid rgba(100, 210, 255, 0.35); cursor: pointer;">
+          📥 Import Coach Timesheet (.xlsx)
+          <input type="file" id="import-excel-modal-input" accept=".xlsx, .xls" style="display: none;">
+        </label>
+
+        <button type="button" class="submit-btn" id="btn-import-september" style="background: rgba(255, 159, 10, 0.15); color: var(--apple-orange); box-shadow: none; border: 1px solid rgba(255, 159, 10, 0.35);">
+          ⚡ One-Click Import "JieHern_CoachTimesheet September2026" (26 sessions)
+        </button>
+
+        <button type="button" class="submit-btn" id="btn-seed-sample" style="background: rgba(10, 132, 255, 0.15); color: var(--apple-blue); box-shadow: none; border: 1px solid rgba(10, 132, 255, 0.35);">
+          🧪 Insert Demo Sample Classes
+        </button>
+
+        <button type="button" class="submit-btn" id="btn-clear-db" style="background: rgba(255, 69, 58, 0.15); color: var(--apple-red); box-shadow: none; border: 1px solid rgba(255, 69, 58, 0.35);">
+          🗑️ Clear All Local Records
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Native Date Picker Jump -->
+  <div class="modal-overlay" id="modal-date-jump">
+    <div class="modal-window" style="max-width: 360px;">
+      <div class="modal-header">
+        <h3 class="modal-title">Jump to Specific Date</h3>
+        <button type="button" class="modal-close-btn" id="btn-close-date-modal">✕</button>
+      </div>
+      <div class="form-group">
+        <label for="date-jump-input">Choose Date</label>
+        <input type="date" id="date-jump-input" class="form-input">
+      </div>
+      <button type="button" class="submit-btn" id="btn-confirm-date-jump" style="margin-top: 14px;">
+        Apply to Rotary Dial
+      </button>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toast-container" aria-live="polite"></div>
+
+  <!-- Main JavaScript App -->
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+{
+  "name": "class-logger",
+  "version": "1.0.0",
+  "description": "Apple Clock Rotary Dial Class Logger with Local Database",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "vite": "^8.3.3"
+  },
+  "dependencies": {
+    "xlsx": "^0.18.5"
+  }
+}
