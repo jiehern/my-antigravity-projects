@@ -1413,7 +1413,7 @@ body::after {
 @media (min-width: 821px) {
   .panel-log-section,
   .panel-history-section {
-    display: flex !important;
+    display: block !important;
   }
 }
 
@@ -1480,7 +1480,7 @@ body::after {
     display: none !important;
   }
   .main-grid.mobile-view-history .panel-history-section {
-    display: flex !important;
+    display: block !important;
   }
 
   .main-grid.mobile-view-log .panel-history-section,
@@ -1489,7 +1489,7 @@ body::after {
   }
   .main-grid.mobile-view-log .panel-log-section,
   .main-grid:not(.mobile-view-history) .panel-log-section {
-    display: flex !important;
+    display: block !important;
   }
 
   /* Prevent iOS Safari auto-zoom on input focus (requires >= 16px) */
