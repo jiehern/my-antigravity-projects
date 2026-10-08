@@ -12,7 +12,7 @@
   <meta name="apple-mobile-web-app-title" content="ClassLogger">
   <link rel="apple-touch-icon" href="assets/app-icon.jpg">
   <link rel="icon" type="image/jpeg" href="assets/app-icon.jpg">
-  <link rel="stylesheet" href="styles.css?v=2.8">
+  <link rel="stylesheet" href="styles.css?v=2.9">
   <script type="importmap">
   {
     "imports": {
@@ -346,12 +346,45 @@
   <div class="modal-overlay" id="modal-data">
     <div class="modal-window">
       <div class="modal-header">
-        <h3 class="modal-title">Database & Backup Manager</h3>
+        <h3 class="modal-title">⚙️ Settings & Database Manager</h3>
         <button type="button" class="modal-close-btn" id="btn-close-data-modal">✕</button>
       </div>
-      <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 20px;">
-        All your class sessions are stored locally in your browser's IndexedDB database. You can export or import backups at any time.
-      </p>
+
+      <!-- Coach Base Rate Adjustment Box -->
+      <div class="settings-base-rate-box">
+        <div class="settings-rate-title-row">
+          <div>
+            <div class="settings-rate-title">💵 Coach Base Rate</div>
+            <div class="settings-rate-subtitle">Base hourly pay per standard class (1.0 unit)</div>
+          </div>
+          <span class="settings-rate-current-tag" id="settings-current-rate-badge">RM 40.0 / class</span>
+        </div>
+        <div class="settings-rate-controls">
+          <div class="settings-rate-input-wrap">
+            <span class="settings-rate-prefix">RM</span>
+            <input 
+              type="number" 
+              id="input-coach-base-rate" 
+              class="form-input settings-rate-input" 
+              placeholder="40" 
+              value="40" 
+              step="1" 
+              min="0"
+            />
+            <span class="settings-rate-suffix">/ class</span>
+          </div>
+          <button type="button" class="quick-pill-btn primary" id="btn-save-base-rate">
+            Save Rate
+          </button>
+        </div>
+        <div class="settings-rate-desc">
+          Reflected on your live Monthly Earnings dashboard, individual session cards (LTS = 1.0x, Pre Comp = 1.5x), and authentic Excel timesheet exports.
+        </div>
+      </div>
+
+      <div style="font-size: 0.72rem; font-weight: 700; text-transform: uppercase; color: var(--text-tertiary); letter-spacing: 0.05em; margin: 16px 0 8px;">
+        Database & Backup Tools
+      </div>
 
       <div style="display: flex; flex-direction: column; gap: 10px;">
         <button type="button" class="submit-btn" id="btn-open-export-modal" style="background: rgba(10, 132, 255, 0.2); color: var(--apple-cyan); box-shadow: none; border: 1px solid rgba(10, 132, 255, 0.4); font-weight: 600;">
@@ -530,6 +563,6 @@
   <div class="toast-container" id="toast-container" aria-live="polite"></div>
 
   <!-- Main JavaScript App -->
-  <script type="module" src="js/app.js?v=2.8"></script>
+  <script type="module" src="js/app.js?v=2.9"></script>
 </body>
 </html>

@@ -34,6 +34,7 @@ class ClassLoggerApp {
     this.updateSoundButtonUI();
     this.renderAssistNamesList();
     this.updateNoteChipsActiveState();
+    this.updateBaseRateUI();
 
     // 3. Initialize Rotary Dial Picker
     const mountEl = document.getElementById('rotary-picker-mount');
@@ -162,6 +163,11 @@ class ClassLoggerApp {
 
     this.toastContainer = document.getElementById('toast-container');
     this.monthlyBonusCard = document.getElementById('monthly-bonus-card');
+
+    // Base rate setting elements
+    this.inputCoachBaseRate = document.getElementById('input-coach-base-rate');
+    this.btnSaveBaseRate = document.getElementById('btn-save-base-rate');
+    this.settingsRateBadge = document.getElementById('settings-current-rate-badge');
 
     // Mobile Navigation & Viewport elements
     this.mobileNavTabs = document.getElementById('mobile-nav-tabs');
@@ -387,11 +393,13 @@ class ClassLoggerApp {
       today.setHours(0,0,0,0);
       const isToday = (today.getTime() === itemDate.getTime());
 
-      // Calculate units and display fee (LTS 50m = 1.0 unit / RM40; Pre Comp 90m = 1.5 units / RM60)
+      // Calculate units and display fee (LTS 50m = 1.0 unit; Pre Comp 90m = 1.5 units)
       const units = getClassCreditUnits(item);
       const isPreComp = (units === 1.5);
       const isLts = (units === 1.0 && (item.duration === 50 || (item.note && item.note.toLowerCase().includes('lts'))));
-      const unitBadgeLabel = isPreComp ? '1.5 class • RM60' : isLts ? '1.0 class • RM40' : `${units.toFixed(1)} class • RM${(units * 40).toFixed(0)}`;
+      const currentBaseRate = this.getBaseRate();
+      const feeCalculated = (units * currentBaseRate).toFixed(0);
+      const unitBadgeLabel = isPreComp ? `1.5 class • RM${feeCalculated}` : isLts ? `1.0 class • RM${feeCalculated}` : `${units.toFixed(1)} class • RM${feeCalculated}`;
       const unitBadgeClass = isPreComp ? 'is-precomp' : isLts ? 'is-lts' : '';
 
       const card = document.createElement('article');
@@ -454,7 +462,7 @@ class ClassLoggerApp {
     const list = Array.isArray(classesToSummarize) ? classesToSummarize : this.classes;
     const totalSessions = list.length;
     const totalUnits = list.reduce((sum, c) => sum + getClassCreditUnits(c), 0);
-    const ratePerClass = 40.0;
+    const ratePerClass = this.getBaseRate();
     const baseEarnings = totalUnits * ratePerClass;
     const bonusInfo = calculateManagerBonus(totalUnits);
     const totalPayout = baseEarnings + bonusInfo.bonus;
@@ -518,7 +526,7 @@ class ClassLoggerApp {
           <strong class="stat-box-val stat-val-units">${totalUnits.toFixed(1)} <span class="stat-unit-sub">hrs</span></strong>
         </div>
         <div class="bonus-stat-box">
-          <span class="stat-box-label">Base Rate (RM40)</span>
+          <span class="stat-box-label">Base Rate (RM ${ratePerClass.toFixed(0)})</span>
           <strong class="stat-box-val stat-val-base">RM ${baseEarnings.toFixed(0)}</strong>
         </div>
         <div class="bonus-stat-box">
@@ -554,7 +562,7 @@ class ClassLoggerApp {
         </div>
         <div class="bonus-footer-row">
           <span class="bonus-next-goal">${nextGoalText}</span>
-          <span class="bonus-unit-formula">LTS (50m) = 1.0 unit (RM40) • Pre Comp (90m) = 1.5 units (RM60)</span>
+          <span class="bonus-unit-formula">LTS (50m) = 1.0 unit (RM${ratePerClass.toFixed(0)}) • Pre Comp (90m) = 1.5 units (RM${(ratePerClass * 1.5).toFixed(0)})</span>
         </div>
       </div>
     `;
@@ -848,6 +856,23 @@ class ClassLoggerApp {
       this.btnCloseDateModal.addEventListener('click', () => this.closeModal(this.modalDateJump));
     }
 
+    // Coach Base Rate Settings Triggers
+    if (this.btnSaveBaseRate) {
+      this.btnSaveBaseRate.addEventListener('click', () => {
+        if (this.inputCoachBaseRate) {
+          this.setBaseRate(this.inputCoachBaseRate.value);
+        }
+      });
+    }
+    if (this.inputCoachBaseRate) {
+      this.inputCoachBaseRate.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          this.setBaseRate(this.inputCoachBaseRate.value);
+        }
+      });
+    }
+
     // Filtered Export triggers
     if (this.btnHeaderExport) {
       this.btnHeaderExport.addEventListener('click', () => this.openExportModal());
@@ -895,7 +920,10 @@ class ClassLoggerApp {
       });
     }
     if (this.exportRatePerClass) {
-      this.exportRatePerClass.addEventListener('input', () => this.updateExportPreview());
+      this.exportRatePerClass.addEventListener('input', () => {
+        this.exportRatePerClass.dataset.userEdited = 'true';
+        this.updateExportPreview();
+      });
     }
     if (this.exportFeesLabel) {
       this.exportFeesLabel.addEventListener('input', () => {
@@ -1047,6 +1075,58 @@ class ClassLoggerApp {
     const muted = sound.isMuted();
     this.soundIcon.textContent = muted ? '🔇' : '🔊';
     this.soundToggleBtn.title = muted ? 'Unmute Sound' : 'Mute Sound';
+  }
+
+  // --- BASE RATE SETTINGS ---
+
+  getBaseRate() {
+    try {
+      const stored = localStorage.getItem('class_logger_base_rate');
+      if (stored !== null && !isNaN(parseFloat(stored))) {
+        const val = parseFloat(stored);
+        if (val >= 0) return val;
+      }
+    } catch (e) {
+      console.warn('Error reading base rate from localStorage:', e);
+    }
+    return 40.0;
+  }
+
+  setBaseRate(newRate) {
+    const val = parseFloat(newRate);
+    if (isNaN(val) || val < 0) {
+      this.showToast('Please enter a valid base rate (RM >= 0)', 'danger');
+      return false;
+    }
+    try {
+      localStorage.setItem('class_logger_base_rate', val.toString());
+    } catch (e) {
+      console.warn('Error saving base rate to localStorage:', e);
+    }
+
+    this.updateBaseRateUI();
+    this.renderClassesList();
+    if (this.exportRatePerClass) {
+      this.exportRatePerClass.value = val;
+      delete this.exportRatePerClass.dataset.userEdited;
+    }
+    this.updateExportPreview();
+    sound.playSuccess();
+    this.showToast(`Coach base rate updated to RM ${val.toFixed(1)} / class!`, 'success');
+    return true;
+  }
+
+  updateBaseRateUI() {
+    const rate = this.getBaseRate();
+    if (this.inputCoachBaseRate) {
+      this.inputCoachBaseRate.value = rate;
+    }
+    if (this.settingsRateBadge) {
+      this.settingsRateBadge.textContent = `RM ${rate.toFixed(1)} / class`;
+    }
+    if (this.exportRatePerClass && !this.exportRatePerClass.dataset.userEdited) {
+      this.exportRatePerClass.value = rate;
+    }
   }
 
   // --- CRUD ACTIONS ---
@@ -1271,6 +1351,8 @@ class ClassLoggerApp {
     modalEl.classList.add('is-open');
     if (modalEl === this.modalCategory) {
       this.renderModalCategoriesList();
+    } else if (modalEl === this.modalData) {
+      this.updateBaseRateUI();
     }
     sound.playTick(1.0);
   }
@@ -1594,6 +1676,9 @@ class ClassLoggerApp {
 
   openExportModal() {
     this.populateExportCategorySelect();
+    if (this.exportRatePerClass && !this.exportRatePerClass.dataset.userEdited) {
+      this.exportRatePerClass.value = this.getBaseRate();
+    }
     this.updateExportPreview();
     this.openModal(this.modalExport);
   }
@@ -1725,7 +1810,8 @@ class ClassLoggerApp {
 
     // Live Billing & Fee Calculations with Units and Manager Bonus
     const totalUnits = classes.reduce((sum, c) => sum + getClassCreditUnits(c), 0);
-    const rateVal = this.exportRatePerClass ? (parseFloat(this.exportRatePerClass.value) || 0) : 40.0;
+    const baseRateFallback = this.getBaseRate();
+    const rateVal = this.exportRatePerClass ? (parseFloat(this.exportRatePerClass.value) || baseRateFallback) : baseRateFallback;
     const baseFees = totalUnits * rateVal;
     const bonusInfo = calculateManagerBonus(totalUnits);
     const grandTotal = baseFees + bonusInfo.bonus;
@@ -1786,7 +1872,7 @@ class ClassLoggerApp {
     }
 
     const coachName = (this.exportCoachName && this.exportCoachName.value.trim()) || 'Chew Jie Hern';
-    const ratePerClass = this.exportRatePerClass ? (parseFloat(this.exportRatePerClass.value) || 40.0) : 40.0;
+    const ratePerClass = this.exportRatePerClass ? (parseFloat(this.exportRatePerClass.value) || this.getBaseRate()) : this.getBaseRate();
     const feesLabel = (this.exportFeesLabel && this.exportFeesLabel.value.trim()) || undefined;
 
     const blob = ExcelTimesheetExporter.toBlob(classes, {
@@ -1808,12 +1894,13 @@ class ClassLoggerApp {
     }
 
     const headers = ['Date', 'Day', 'Time', 'Category', 'Duration (mins)', 'Duration (hrs)', 'Credit Units', 'Fee (RM)', 'Notes / Remarks', 'Session ID'];
+    const rateVal = this.exportRatePerClass ? (parseFloat(this.exportRatePerClass.value) || this.getBaseRate()) : this.getBaseRate();
     const rows = classes.map(c => {
       const d = new Date(c.date + 'T00:00:00');
       const dayOfWeek = isNaN(d.getTime()) ? '' : d.toLocaleDateString('en-US', { weekday: 'short' });
       const hours = c.duration ? (c.duration / 60).toFixed(2) : '1.00';
       const units = getClassCreditUnits(c);
-      const fee = (units * 40).toFixed(2);
+      const fee = (units * rateVal).toFixed(2);
       return [
         `"${c.date}"`,
         `"${dayOfWeek}"`,
