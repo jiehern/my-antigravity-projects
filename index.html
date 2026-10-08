@@ -12,7 +12,7 @@
   <meta name="apple-mobile-web-app-title" content="ClassLogger">
   <link rel="apple-touch-icon" href="assets/app-icon.jpg">
   <link rel="icon" type="image/jpeg" href="assets/app-icon.jpg">
-  <link rel="stylesheet" href="styles.css?v=2.5">
+  <link rel="stylesheet" href="styles.css?v=2.6">
   <script type="importmap">
   {
     "imports": {
@@ -283,9 +283,24 @@
   <div class="modal-overlay" id="modal-category">
     <div class="modal-window">
       <div class="modal-header">
-        <h3 class="modal-title">Create Class Category</h3>
+        <h3 class="modal-title">Class Categories</h3>
         <button type="button" class="modal-close-btn" id="btn-close-cat-modal">✕</button>
       </div>
+
+      <!-- Manage Existing Categories List -->
+      <div style="margin-bottom: 16px;">
+        <div style="font-size: 0.72rem; font-weight: 700; text-transform: uppercase; color: var(--text-tertiary); letter-spacing: 0.05em; margin-bottom: 8px;">
+          Manage Existing Categories
+        </div>
+        <div class="modal-categories-list" id="modal-categories-list" style="max-height: 150px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; padding-right: 2px;">
+          <!-- Rendered dynamically by JS -->
+        </div>
+      </div>
+
+      <div style="font-size: 0.72rem; font-weight: 700; text-transform: uppercase; color: var(--text-tertiary); letter-spacing: 0.05em; margin-bottom: 10px; border-top: 1px solid var(--border-subtle); padding-top: 14px;">
+        Add New Category
+      </div>
+
       <form id="category-form" onsubmit="return false;">
         <div class="form-group">
           <label for="new-cat-name">Category Name</label>
@@ -494,6 +509,6 @@
   <div class="toast-container" id="toast-container" aria-live="polite"></div>
 
   <!-- Main JavaScript App -->
-  <script type="module" src="js/app.js?v=2.5"></script>
+  <script type="module" src="js/app.js?v=2.6"></script>
 </body>
 </html>

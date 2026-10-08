@@ -661,8 +661,8 @@ body::after {
 
 .category-check {
   position: absolute;
-  top: 8px;
-  right: 8px;
+  top: 7px;
+  left: 7px;
   width: 16px;
   height: 16px;
   border-radius: 50%;
@@ -673,6 +673,7 @@ body::after {
   opacity: 0;
   transform: scale(0.6);
   transition: all var(--transition-fast);
+  z-index: 5;
 }
 
 .category-card.is-selected .category-check {
@@ -685,6 +686,40 @@ body::after {
   height: 10px;
   stroke: #000;
   stroke-width: 3;
+}
+
+.category-delete-btn {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: var(--text-tertiary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.72rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  z-index: 6;
+  opacity: 0.8;
+}
+
+.category-card:hover .category-delete-btn {
+  opacity: 1;
+}
+
+.category-delete-btn:hover,
+.category-delete-btn:active {
+  background: rgba(255, 69, 58, 0.25);
+  border-color: rgba(255, 69, 58, 0.5);
+  color: #ff453a;
+  transform: scale(1.1);
+  opacity: 1;
 }
 
 .add-category-btn {
@@ -842,8 +877,8 @@ body::after {
 
 /* Assist Dropdown Container & Menu */
 .assist-dropdown-container {
-  position: relative;
-  display: inline-block;
+  display: inline-flex;
+  position: static;
 }
 
 .assist-chip-btn {
@@ -867,18 +902,19 @@ body::after {
   position: absolute;
   top: calc(100% + 8px);
   left: 0;
-  width: 270px;
-  max-width: calc(100vw - 36px);
+  right: 0;
+  width: 100%;
+  box-sizing: border-box;
   background: rgba(22, 22, 26, 0.98);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
   border: 1px solid rgba(255, 255, 255, 0.14);
-  border-radius: 12px;
-  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.75), 0 0 0 1px rgba(255, 159, 10, 0.2);
+  border-radius: 14px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 159, 10, 0.25);
   z-index: 120;
-  padding: 8px;
+  padding: 10px;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
   animation: dropdown-fade-in 0.15s ease-out;
 }
 
@@ -984,18 +1020,27 @@ body::after {
 }
 
 .assist-name-delete-btn {
-  background: none;
-  border: none;
-  color: var(--text-muted);
-  font-size: 0.8rem;
-  padding: 8px 10px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 6px;
+  color: var(--text-tertiary);
+  font-size: 0.75rem;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
-  transition: color 0.15s ease;
+  transition: all 0.15s ease;
   line-height: 1;
   flex-shrink: 0;
+  margin-right: 4px;
 }
 
-.assist-name-delete-btn:hover {
+.assist-name-delete-btn:hover,
+.assist-name-delete-btn:active {
+  background: rgba(255, 69, 58, 0.25);
+  border-color: rgba(255, 69, 58, 0.5);
   color: #ff453a;
 }
 

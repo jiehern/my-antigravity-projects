@@ -45,6 +45,7 @@ class LocalDatabase {
           if (!db.objectStoreNames.contains(STORE_CATEGORIES)) {
             const catStore = db.createObjectStore(STORE_CATEGORIES, { keyPath: 'id' });
             DEFAULT_CATEGORIES.forEach(cat => catStore.add(cat));
+            try { localStorage.setItem('class_logger_categories_seeded', 'true'); } catch (e) {}
           }
         };
 
@@ -72,11 +73,12 @@ class LocalDatabase {
 
   initLocalStorageDefaults() {
     const existingCats = localStorage.getItem('class_logger_categories');
-    if (!existingCats) {
+    if (existingCats === null) {
       localStorage.setItem('class_logger_categories', JSON.stringify(DEFAULT_CATEGORIES));
+      localStorage.setItem('class_logger_categories_seeded', 'true');
     }
     const existingClasses = localStorage.getItem('class_logger_classes');
-    if (!existingClasses) {
+    if (existingClasses === null) {
       localStorage.setItem('class_logger_classes', JSON.stringify([]));
     }
   }
@@ -235,7 +237,7 @@ class LocalDatabase {
     await this.init();
     if (!this.isIndexedDBAvailable || !this.db) {
       const data = localStorage.getItem('class_logger_categories');
-      return data ? JSON.parse(data) : DEFAULT_CATEGORIES;
+      return data !== null ? JSON.parse(data) : DEFAULT_CATEGORIES;
     }
 
     return new Promise((resolve) => {
@@ -246,16 +248,18 @@ class LocalDatabase {
 
         request.onsuccess = () => {
           const results = request.result || [];
-          if (results.length === 0) {
-            // Seed defaults if empty
+          const seeded = localStorage.getItem('class_logger_categories_seeded');
+          if (results.length === 0 && !seeded) {
+            try { localStorage.setItem('class_logger_categories_seeded', 'true'); } catch (e) {}
             this.seedDefaultCategories().then(() => resolve(DEFAULT_CATEGORIES));
           } else {
+            try { localStorage.setItem('class_logger_categories_seeded', 'true'); } catch (e) {}
             resolve(results);
           }
         };
-        request.onerror = () => resolve(DEFAULT_CATEGORIES);
+        request.onerror = () => resolve([]);
       } catch (err) {
-        resolve(DEFAULT_CATEGORIES);
+        resolve([]);
       }
     });
   }
@@ -297,6 +301,7 @@ class LocalDatabase {
 
   async deleteCategory(id) {
     await this.init();
+    try { localStorage.setItem('class_logger_categories_seeded', 'true'); } catch (e) {}
     if (!this.isIndexedDBAvailable || !this.db) {
       let cats = await this.getAllCategories();
       cats = cats.filter(c => c.id !== id);

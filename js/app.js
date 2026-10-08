@@ -185,16 +185,20 @@ class ClassLoggerApp {
   async loadCategories() {
     try {
       const cats = await db.getAllCategories();
-      if (cats && cats.length > 0) {
+      if (Array.isArray(cats)) {
         this.categories = cats;
       }
     } catch (e) {
       console.warn('Failed to load categories, using defaults:', e);
     }
 
-    if (!this.selectedCategoryId && this.categories.length > 0) {
-      const defaultCat = this.categories.find(c => c.name === 'Coach Allen') || this.categories[0];
-      this.selectedCategoryId = defaultCat.id;
+    if (this.categories.length > 0) {
+      if (!this.selectedCategoryId || !this.categories.some(c => c.id === this.selectedCategoryId)) {
+        const defaultCat = this.categories.find(c => c.name === 'Coach Allen') || this.categories[0];
+        this.selectedCategoryId = defaultCat.id;
+      }
+    } else {
+      this.selectedCategoryId = null;
     }
     this.renderCategoryGrid();
     this.renderFilterTabs();
@@ -212,20 +216,35 @@ class ClassLoggerApp {
       card.style.setProperty('--category-glow', `${cat.color || '#ff9f0a'}40`);
 
       card.innerHTML = `
-        <div class="category-icon">${cat.icon || '📌'}</div>
-        <div class="category-name" title="${cat.name}">${cat.name}</div>
         <div class="category-check">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
             <polyline points="20 6 9 17 4 12"></polyline>
           </svg>
         </div>
+        <button type="button" class="category-delete-btn" title="Delete ${this.escapeHTML(cat.name)}" aria-label="Delete ${this.escapeHTML(cat.name)}">
+          ✕
+        </button>
+        <div class="category-icon">${cat.icon || '📌'}</div>
+        <div class="category-name" title="${this.escapeHTML(cat.name)}">${this.escapeHTML(cat.name)}</div>
       `;
 
-      card.addEventListener('click', () => {
+      card.addEventListener('click', (e) => {
+        if (e.target.closest('.category-delete-btn')) return;
         this.selectedCategoryId = cat.id;
         sound.playTick(1.2);
         this.renderCategoryGrid();
       });
+
+      const delBtn = card.querySelector('.category-delete-btn');
+      if (delBtn) {
+        delBtn.addEventListener('click', async (e) => {
+          e.stopPropagation();
+          e.preventDefault();
+          if (confirm(`Remove category "${cat.name}"?`)) {
+            await this.handleDeleteCategory(cat.id, cat.name);
+          }
+        });
+      }
 
       this.categoryGrid.appendChild(card);
     });
@@ -1021,11 +1040,59 @@ class ClassLoggerApp {
     this.showToast(`Category "${name}" created!`, 'success');
   }
 
+  async handleDeleteCategory(catId, catName) {
+    await db.deleteCategory(catId);
+    this.categories = this.categories.filter(c => c.id !== catId);
+    if (this.selectedCategoryId === catId) {
+      this.selectedCategoryId = this.categories.length > 0 ? this.categories[0].id : null;
+    }
+    this.renderCategoryGrid();
+    this.renderFilterTabs();
+    this.renderModalCategoriesList();
+    sound.playTrash();
+    this.showToast(`Removed category "${catName}"`, 'info');
+  }
+
+  renderModalCategoriesList() {
+    const listEl = document.getElementById('modal-categories-list');
+    if (!listEl) return;
+    if (this.categories.length === 0) {
+      listEl.innerHTML = `<div style="font-size: 0.8rem; color: var(--text-muted); font-style: italic; padding: 6px 0;">No categories available. Add one below.</div>`;
+      return;
+    }
+
+    listEl.innerHTML = this.categories.map(cat => `
+      <div class="modal-cat-item" style="display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; background: rgba(255,255,255,0.04); border-radius: 8px; border: 1px solid var(--border-subtle);">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 1.1rem;">${cat.icon || '📌'}</span>
+          <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-primary);">${this.escapeHTML(cat.name)}</span>
+        </div>
+        <button type="button" class="btn-delete-modal-cat" data-id="${cat.id}" data-name="${this.escapeHTML(cat.name)}" style="background: rgba(255,69,58,0.15); border: 1px solid rgba(255,69,58,0.3); color: #ff453a; border-radius: 6px; padding: 4px 10px; font-size: 0.75rem; font-weight: 600; cursor: pointer; transition: all 0.15s ease;">
+          Remove
+        </button>
+      </div>
+    `).join('');
+
+    listEl.querySelectorAll('.btn-delete-modal-cat').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        e.preventDefault();
+        const id = btn.dataset.id;
+        const name = btn.dataset.name;
+        if (confirm(`Remove category "${name}"?`)) {
+          await this.handleDeleteCategory(id, name);
+        }
+      });
+    });
+  }
+
   // --- MODALS & UTILS ---
 
   openModal(modalEl) {
     if (!modalEl) return;
     modalEl.classList.add('is-open');
+    if (modalEl === this.modalCategory) {
+      this.renderModalCategoriesList();
+    }
     sound.playTick(1.0);
   }
 
@@ -1076,9 +1143,9 @@ class ClassLoggerApp {
   getAssistNames() {
     try {
       const saved = localStorage.getItem('class_logger_assist_names');
-      if (saved) {
+      if (saved !== null) {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        if (Array.isArray(parsed)) return parsed;
       }
     } catch (e) {
       console.warn('Failed to parse assist names', e);
@@ -1112,7 +1179,7 @@ class ClassLoggerApp {
     `;
 
     if (names.length === 0) {
-      html += `<div class="assist-no-names">No custom names yet</div>`;
+      html += `<div class="assist-no-names">No custom names saved yet. Add a name below.</div>`;
     } else {
       names.forEach((name, idx) => {
         const isNameActive = currentVal === `Assist ${name}` || currentVal.startsWith(`Assist ${name} -`) || currentVal.startsWith(`Assist ${name} `);
