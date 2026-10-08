@@ -445,9 +445,6 @@ class LocalDatabase {
         throw new Error('Invalid JSON format: missing "classes" array');
       }
 
-      const existingCats = await this.getAllCategories();
-      const existingCatNames = new Set(existingCats.map(c => (c.name || '').toLowerCase()));
-
       let importedCount = 0;
       for (const raw of classesList) {
         if (!raw || typeof raw !== 'object') continue;
@@ -473,21 +470,9 @@ class LocalDatabase {
           timestamp = new Date(y, (m || 1) - 1, d || 1, hh || 12, mm || 0).getTime();
         }
 
-        const category = String(raw.category || 'Aerosplash').trim();
+        const category = 'AeroSplash';
         const duration = Number(raw.duration) || 60;
         const note = String(raw.note || '').trim();
-
-        // Check and register missing category if needed
-        if (category && !existingCatNames.has(category.toLowerCase())) {
-          existingCatNames.add(category.toLowerCase());
-          const catId = raw.categoryId || `cat_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
-          await this.addCategory({
-            id: catId,
-            name: category,
-            color: '#0a84ff',
-            icon: '🏊'
-          });
-        }
 
         const normalizedItem = {
           ...raw,
@@ -505,15 +490,6 @@ class LocalDatabase {
 
         await this.upsertClass(normalizedItem);
         importedCount++;
-      }
-
-      // Also import categories array if included in JSON
-      if (Array.isArray(data.categories)) {
-        for (const cat of data.categories) {
-          if (cat && cat.name) {
-            await this.addCategory(cat);
-          }
-        }
       }
 
       return { success: true, count: importedCount };

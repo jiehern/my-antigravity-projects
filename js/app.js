@@ -1566,7 +1566,10 @@ class ClassLoggerApp {
       const text = await file.text();
       const res = await db.importJSON(text);
       await this.loadClasses();
-      await this.migrateLegacyImportCategories();
+      if (typeof this.migrateLegacyImportCategories === 'function') {
+        await this.migrateLegacyImportCategories();
+      }
+      this.switchMobileTab('history');
       this.closeModal(this.modalData);
       sound.playSuccess();
       this.showToast(`Successfully imported ${res.count} class session${res.count === 1 ? '' : 's'} from JSON!`, 'success');
@@ -1575,6 +1578,11 @@ class ClassLoggerApp {
       sound.playTrash();
       this.showToast(`Import failed: ${err.message || 'Invalid JSON format'}`, 'danger');
     }
+  }
+
+  async loadCategories() {
+    // Backward-compatibility no-op stub: ensures any cached module or caller never throws
+    return [];
   }
 
   // --- EXCEL IMPORT ---
