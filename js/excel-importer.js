@@ -162,11 +162,24 @@ export class ExcelTimesheetImporter {
       const rawDuration = colMap.duration !== -1 ? row[colMap.duration] : '60';
       const durationMins = this.parseDuration(rawDuration);
 
-      const rawCategory = colMap.description !== -1 ? String(row[colMap.description] || '').trim() : 'LTS';
-      const category = rawCategory || 'Class';
+      const rawCategory = colMap.description !== -1 ? String(row[colMap.description] || '').trim() : '';
+      const rawRemarks = colMap.remarks !== -1 ? String(row[colMap.remarks] || '').trim() : '';
+
+      // For this project, any .xlsx file imported is strictly under the Aerosplash category
+      const category = 'Aerosplash';
       detectedCategories.add(category);
 
-      const rawRemarks = colMap.remarks !== -1 ? String(row[colMap.remarks] || '').trim() : '';
+      // Preserve description (e.g. LTS, PreComp, Swim Clinic) and remarks in session note
+      let combinedNote = '';
+      if (rawCategory && rawCategory.toLowerCase() !== 'aerosplash') {
+        if (rawRemarks) {
+          combinedNote = `${rawCategory} - ${rawRemarks}`;
+        } else {
+          combinedNote = rawCategory;
+        }
+      } else {
+        combinedNote = rawRemarks;
+      }
 
       // Create timestamp
       const [y, m, d] = dateStr.split('-').map(Number);
@@ -179,8 +192,8 @@ export class ExcelTimesheetImporter {
         displayTime: timeObj.displayTime,
         timestamp,
         duration: durationMins,
-        category,
-        note: rawRemarks,
+        category: 'Aerosplash',
+        note: combinedNote,
         importedFrom: firstSheetName,
         createdAt: new Date().toISOString()
       });
@@ -189,8 +202,27 @@ export class ExcelTimesheetImporter {
     return {
       sheetName: firstSheetName,
       classes: parsedClasses,
-      categories: Array.from(detectedCategories),
+      categories: ['Aerosplash'],
       totalCount: parsedClasses.length
     };
   }
 }
+
+import { exportCoachTimesheetXLSX } from './timesheet-template.js';
+
+/**
+ * ExcelTimesheetExporter - Generates authentic Coach Timesheet Excel (.xlsx) files
+ * Faithfully matches 'JieHern_CoachTimesheet September2026.xlsx' in cell borders,
+ * fonts, date/time numFmts, formulas, and summary fee calculations.
+ */
+export class ExcelTimesheetExporter {
+  /**
+   * Return a Blob matching the exact formatting, borders, and formulas of the sample timesheet
+   */
+  static toBlob(classes, options = {}) {
+    const opts = typeof options === 'string' ? { sheetName: options } : (options || {});
+    return exportCoachTimesheetXLSX(classes, opts);
+  }
+}
+
+

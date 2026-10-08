@@ -320,30 +320,62 @@ class LocalDatabase {
 
   // --- EXPORT & IMPORT ---
 
-  async exportJSON() {
-    const classes = await this.getAllClasses();
+  async getFilteredClasses(filter = {}) {
+    let list = await this.getAllClasses();
+    const { category, startDate, endDate } = filter;
+
+    if (category && category !== 'all') {
+      const catLower = category.toLowerCase();
+      list = list.filter(c => c.category && c.category.toLowerCase() === catLower);
+    }
+
+    if (startDate) {
+      list = list.filter(c => c.date >= startDate);
+    }
+
+    if (endDate) {
+      list = list.filter(c => c.date <= endDate);
+    }
+
+    return list;
+  }
+
+  async exportJSON(filter = {}) {
+    const classes = await this.getFilteredClasses(filter);
     const categories = await this.getAllCategories();
     return JSON.stringify({
       version: 1,
       appName: 'ClassLogger',
       exportedAt: new Date().toISOString(),
+      filter: {
+        category: filter.category || 'all',
+        startDate: filter.startDate || null,
+        endDate: filter.endDate || null
+      },
+      totalCount: classes.length,
       classes,
       categories
     }, null, 2);
   }
 
-  async exportCSV() {
-    const classes = await this.getAllClasses();
-    const headers = ['ID', 'Date', 'Time', 'Category', 'Duration (mins)', 'Note', 'Logged At'];
-    const rows = classes.map(c => [
-      `"${c.id}"`,
-      `"${c.date}"`,
-      `"${c.displayTime || c.time}"`,
-      `"${(c.category || '').replace(/"/g, '""')}"`,
-      c.duration || 60,
-      `"${(c.note || '').replace(/"/g, '""')}"`,
-      `"${c.createdAt || ''}"`
-    ]);
+  async exportCSV(filter = {}) {
+    const classes = await this.getFilteredClasses(filter);
+    const headers = ['Date', 'Day', 'Time', 'Category', 'Duration (mins)', 'Duration (hrs)', 'Notes / Remarks', 'Session ID'];
+    const rows = classes.map(c => {
+      const d = new Date(c.date + 'T00:00:00');
+      const dayOfWeek = isNaN(d.getTime()) ? '' : d.toLocaleDateString('en-US', { weekday: 'short' });
+      const hours = c.duration ? (c.duration / 60).toFixed(2) : '1.00';
+      return [
+        `"${c.date}"`,
+        `"${dayOfWeek}"`,
+        `"${c.displayTime || c.time}"`,
+        `"${(c.category || '').replace(/"/g, '""')}"`,
+        c.duration || 60,
+        hours,
+        `"${(c.note || '').replace(/"/g, '""')}"`,
+        `"${c.id}"`
+      ];
+    });
 
     return [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
   }

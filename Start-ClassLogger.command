@@ -3,12 +3,21 @@
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 cd "$DIR"
 
-# Check if Vite is already running on port 5173
-if lsof -Pi :5173 -sTCP:LISTEN -t >/dev/null ; then
-    open "http://localhost:5173/"
+PORT=5173
+
+# Check if server is already running on port 5173
+if lsof -Pi :$PORT -sTCP:LISTEN -t >/dev/null 2>&1 ; then
+    open "http://localhost:$PORT/"
 else
-    # Start dev server and open in default browser
-    npx vite --port 5173 &
-    sleep 1.5
-    open "http://localhost:5173/"
+    # Prefer npx vite if available, otherwise seamlessly use python3 http.server
+    if command -v npx >/dev/null 2>&1 ; then
+        nohup npx vite --port $PORT >/dev/null 2>&1 &
+    elif command -v python3 >/dev/null 2>&1 ; then
+        nohup python3 -m http.server $PORT >/dev/null 2>&1 &
+    elif command -v python >/dev/null 2>&1 ; then
+        nohup python -m http.server $PORT >/dev/null 2>&1 &
+    fi
+    sleep 1.2
+    open "http://localhost:$PORT/"
 fi
+
