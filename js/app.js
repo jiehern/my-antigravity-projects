@@ -1565,8 +1565,8 @@ class ClassLoggerApp {
     try {
       const text = await file.text();
       const res = await db.importJSON(text);
-      await this.loadCategories();
       await this.loadClasses();
+      await this.migrateLegacyImportCategories();
       this.closeModal(this.modalData);
       sound.playSuccess();
       this.showToast(`Successfully imported ${res.count} class session${res.count === 1 ? '' : 's'} from JSON!`, 'success');
