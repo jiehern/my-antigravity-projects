@@ -231,11 +231,14 @@ export class RotaryDialPicker {
     }, { passive: true });
 
     colEl.addEventListener('touchmove', (e) => {
-      if (e.touches.length === 1) onPointerMove(e.touches[0].clientY);
-    }, { passive: true });
+      if (e.touches.length === 1) {
+        if (e.cancelable) e.preventDefault();
+        onPointerMove(e.touches[0].clientY);
+      }
+    }, { passive: false });
 
-    colEl.addEventListener('touchend', () => onPointerUp());
-    colEl.addEventListener('touchcancel', () => onPointerUp());
+    colEl.addEventListener('touchend', () => onPointerUp(), { passive: true });
+    colEl.addEventListener('touchcancel', () => onPointerUp(), { passive: true });
 
     // Mouse handlers
     colEl.addEventListener('mousedown', (e) => {

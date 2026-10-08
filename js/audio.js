@@ -53,6 +53,11 @@ class SoundEngine {
     if (now - this.lastTickTime < this.minTickInterval) return;
     this.lastTickTime = now;
 
+    // Haptic vibration feedback on supported mobile devices
+    if (typeof navigator !== 'undefined' && typeof navigator.vibrate === 'function') {
+      try { navigator.vibrate(6); } catch (_) {}
+    }
+
     this.initContext();
     if (!this.ctx) return;
 

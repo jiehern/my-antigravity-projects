@@ -153,6 +153,14 @@ class ClassLoggerApp {
     this.btnExportFilteredJson = document.getElementById('btn-export-filtered-json');
 
     this.toastContainer = document.getElementById('toast-container');
+
+    // Mobile Navigation & Viewport elements
+    this.mobileNavTabs = document.getElementById('mobile-nav-tabs');
+    this.mobileTabLog = document.getElementById('mobile-tab-log');
+    this.mobileTabHistory = document.getElementById('mobile-tab-history');
+    this.mobileHistoryBadge = document.getElementById('mobile-history-badge');
+    this.mainGrid = document.querySelector('.main-grid');
+    this.activeMobileTab = 'log';
   }
 
   // --- ROTARY PICKER LISTENER ---
@@ -301,6 +309,9 @@ class ClassLoggerApp {
 
     if (this.logCountTag) {
       this.logCountTag.textContent = `${filtered.length} session${filtered.length === 1 ? '' : 's'}`;
+    }
+    if (this.mobileHistoryBadge) {
+      this.mobileHistoryBadge.textContent = this.classes.length;
     }
 
     if (filtered.length === 0) {
@@ -687,6 +698,28 @@ class ClassLoggerApp {
     if (this.btnImportSeptember) {
       this.btnImportSeptember.addEventListener('click', () => this.handleOneClickSeptemberImport());
     }
+
+    // 10. Mobile Segmented Switcher tabs
+    if (this.mobileTabLog) {
+      this.mobileTabLog.addEventListener('click', () => this.switchMobileTab('log'));
+    }
+    if (this.mobileTabHistory) {
+      this.mobileTabHistory.addEventListener('click', () => this.switchMobileTab('history'));
+    }
+  }
+
+  switchMobileTab(tab) {
+    this.activeMobileTab = tab;
+    if (this.mobileTabLog && this.mobileTabHistory) {
+      this.mobileTabLog.classList.toggle('is-active', tab === 'log');
+      this.mobileTabHistory.classList.toggle('is-active', tab === 'history');
+    }
+    if (this.mainGrid) {
+      this.mainGrid.classList.remove('mobile-view-log', 'mobile-view-history');
+      this.mainGrid.classList.add(tab === 'log' ? 'mobile-view-log' : 'mobile-view-history');
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    sound.playTick(1.2);
   }
 
   updateSoundButtonUI() {
@@ -742,6 +775,7 @@ class ClassLoggerApp {
 
   startEditClass(item) {
     this.editingClassId = item.id;
+    this.switchMobileTab('log');
 
     // Load date into rotary picker
     if (this.rotaryPicker) {

@@ -2,9 +2,15 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>ClassLogger • Apple Clock Rotary Dial Class Tracker</title>
   <meta name="description" content="A sleek Apple Clock-style class logging tool with authentic 3D rotary drum dial picker, category management, and local database storage.">
+  <meta name="theme-color" content="#0a0a0c">
+  <meta name="color-scheme" content="dark">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="ClassLogger">
+  <link rel="apple-touch-icon" href="assets/app-icon.jpg">
   <link rel="icon" type="image/jpeg" href="assets/app-icon.jpg">
   <link rel="stylesheet" href="styles.css">
   <script type="importmap">
@@ -38,12 +44,13 @@
           <span id="db-status-text">Local DB: IndexedDB</span>
         </div>
 
-        <label class="quick-pill-btn primary" style="cursor: pointer; margin: 0; padding: 7px 14px; font-size: 0.8rem; display: flex; align-items: center; gap: 6px;" title="Import coach timesheet Excel spreadsheet (.xlsx)">
-          <span>📥 Import Excel (.xlsx)</span>
+        <label class="quick-pill-btn primary" style="cursor: pointer; margin: 0; display: inline-flex; align-items: center; gap: 5px;" title="Import coach timesheet Excel spreadsheet (.xlsx)">
+          <span class="desktop-only-text">📥 Import Excel (.xlsx)</span>
+          <span class="mobile-only-text">📥 Import</span>
           <input type="file" id="import-excel-btn" accept=".xlsx, .xls" style="display: none;">
         </label>
 
-        <button type="button" class="quick-pill-btn" id="btn-header-export" style="cursor: pointer; margin: 0; padding: 7px 14px; font-size: 0.8rem; display: flex; align-items: center; gap: 6px;" title="Export classes by category and date range">
+        <button type="button" class="quick-pill-btn" id="btn-header-export" style="cursor: pointer; margin: 0; display: inline-flex; align-items: center; gap: 5px;" title="Export classes by category and date range">
           <span>📤 Export</span>
         </button>
 
@@ -58,10 +65,21 @@
     </header>
 
 
+    <!-- Mobile Segmented View Switcher (Visible only on mobile screens) -->
+    <nav class="mobile-segmented-nav" id="mobile-nav-tabs" aria-label="Mobile Navigation">
+      <button type="button" class="mobile-nav-pill is-active" id="mobile-tab-log" data-tab="log">
+        <span>⏱️ Log Class</span>
+      </button>
+      <button type="button" class="mobile-nav-pill" id="mobile-tab-history" data-tab="history">
+        <span>📋 Class History</span>
+        <span class="mobile-nav-badge" id="mobile-history-badge">0</span>
+      </button>
+    </nav>
+
     <!-- Main Content Grid -->
     <main class="main-grid">
       <!-- Left Panel: Logging Form & Rotary Dial -->
-      <section class="panel-card" aria-label="Log Class Form">
+      <section class="panel-card panel-log-section" id="panel-log" aria-label="Log Class Form">
         <div class="panel-header">
           <h2 class="panel-title" id="form-heading">
             <span>⏱️</span> Log Class Session
@@ -181,7 +199,7 @@
       </section>
 
       <!-- Right Panel: Logged Classes History & Search -->
-      <section class="panel-card" aria-label="Logged Classes History">
+      <section class="panel-card panel-history-section" id="panel-history" aria-label="Logged Classes History">
         <div class="panel-header">
           <h2 class="panel-title">
             <span>📋</span> Class Log History
