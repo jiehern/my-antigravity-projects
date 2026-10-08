@@ -121,6 +121,7 @@ class ClassLoggerApp {
     this.btnExportCsv = document.getElementById('btn-export-csv');
     this.btnExportJson = document.getElementById('btn-export-json');
     this.importJsonInput = document.getElementById('import-json-input');
+    this.importJsonHeaderBtn = document.getElementById('import-json-header-btn');
     this.btnSeedSample = document.getElementById('btn-seed-sample');
     this.btnClearDb = document.getElementById('btn-clear-db');
 
@@ -946,22 +947,39 @@ class ClassLoggerApp {
       });
     }
 
+    // JSON Import Listeners
+    const jsonChangeHandler = (e) => {
+      const file = e.target.files[0];
+      if (file) this.handleJsonImport(file);
+      e.target.value = '';
+    };
+
     if (this.importJsonInput) {
-      this.importJsonInput.addEventListener('change', async (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-        try {
-          const text = await file.text();
-          const res = await db.importJSON(text);
-          await this.loadCategories();
-          await this.loadClasses();
-          this.closeModal(this.modalData);
-          this.showToast(`Restored ${res.count} sessions from backup!`, 'success');
-        } catch (err) {
-          this.showToast('Invalid backup file', 'danger');
-        }
-      });
+      this.importJsonInput.addEventListener('change', jsonChangeHandler);
     }
+    if (this.importJsonHeaderBtn) {
+      this.importJsonHeaderBtn.addEventListener('change', jsonChangeHandler);
+    }
+
+    // Drag & Drop File Import (JSON & XLSX)
+    window.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+    });
+
+    window.addEventListener('drop', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const files = e.dataTransfer?.files;
+      if (!files || files.length === 0) return;
+      const file = files[0];
+      const lower = file.name.toLowerCase();
+      if (lower.endsWith('.json')) {
+        this.handleJsonImport(file);
+      } else if (lower.endsWith('.xlsx') || lower.endsWith('.xls')) {
+        this.handleExcelImport(file);
+      }
+    });
 
     if (this.btnSeedSample) {
       this.btnSeedSample.addEventListener('click', async () => {
@@ -1483,6 +1501,26 @@ class ClassLoggerApp {
       this.renderAssistNamesList();
       this.showToast(`Removed "${deleted}" from saved list`, 'info');
       sound.playTick(0.9);
+    }
+  }
+
+  // --- JSON IMPORT ---
+
+  async handleJsonImport(file) {
+    if (!file) return;
+    this.showToast(`Reading "${file.name}"...`, 'info');
+    try {
+      const text = await file.text();
+      const res = await db.importJSON(text);
+      await this.loadCategories();
+      await this.loadClasses();
+      this.closeModal(this.modalData);
+      sound.playSuccess();
+      this.showToast(`Successfully imported ${res.count} class session${res.count === 1 ? '' : 's'} from JSON!`, 'success');
+    } catch (err) {
+      console.error('JSON import error:', err);
+      sound.playTrash();
+      this.showToast(`Import failed: ${err.message || 'Invalid JSON format'}`, 'danger');
     }
   }
 

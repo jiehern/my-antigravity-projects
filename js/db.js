@@ -146,6 +146,42 @@ class LocalDatabase {
     });
   }
 
+  async upsertClass(classItem) {
+    await this.init();
+    const id = classItem.id || 'cls_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7);
+    const item = {
+      ...classItem,
+      id,
+      createdAt: classItem.createdAt || new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+
+    if (!this.isIndexedDBAvailable || !this.db) {
+      const list = await this.getAllClasses();
+      const existingIdx = list.findIndex(c => c.id === id);
+      if (existingIdx !== -1) {
+        list[existingIdx] = item;
+      } else {
+        list.unshift(item);
+      }
+      localStorage.setItem('class_logger_classes', JSON.stringify(list));
+      return item;
+    }
+
+    return new Promise((resolve, reject) => {
+      try {
+        const tx = this.db.transaction(STORE_CLASSES, 'readwrite');
+        const store = tx.objectStore(STORE_CLASSES);
+        const request = store.put(item);
+
+        request.onsuccess = () => resolve(item);
+        request.onerror = () => reject(request.error);
+      } catch (err) {
+        reject(err);
+      }
+    });
+  }
+
   async updateClass(id, updatedFields) {
     await this.init();
     if (!this.isIndexedDBAvailable || !this.db) {
@@ -388,24 +424,99 @@ class LocalDatabase {
   async importJSON(jsonStr) {
     try {
       const data = typeof jsonStr === 'string' ? JSON.parse(jsonStr) : jsonStr;
-      if (!data || !Array.isArray(data.classes)) {
-        throw new Error('Invalid JSON format: missing classes list');
+      if (!data) {
+        throw new Error('Invalid JSON format: empty payload');
       }
 
-      for (const item of data.classes) {
-        if (!item.id) {
-          item.id = 'cls_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7);
+      // Extract array of classes from common structures:
+      // 1. data.classes (standard ClassLogger export format)
+      // 2. data directly is an Array
+      // 3. data.sessions or data.data
+      let classesList = null;
+      if (Array.isArray(data.classes)) {
+        classesList = data.classes;
+      } else if (Array.isArray(data)) {
+        classesList = data;
+      } else if (Array.isArray(data.sessions)) {
+        classesList = data.sessions;
+      } else if (Array.isArray(data.data)) {
+        classesList = data.data;
+      } else {
+        throw new Error('Invalid JSON format: missing "classes" array');
+      }
+
+      const existingCats = await this.getAllCategories();
+      const existingCatNames = new Set(existingCats.map(c => (c.name || '').toLowerCase()));
+
+      let importedCount = 0;
+      for (const raw of classesList) {
+        if (!raw || typeof raw !== 'object') continue;
+
+        // Auto-normalize fields
+        const date = String(raw.date || '').trim() || new Date().toISOString().split('T')[0];
+        const time = String(raw.time || '12:00').trim();
+        let displayTime = raw.displayTime;
+        if (!displayTime) {
+          const parts = time.split(':');
+          let h = parseInt(parts[0], 10) || 12;
+          const m = parseInt(parts[1], 10) || 0;
+          const period = h >= 12 ? 'PM' : 'AM';
+          let h12 = h % 12;
+          if (h12 === 0) h12 = 12;
+          displayTime = `${String(h12).padStart(2, '0')}:${String(m).padStart(2, '0')} ${period}`;
         }
-        await this.addClass(item);
+
+        let timestamp = raw.timestamp;
+        if (!timestamp) {
+          const [y, m, d] = date.split('-').map(Number);
+          const [hh, mm] = time.split(':').map(Number);
+          timestamp = new Date(y, (m || 1) - 1, d || 1, hh || 12, mm || 0).getTime();
+        }
+
+        const category = String(raw.category || 'Aerosplash').trim();
+        const duration = Number(raw.duration) || 60;
+        const note = String(raw.note || '').trim();
+
+        // Check and register missing category if needed
+        if (category && !existingCatNames.has(category.toLowerCase())) {
+          existingCatNames.add(category.toLowerCase());
+          const catId = raw.categoryId || `cat_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
+          await this.addCategory({
+            id: catId,
+            name: category,
+            color: '#0a84ff',
+            icon: '🏊'
+          });
+        }
+
+        const normalizedItem = {
+          ...raw,
+          id: raw.id || `cls_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
+          date,
+          time,
+          displayTime,
+          timestamp,
+          category,
+          duration,
+          note,
+          createdAt: raw.createdAt || new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        };
+
+        await this.upsertClass(normalizedItem);
+        importedCount++;
       }
 
+      // Also import categories array if included in JSON
       if (Array.isArray(data.categories)) {
         for (const cat of data.categories) {
-          await this.addCategory(cat);
+          if (cat && cat.name) {
+            await this.addCategory(cat);
+          }
         }
       }
 
-      return { success: true, count: data.classes.length };
+      return { success: true, count: importedCount };
     } catch (e) {
       console.error('Import failed:', e);
       throw e;

@@ -12,7 +12,7 @@
   <meta name="apple-mobile-web-app-title" content="ClassLogger">
   <link rel="apple-touch-icon" href="assets/app-icon.jpg">
   <link rel="icon" type="image/jpeg" href="assets/app-icon.jpg">
-  <link rel="stylesheet" href="styles.css?v=2.7">
+  <link rel="stylesheet" href="styles.css?v=2.8">
   <script type="importmap">
   {
     "imports": {
@@ -44,9 +44,17 @@
           <span id="db-status-text">Local DB: IndexedDB</span>
         </div>
 
+        <!-- Direct JSON File Import Button -->
+        <label class="quick-pill-btn" style="cursor: pointer; margin: 0; display: inline-flex; align-items: center; gap: 5px;" title="Import classes from .json file">
+          <span class="desktop-only-text">💾 Import JSON</span>
+          <span class="mobile-only-text">💾 JSON</span>
+          <input type="file" id="import-json-header-btn" accept=".json,application/json" style="display: none;">
+        </label>
+
+        <!-- Direct Excel File Import Button -->
         <label class="quick-pill-btn primary" style="cursor: pointer; margin: 0; display: inline-flex; align-items: center; gap: 5px;" title="Import coach timesheet Excel spreadsheet (.xlsx)">
           <span class="desktop-only-text">📥 Import Excel (.xlsx)</span>
-          <span class="mobile-only-text">📥 Import</span>
+          <span class="mobile-only-text">📥 Excel</span>
           <input type="file" id="import-excel-btn" accept=".xlsx, .xls" style="display: none;">
         </label>
 
@@ -356,9 +364,9 @@
           💾 Backup Full Database (JSON)
         </button>
         
-        <label class="submit-btn" style="background: var(--bg-surface-2); color: #fff; box-shadow: none; border: 1px solid var(--border-medium); cursor: pointer;">
-          📥 Restore from Backup (JSON)
-          <input type="file" id="import-json-input" accept=".json" style="display: none;">
+        <label class="submit-btn" style="background: rgba(10, 132, 255, 0.15); color: var(--apple-cyan); box-shadow: none; border: 1px solid rgba(10, 132, 255, 0.35); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;">
+          <span>💾</span> Import Classes (.json)
+          <input type="file" id="import-json-input" accept=".json,application/json" style="display: none;">
         </label>
 
         <label class="submit-btn" style="background: rgba(100, 210, 255, 0.15); color: var(--apple-cyan); box-shadow: none; border: 1px solid rgba(100, 210, 255, 0.35); cursor: pointer;">
@@ -522,6 +530,6 @@
   <div class="toast-container" id="toast-container" aria-live="polite"></div>
 
   <!-- Main JavaScript App -->
-  <script type="module" src="js/app.js?v=2.7"></script>
+  <script type="module" src="js/app.js?v=2.8"></script>
 </body>
 </html>
