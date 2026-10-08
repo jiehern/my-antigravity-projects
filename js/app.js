@@ -125,7 +125,6 @@ class ClassLoggerApp {
     // Excel import elements
     this.importExcelBtn = document.getElementById('import-excel-btn');
     this.importExcelModalInput = document.getElementById('import-excel-modal-input');
-    this.btnImportSeptember = document.getElementById('btn-import-september');
 
     this.modalDateJump = document.getElementById('modal-date-jump');
     this.btnCloseDateModal = document.getElementById('btn-close-date-modal');
@@ -1099,9 +1098,6 @@ class ClassLoggerApp {
     if (this.importExcelModalInput) {
       this.importExcelModalInput.addEventListener('change', excelChangeHandler);
     }
-    if (this.btnImportSeptember) {
-      this.btnImportSeptember.addEventListener('click', () => this.handleOneClickSeptemberImport());
-    }
 
     // 10. Mobile Segmented Switcher tabs
     if (this.mobileTabLog) {
@@ -1613,27 +1609,6 @@ class ClassLoggerApp {
     } catch (err) {
       console.error('Excel import error:', err);
       this.showToast(`Import error: ${err.message}`, 'danger');
-    }
-  }
-
-  async handleOneClickSeptemberImport() {
-    this.showToast('Fetching September 2026 timesheet...', 'info');
-    try {
-      let resp = await fetch('/JieHern_CoachTimesheet September2026.xlsx');
-      if (!resp.ok) {
-        resp = await fetch('/JieHern_CoachTimesheet%20September2026.xlsx');
-      }
-      if (!resp.ok) {
-        this.showToast('Could not find the September 2026 xlsx file', 'danger');
-        return;
-      }
-      const arrayBuffer = await resp.arrayBuffer();
-      const blob = new Blob([arrayBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-      const file = new File([blob], 'JieHern_CoachTimesheet September2026.xlsx');
-      await this.handleExcelImport(file);
-    } catch (err) {
-      console.error('One-click import error:', err);
-      this.showToast(`Failed to auto-import: ${err.message}`, 'danger');
     }
   }
 
