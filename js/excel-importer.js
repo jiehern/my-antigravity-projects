@@ -208,7 +208,9 @@ export class ExcelTimesheetImporter {
   }
 }
 
-import { exportCoachTimesheetXLSX } from './timesheet-template.js';
+import { exportCoachTimesheetXLSX, getClassCreditUnits, calculateManagerBonus } from './timesheet-template.js';
+
+export { getClassCreditUnits, calculateManagerBonus, exportCoachTimesheetXLSX };
 
 /**
  * ExcelTimesheetExporter - Generates authentic Coach Timesheet Excel (.xlsx) files

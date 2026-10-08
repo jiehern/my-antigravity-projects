@@ -2048,3 +2048,291 @@ body::after {
   }
 }
 
+/* ==========================================================================
+   Monthly Manager Bonus System & Card Units Badges
+   ========================================================================== */
+
+.card-top-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.card-units-badge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-secondary);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  display: inline-flex;
+  align-items: center;
+}
+
+.card-units-badge.is-precomp {
+  background: rgba(255, 159, 10, 0.15);
+  color: #ffb340;
+  border-color: rgba(255, 159, 10, 0.35);
+}
+
+.card-units-badge.is-lts {
+  background: rgba(100, 210, 255, 0.14);
+  color: #7ce0ff;
+  border-color: rgba(100, 210, 255, 0.3);
+}
+
+.monthly-bonus-card {
+  background: linear-gradient(145deg, rgba(28, 28, 34, 0.95) 0%, rgba(18, 18, 22, 0.98) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+  margin-bottom: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+  position: relative;
+  overflow: hidden;
+}
+
+.monthly-bonus-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #ff9f0a, #ffd60a, #30d158, #0a84ff);
+  opacity: 0.85;
+}
+
+.bonus-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  gap: 10px;
+}
+
+.bonus-card-title-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.bonus-trophy-icon {
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.bonus-card-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+}
+
+.bonus-card-period {
+  font-size: 0.72rem;
+  color: var(--text-tertiary);
+  margin-top: 1px;
+}
+
+.bonus-tier-badge {
+  font-size: 0.74rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+
+.bonus-tier-badge.tier-1 {
+  background: rgba(10, 132, 255, 0.18);
+  color: #64d2ff;
+  border-color: rgba(10, 132, 255, 0.4);
+}
+
+.bonus-tier-badge.tier-2 {
+  background: rgba(191, 90, 242, 0.18);
+  color: #d48aff;
+  border-color: rgba(191, 90, 242, 0.4);
+}
+
+.bonus-tier-badge.tier-3 {
+  background: rgba(255, 159, 10, 0.18);
+  color: #ffb340;
+  border-color: rgba(255, 159, 10, 0.45);
+}
+
+.bonus-tier-badge.tier-4 {
+  background: rgba(255, 214, 10, 0.2);
+  color: #ffe04d;
+  border-color: rgba(255, 214, 10, 0.5);
+  box-shadow: 0 0 12px rgba(255, 214, 10, 0.2);
+}
+
+.bonus-tier-badge.no-tier {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-tertiary);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.bonus-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.bonus-stat-box {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.bonus-stat-box.stat-box-total {
+  background: rgba(255, 159, 10, 0.08);
+  border-color: rgba(255, 159, 10, 0.25);
+}
+
+.stat-box-label {
+  font-size: 0.68rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-tertiary);
+}
+
+.stat-box-val {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+}
+
+.stat-val-units {
+  color: var(--apple-cyan);
+}
+
+.stat-unit-sub {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-tertiary);
+}
+
+.stat-val-base {
+  color: var(--text-primary);
+}
+
+.stat-val-bonus {
+  color: var(--apple-green);
+}
+
+.stat-val-payout {
+  color: var(--apple-orange);
+}
+
+.bonus-progress-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.bonus-progress-track {
+  position: relative;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  margin: 18px 0 24px 0;
+}
+
+.bonus-progress-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #ff9f0a 0%, #30d158 70%, #ffd60a 100%);
+  box-shadow: 0 0 10px rgba(255, 159, 10, 0.4);
+  transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  min-width: 4px;
+}
+
+.bonus-milestone {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  pointer-events: none;
+}
+
+.milestone-tick {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--bg-surface-1);
+  border: 2px solid rgba(255, 255, 255, 0.25);
+  transition: all 0.25s ease;
+}
+
+.bonus-milestone.is-active .milestone-tick {
+  background: #30d158;
+  border-color: #ffffff;
+  box-shadow: 0 0 8px rgba(48, 209, 88, 0.6);
+}
+
+.milestone-tag {
+  position: absolute;
+  top: 14px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  white-space: nowrap;
+  color: var(--text-tertiary);
+  transition: color 0.25s ease;
+}
+
+.bonus-milestone.is-active .milestone-tag {
+  color: #30d158;
+}
+
+.bonus-footer-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding-top: 4px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.bonus-next-goal {
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: var(--apple-cyan);
+}
+
+.bonus-unit-formula {
+  font-size: 0.7rem;
+  color: var(--text-tertiary);
+}
+
+/* Mobile responsive layout for bonus card */
+@media (max-width: 640px) {
+  .bonus-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .bonus-footer-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+

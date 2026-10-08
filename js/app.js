@@ -6,7 +6,7 @@
 import { db, DEFAULT_CATEGORIES } from './db.js';
 import { RotaryDialPicker } from './rotary-picker.js';
 import { sound } from './audio.js';
-import { ExcelTimesheetImporter, ExcelTimesheetExporter } from './excel-importer.js';
+import { ExcelTimesheetImporter, ExcelTimesheetExporter, getClassCreditUnits, calculateManagerBonus } from './excel-importer.js';
 
 class ClassLoggerApp {
   constructor() {
@@ -151,6 +151,8 @@ class ClassLoggerApp {
     this.exportFeesLabel = document.getElementById('export-fees-label');
     this.exportCalcTotalClasses = document.getElementById('export-calc-total-classes');
     this.exportCalcRate = document.getElementById('export-calc-rate');
+    this.exportCalcBaseFees = document.getElementById('export-calc-base-fees');
+    this.exportCalcBonus = document.getElementById('export-calc-bonus');
     this.exportCalcTotalFees = document.getElementById('export-calc-total-fees');
 
     this.btnExportFilteredXlsx = document.getElementById('btn-export-filtered-xlsx');
@@ -158,6 +160,7 @@ class ClassLoggerApp {
     this.btnExportFilteredJson = document.getElementById('btn-export-filtered-json');
 
     this.toastContainer = document.getElementById('toast-container');
+    this.monthlyBonusCard = document.getElementById('monthly-bonus-card');
 
     // Mobile Navigation & Viewport elements
     this.mobileNavTabs = document.getElementById('mobile-nav-tabs');
@@ -338,6 +341,9 @@ class ClassLoggerApp {
       this.mobileHistoryBadge.textContent = this.classes.length;
     }
 
+    // Update the live Monthly Manager Bonus tracker card
+    this.renderMonthlyBonusCard(filtered);
+
     if (filtered.length === 0) {
       this.classesList.innerHTML = `
         <div class="empty-state">
@@ -380,6 +386,13 @@ class ClassLoggerApp {
       today.setHours(0,0,0,0);
       const isToday = (today.getTime() === itemDate.getTime());
 
+      // Calculate units and display fee (LTS 50m = 1.0 unit / RM40; Pre Comp 90m = 1.5 units / RM60)
+      const units = getClassCreditUnits(item);
+      const isPreComp = (units === 1.5);
+      const isLts = (units === 1.0 && (item.duration === 50 || (item.note && item.note.toLowerCase().includes('lts'))));
+      const unitBadgeLabel = isPreComp ? '1.5 class • RM60' : isLts ? '1.0 class • RM40' : `${units.toFixed(1)} class • RM${(units * 40).toFixed(0)}`;
+      const unitBadgeClass = isPreComp ? 'is-precomp' : isLts ? 'is-lts' : '';
+
       const card = document.createElement('article');
       card.className = 'class-log-card';
       card.style.setProperty('--card-accent', catObj.color);
@@ -390,9 +403,12 @@ class ClassLoggerApp {
             <span>${catObj.icon}</span>
             <span>${item.category}</span>
           </div>
-          <div class="card-date-group">
-            ${isToday ? '<span class="card-relative-badge is-today">Today</span>' : ''}
-            <span>${formattedDate}</span>
+          <div class="card-top-meta">
+            <span class="card-units-badge ${unitBadgeClass}">${unitBadgeLabel}</span>
+            <div class="card-date-group">
+              ${isToday ? '<span class="card-relative-badge is-today">Today</span>' : ''}
+              <span>${formattedDate}</span>
+            </div>
           </div>
         </div>
 
@@ -427,6 +443,151 @@ class ClassLoggerApp {
 
       this.classesList.appendChild(card);
     });
+  }
+
+  // --- MONTHLY MANAGER BONUS CARD ---
+
+  renderMonthlyBonusCard(classesToSummarize = this.classes) {
+    if (!this.monthlyBonusCard) return;
+
+    const list = Array.isArray(classesToSummarize) ? classesToSummarize : this.classes;
+    const totalSessions = list.length;
+    const totalUnits = list.reduce((sum, c) => sum + getClassCreditUnits(c), 0);
+    const ratePerClass = 40.0;
+    const baseEarnings = totalUnits * ratePerClass;
+    const bonusInfo = calculateManagerBonus(totalUnits);
+    const totalPayout = baseEarnings + bonusInfo.bonus;
+
+    let periodLabel = 'This Month';
+    if (this.activeFilter === 'all' && !this.searchQuery) {
+      if (list.length > 0 && list[0].date) {
+        const [y, m] = list[0].date.split('-').map(Number);
+        const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+        periodLabel = `${monthNames[m - 1] || 'Current Month'} ${y || 2026}`;
+      } else {
+        const now = new Date();
+        periodLabel = now.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+      }
+    } else if (this.activeFilter !== 'all') {
+      const cat = this.categories.find(c => c.id === this.activeFilter);
+      periodLabel = cat ? cat.name : 'Filtered View';
+    } else if (this.searchQuery) {
+      periodLabel = 'Search Results';
+    }
+
+    // Milestones progress calculation (scale 0 to 50 max)
+    const progressPct = Math.min(100, Math.max(0, (totalUnits / 50) * 100));
+
+    // Next goal description
+    let nextGoalText = '';
+    if (totalUnits >= 50) {
+      nextGoalText = '🎉 Maximum Tier 4 Reached! (RM350 Bonus)';
+    } else if (totalUnits >= 40) {
+      nextGoalText = `🎯 ${bonusInfo.needed} more hrs/units to reach Tier 4 (RM350 Bonus)`;
+    } else if (totalUnits >= 30) {
+      nextGoalText = `🎯 ${bonusInfo.needed} more hrs/units to reach Tier 3 (RM250 Bonus)`;
+    } else if (totalUnits >= 24) {
+      nextGoalText = `🎯 ${bonusInfo.needed} more hrs/units to reach Tier 2 (RM150 Bonus)`;
+    } else {
+      nextGoalText = `🎯 ${bonusInfo.needed} more hrs/units to unlock Tier 1 (RM100 Bonus)`;
+    }
+
+    let tierBadgeHtml = '';
+    if (bonusInfo.tier > 0) {
+      tierBadgeHtml = `<span class="bonus-tier-badge tier-${bonusInfo.tier}">⭐ ${bonusInfo.tierName}: +RM${bonusInfo.bonus}</span>`;
+    } else {
+      tierBadgeHtml = `<span class="bonus-tier-badge no-tier">Below 24 hrs</span>`;
+    }
+
+    this.monthlyBonusCard.innerHTML = `
+      <div class="bonus-card-top">
+        <div class="bonus-card-title-group">
+          <span class="bonus-trophy-icon">🏆</span>
+          <div>
+            <div class="bonus-card-title">Monthly Earnings & Manager Bonus</div>
+            <div class="bonus-card-period">${this.escapeHTML(periodLabel)} • ${totalSessions} class${totalSessions === 1 ? '' : 'es'}</div>
+          </div>
+        </div>
+        ${tierBadgeHtml}
+      </div>
+
+      <div class="bonus-stats-grid">
+        <div class="bonus-stat-box">
+          <span class="stat-box-label">Class Units</span>
+          <strong class="stat-box-val stat-val-units">${totalUnits.toFixed(1)} <span class="stat-unit-sub">hrs</span></strong>
+        </div>
+        <div class="bonus-stat-box">
+          <span class="stat-box-label">Base Rate (RM40)</span>
+          <strong class="stat-box-val stat-val-base">RM ${baseEarnings.toFixed(0)}</strong>
+        </div>
+        <div class="bonus-stat-box">
+          <span class="stat-box-label">Manager Bonus</span>
+          <strong class="stat-box-val stat-val-bonus">${bonusInfo.bonus > 0 ? '+RM ' + bonusInfo.bonus : 'RM 0'}</strong>
+        </div>
+        <div class="bonus-stat-box stat-box-total">
+          <span class="stat-box-label">Total Payout</span>
+          <strong class="stat-box-val stat-val-payout">RM ${totalPayout.toFixed(0)}</strong>
+        </div>
+      </div>
+
+      <div class="bonus-progress-wrap">
+        <div class="bonus-progress-track">
+          <div class="bonus-progress-fill" style="width: ${progressPct}%;"></div>
+          <!-- Milestone markers -->
+          <div class="bonus-milestone mark-24 ${totalUnits >= 24 ? 'is-active' : ''}" style="left: 48%;" title="24 hrs: RM100">
+            <span class="milestone-tick"></span>
+            <span class="milestone-tag">24h • RM100</span>
+          </div>
+          <div class="bonus-milestone mark-30 ${totalUnits >= 30 ? 'is-active' : ''}" style="left: 60%;" title="30 hrs: RM150">
+            <span class="milestone-tick"></span>
+            <span class="milestone-tag">30h • RM150</span>
+          </div>
+          <div class="bonus-milestone mark-40 ${totalUnits >= 40 ? 'is-active' : ''}" style="left: 80%;" title="40 hrs: RM250">
+            <span class="milestone-tick"></span>
+            <span class="milestone-tag">40h • RM250</span>
+          </div>
+          <div class="bonus-milestone mark-50 ${totalUnits >= 50 ? 'is-active' : ''}" style="left: 100%;" title="50 hrs: RM350">
+            <span class="milestone-tick"></span>
+            <span class="milestone-tag">50h • RM350</span>
+          </div>
+        </div>
+        <div class="bonus-footer-row">
+          <span class="bonus-next-goal">${nextGoalText}</span>
+          <span class="bonus-unit-formula">LTS (50m) = 1.0 unit (RM40) • Pre Comp (90m) = 1.5 units (RM60)</span>
+        </div>
+      </div>
+    `;
+  }
+
+  // --- DURATION HELPER ---
+
+  setDuration(mins) {
+    const parsed = parseInt(mins, 10);
+    if (!parsed || parsed <= 0) return;
+    this.selectedDuration = parsed;
+
+    if (this.durationLabel) {
+      this.durationLabel.textContent = `${parsed} mins`;
+    }
+
+    if (this.durationContainer) {
+      let matched = false;
+      this.durationContainer.querySelectorAll('.duration-pill').forEach(pill => {
+        const isMatch = parseInt(pill.dataset.mins, 10) === parsed;
+        pill.classList.toggle('is-active', isMatch);
+        if (isMatch) matched = true;
+      });
+
+      const customPill = this.durationContainer.querySelector('[data-mins="custom"]');
+      if (!matched) {
+        if (customPill) customPill.classList.add('is-active');
+        if (this.customDurationWrapper) this.customDurationWrapper.style.display = 'flex';
+        if (this.customDurationInput) this.customDurationInput.value = parsed;
+      } else {
+        if (customPill) customPill.classList.remove('is-active');
+        if (this.customDurationWrapper) this.customDurationWrapper.style.display = 'none';
+      }
+    }
   }
 
   // --- ATTACH EVENT LISTENERS ---
@@ -1253,6 +1414,13 @@ class ClassLoggerApp {
       }
     }
 
+    // Auto-align duration based on class note: LTS -> 50m; Pre Comp -> 90m (1h30m)
+    if (newType === 'LTS' || newType.startsWith('LTS ') || newType.startsWith('LTS -')) {
+      this.setDuration(50);
+    } else if (newType === 'Pre Comp' || newType.startsWith('Pre Comp ') || newType.startsWith('Pre Comp -')) {
+      this.setDuration(90);
+    }
+
     this.updateNoteChipsActiveState();
     this.renderAssistNamesList();
     this.notesInput.focus();
@@ -1517,18 +1685,27 @@ class ClassLoggerApp {
       this.exportPreviewRange.textContent = `${catLabel} • ${dateLabel}`;
     }
 
-    // Live Billing & Fee Calculations
+    // Live Billing & Fee Calculations with Units and Manager Bonus
+    const totalUnits = classes.reduce((sum, c) => sum + getClassCreditUnits(c), 0);
     const rateVal = this.exportRatePerClass ? (parseFloat(this.exportRatePerClass.value) || 0) : 40.0;
-    const totalFees = count * rateVal;
+    const baseFees = totalUnits * rateVal;
+    const bonusInfo = calculateManagerBonus(totalUnits);
+    const grandTotal = baseFees + bonusInfo.bonus;
 
     if (this.exportCalcTotalClasses) {
-      this.exportCalcTotalClasses.textContent = `${count} class${count === 1 ? '' : 'es'}`;
+      this.exportCalcTotalClasses.textContent = `${totalUnits.toFixed(1)} units (${count} class${count === 1 ? '' : 'es'})`;
     }
     if (this.exportCalcRate) {
       this.exportCalcRate.textContent = `RM ${rateVal.toFixed(1)}`;
     }
+    if (this.exportCalcBaseFees) {
+      this.exportCalcBaseFees.textContent = `RM ${baseFees.toFixed(2)}`;
+    }
+    if (this.exportCalcBonus) {
+      this.exportCalcBonus.textContent = bonusInfo.bonus > 0 ? `+RM ${bonusInfo.bonus.toFixed(2)} (${bonusInfo.tierName})` : `RM 0.00`;
+    }
     if (this.exportCalcTotalFees) {
-      this.exportCalcTotalFees.textContent = `RM ${totalFees.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+      this.exportCalcTotalFees.textContent = `RM ${grandTotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
     }
 
     // Auto-suggest month and year for fees label placeholder if not manually edited
@@ -1592,11 +1769,13 @@ class ClassLoggerApp {
       return;
     }
 
-    const headers = ['Date', 'Day', 'Time', 'Category', 'Duration (mins)', 'Duration (hrs)', 'Notes / Remarks', 'Session ID'];
+    const headers = ['Date', 'Day', 'Time', 'Category', 'Duration (mins)', 'Duration (hrs)', 'Credit Units', 'Fee (RM)', 'Notes / Remarks', 'Session ID'];
     const rows = classes.map(c => {
       const d = new Date(c.date + 'T00:00:00');
       const dayOfWeek = isNaN(d.getTime()) ? '' : d.toLocaleDateString('en-US', { weekday: 'short' });
       const hours = c.duration ? (c.duration / 60).toFixed(2) : '1.00';
+      const units = getClassCreditUnits(c);
+      const fee = (units * 40).toFixed(2);
       return [
         `"${c.date}"`,
         `"${dayOfWeek}"`,
@@ -1604,6 +1783,8 @@ class ClassLoggerApp {
         `"${(c.category || '').replace(/"/g, '""')}"`,
         c.duration || 60,
         hours,
+        units.toFixed(1),
+        fee,
         `"${(c.note || '').replace(/"/g, '""')}"`,
         `"${c.id}"`
       ];

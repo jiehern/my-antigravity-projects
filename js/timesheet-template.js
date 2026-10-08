@@ -159,6 +159,101 @@ export function createZipBlob(filesMap) {
 }
 
 /**
+ * Calculate the class credit units / hours for a session:
+ * - Pre Comp classes (or 90m / 1.5h): 1.5 units (= RM60 at RM40 rate)
+ * - LTS classes (50m): 1.0 unit (= RM40 at RM40 rate)
+ * - 60m: 1.0 unit
+ * - 120m: 2.0 units
+ * - 30m: 0.5 units
+ * - 45m: 0.75 units
+ * - 75m: 1.25 units
+ * - General: duration / 60
+ */
+export function getClassCreditUnits(c) {
+  if (!c) return 1.0;
+  const note = (c.note || '').toLowerCase();
+  const cat = (c.category || '').toLowerCase();
+  const dur = Number(c.duration) || 60;
+
+  if (note.includes('pre comp') || note.includes('precomp') || cat.includes('pre comp') || cat.includes('precomp') || dur === 90) {
+    return 1.5;
+  }
+  if (note.includes('lts') || dur === 50) {
+    return 1.0;
+  }
+  if (dur === 120) return 2.0;
+  if (dur === 30) return 0.5;
+  if (dur === 45) return 0.75;
+  if (dur === 75) return 1.25;
+  if (dur === 60) return 1.0;
+  return Math.round((dur / 60) * 10) / 10;
+}
+
+/**
+ * Manager Bonus System:
+ * 24 hrs or class → RM100
+ * 30 hrs or class → RM150
+ * 40 hrs or class → RM250
+ * 50 hrs or class → RM350
+ */
+export function calculateManagerBonus(totalUnits) {
+  const units = Number(totalUnits) || 0;
+  if (units >= 50) {
+    return {
+      bonus: 350,
+      tier: 4,
+      threshold: 50,
+      nextThreshold: null,
+      needed: 0,
+      label: '≥ 50 hrs tier (RM350 max)',
+      tierName: 'Tier 4'
+    };
+  }
+  if (units >= 40) {
+    return {
+      bonus: 250,
+      tier: 3,
+      threshold: 40,
+      nextThreshold: 50,
+      needed: Math.round((50 - units) * 10) / 10,
+      label: '≥ 40 hrs tier (RM250)',
+      tierName: 'Tier 3'
+    };
+  }
+  if (units >= 30) {
+    return {
+      bonus: 150,
+      tier: 2,
+      threshold: 30,
+      nextThreshold: 40,
+      needed: Math.round((40 - units) * 10) / 10,
+      label: '≥ 30 hrs tier (RM150)',
+      tierName: 'Tier 2'
+    };
+  }
+  if (units >= 24) {
+    return {
+      bonus: 100,
+      tier: 1,
+      threshold: 24,
+      nextThreshold: 30,
+      needed: Math.round((30 - units) * 10) / 10,
+      label: '≥ 24 hrs tier (RM100)',
+      tierName: 'Tier 1'
+    };
+  }
+  return {
+    bonus: 0,
+    tier: 0,
+    threshold: 0,
+    nextThreshold: 24,
+    needed: Math.round((24 - units) * 10) / 10,
+    label: 'Below tier threshold (< 24 hrs)',
+    tierName: 'No Tier'
+  };
+}
+
+/**
  * Generate 100% Authentic Coach Timesheet .xlsx
  */
 export function exportCoachTimesheetXLSX(classes, options = {}) {
@@ -264,13 +359,17 @@ export function exportCoachTimesheetXLSX(classes, options = {}) {
     }
     const descIdx = getStrIdx(desc);
 
+    // 5. Total Class Credit Units (LTS 50m = 1.0, Pre Comp 90m = 1.5)
+    const units = getClassCreditUnits(c);
+    const unitsStr = units.toFixed(1);
+
     let rowXml = `<row r="${r}" ht="14.25" customHeight="1">`;
     rowXml += `<c r="A${r}" s="7"><v>${serial}.0</v></c>`;
     rowXml += `<c r="B${r}" s="2"><f>TEXT(A${r}, &quot;ddd&quot;)</f><v>${dayStr}</v></c>`;
     rowXml += `<c r="C${r}" s="8"><v>${timeFraction}</v></c>`;
     rowXml += `<c r="D${r}" s="14" t="s"><v>${durIdx}</v></c>`;
     rowXml += `<c r="E${r}" s="15" t="s"><v>${descIdx}</v></c>`;
-    rowXml += `<c r="F${r}" s="16"><v>1.0</v></c>`;
+    rowXml += `<c r="F${r}" s="16"><v>${unitsStr}</v></c>`;
 
     if (remarks) {
       const remIdx = getStrIdx(remarks);
@@ -284,6 +383,8 @@ export function exportCoachTimesheetXLSX(classes, options = {}) {
   });
 
   const count = sortedClasses.length;
+  const totalUnits = sortedClasses.reduce((sum, c) => sum + getClassCreditUnits(c), 0);
+  const totalUnitsStr = totalUnits.toFixed(1);
 
   // The template table has a standard 29-row grid (rows 5 to 33)
   // If count < 29, pad empty rows up to row 33 so Total Row is row 34, exactly matching reference sheet
@@ -310,7 +411,7 @@ export function exportCoachTimesheetXLSX(classes, options = {}) {
     `<c r="C${totalRow}" s="11"/>` +
     `<c r="D${totalRow}" s="9"/>` +
     `<c r="E${totalRow}" s="21"/>` +
-    `<c r="F${totalRow}" s="5"><f>${sumFormula}</f><v>${count}</v></c>` +
+    `<c r="F${totalRow}" s="5"><f>${sumFormula}</f><v>${totalUnitsStr}</v></c>` +
     `<c r="G${totalRow}" s="10"/>` +
     `</row>`
   );
@@ -332,17 +433,31 @@ export function exportCoachTimesheetXLSX(classes, options = {}) {
   // Row totalRow + 4 (Row 38 when count <= 29): "Total class :" and formula =F{totalRow} (=F34)
   const rTotal = totalRow + 4;
   const idxTotal = getStrIdx('Total class :');
-  rowsXml.push(`<row r="${rTotal}" ht="14.25" customHeight="1"><c r="A${rTotal}" s="1" t="s"><v>${idxTotal}</v></c><c r="C${rTotal}" s="4"><f>F${totalRow}</f><v>${count}</v></c><c r="D${rTotal}" s="3"/><c r="F${rTotal}" s="4"/></row>`);
+  rowsXml.push(`<row r="${rTotal}" ht="14.25" customHeight="1"><c r="A${rTotal}" s="1" t="s"><v>${idxTotal}</v></c><c r="C${rTotal}" s="4"><f>F${totalRow}</f><v>${totalUnitsStr}</v></c><c r="D${rTotal}" s="3"/><c r="F${rTotal}" s="4"/></row>`);
 
-  // Row totalRow + 5 (Row 39 when count <= 29): Fees label and formula =C{rRate}*C{rTotal} (=C37*C38)
+  // Row totalRow + 5 (Row 39 when count <= 29): Base fees label and formula =C{rRate}*C{rTotal} (=C37*C38)
   const rFees = totalRow + 5;
-  const feesLabel = options.feesLabel || (detectedMonth && detectedYear ? `${detectedMonth} ${detectedYear} fees :` : 'September 2026 fees :');
+  const feesLabel = options.feesLabel || (detectedMonth && detectedYear ? `${detectedMonth} ${detectedYear} base fees :` : 'Base fees :');
   const idxFees = getStrIdx(feesLabel);
-  const totalFees = count * ratePerClass;
-  rowsXml.push(`<row r="${rFees}" ht="14.25" customHeight="1"><c r="A${rFees}" s="1" t="s"><v>${idxFees}</v></c><c r="C${rFees}" s="23"><f>C${rRate}*C${rTotal}</f><v>${totalFees}</v></c><c r="D${rFees}" s="3"/><c r="F${rFees}" s="4"/></row>`);
+  const baseFees = totalUnits * ratePerClass;
+  rowsXml.push(`<row r="${rFees}" ht="14.25" customHeight="1"><c r="A${rFees}" s="1" t="s"><v>${idxFees}</v></c><c r="C${rFees}" s="4"><f>C${rRate}*C${rTotal}</f><v>${baseFees.toFixed(2)}</v></c><c r="D${rFees}" s="3"/><c r="F${rFees}" s="4"/></row>`);
 
-  // Rows 40-45: Spacer trailing rows matching template
-  for (let r = rFees + 1; r <= rFees + 6; r++) {
+  // Row totalRow + 6 (Row 40 when count <= 29): Manager bonus row with nested IF formula
+  const rBonus = totalRow + 6;
+  const idxBonus = getStrIdx('Manager bonus :');
+  const bonusInfo = calculateManagerBonus(totalUnits);
+  const bonusAmount = bonusInfo.bonus;
+  const bonusFormula = `IF(C${rTotal}>=50,350,IF(C${rTotal}>=40,250,IF(C${rTotal}>=30,150,IF(C${rTotal}>=24,100,0))))`;
+  rowsXml.push(`<row r="${rBonus}" ht="14.25" customHeight="1"><c r="A${rBonus}" s="1" t="s"><v>${idxBonus}</v></c><c r="C${rBonus}" s="4"><f>${bonusFormula}</f><v>${bonusAmount.toFixed(2)}</v></c><c r="D${rBonus}" s="3"/><c r="F${rBonus}" s="4"/></row>`);
+
+  // Row totalRow + 7 (Row 41 when count <= 29): "Total fees to be paid :" with formula =C{rFees}+C{rBonus} (style 23 double underline)
+  const rGrandTotal = totalRow + 7;
+  const idxGrandTotal = getStrIdx('Total fees to be paid :');
+  const grandTotal = baseFees + bonusAmount;
+  rowsXml.push(`<row r="${rGrandTotal}" ht="14.25" customHeight="1"><c r="A${rGrandTotal}" s="1" t="s"><v>${idxGrandTotal}</v></c><c r="C${rGrandTotal}" s="23"><f>C${rFees}+C${rBonus}</f><v>${grandTotal.toFixed(2)}</v></c><c r="D${rGrandTotal}" s="3"/><c r="F${rGrandTotal}" s="4"/></row>`);
+
+  // Rows trailing spacer rows matching template
+  for (let r = rGrandTotal + 1; r <= rGrandTotal + 6; r++) {
     rowsXml.push(`<row r="${r}" ht="14.25" customHeight="1"><c r="C${r}" s="4"/><c r="D${r}" s="3"/><c r="F${r}" s="4"/></row>`);
   }
 
