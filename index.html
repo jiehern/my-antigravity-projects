@@ -12,7 +12,7 @@
   <meta name="apple-mobile-web-app-title" content="AeroSplash">
   <link rel="apple-touch-icon" href="assets/app-icon.png">
   <link rel="icon" type="image/png" href="assets/app-icon.png">
-  <link rel="stylesheet" href="styles.css?v=3.1">
+  <link rel="stylesheet" href="styles.css?v=3.2">
   <script type="importmap">
   {
     "imports": {
@@ -469,10 +469,10 @@
           </div>
           <div class="preview-range-text" id="export-preview-range">Showing all recorded dates</div>
 
-          <div class="export-billing-summary" id="export-billing-summary" style="margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255, 255, 255, 0.08); display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; font-size: 0.76rem;">
+          <div class="export-billing-summary" id="export-billing-summary" style="margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border-subtle); display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; font-size: 0.76rem;">
             <div>
               <span style="color: var(--text-tertiary); display: block;">Total Class Units</span>
-              <strong id="export-calc-total-classes" style="color: #fff; font-size: 0.92rem;">0</strong>
+              <strong id="export-calc-total-classes" style="color: var(--text-primary); font-size: 0.92rem;">0</strong>
             </div>
             <div>
               <span style="color: var(--text-tertiary); display: block;">Base Rate</span>
@@ -488,7 +488,7 @@
             </div>
             <div style="grid-column: span 2;">
               <span style="color: var(--text-tertiary); display: block;">Total Fees to be Paid</span>
-              <strong id="export-calc-total-fees" style="color: var(--apple-orange); font-size: 1.05rem;">RM 0.00</strong>
+              <strong id="export-calc-total-fees" style="color: var(--accent-color); font-size: 1.05rem;">RM 0.00</strong>
             </div>
           </div>
         </div>
@@ -532,6 +532,6 @@
   <div class="toast-container" id="toast-container" aria-live="polite"></div>
 
   <!-- Main JavaScript App -->
-  <script type="module" src="js/app.js?v=3.1"></script>
+  <script type="module" src="js/app.js?v=3.2"></script>
 </body>
 </html>
