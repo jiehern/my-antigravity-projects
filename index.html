@@ -12,7 +12,7 @@
   <meta name="apple-mobile-web-app-title" content="ClassLogger">
   <link rel="apple-touch-icon" href="assets/app-icon.jpg">
   <link rel="icon" type="image/jpeg" href="assets/app-icon.jpg">
-  <link rel="stylesheet" href="styles.css?v=2.4">
+  <link rel="stylesheet" href="styles.css?v=2.5">
   <script type="importmap">
   {
     "imports": {
@@ -193,15 +193,37 @@
               <textarea 
                 id="class-notes-input" 
                 class="note-textarea" 
-                placeholder="What did you focus on today? (e.g., Laps completed, coach feedback, personal records, techniques...)"
+                placeholder="e.g. LTS, Pre Comp, Assist Coach Allen..."
               ></textarea>
 
               <div class="quick-note-tags" id="quick-note-tags">
-                <button type="button" class="note-tag-chip" data-tag="🏊 Form & Technique Drills">🏊 Form Drills</button>
-                <button type="button" class="note-tag-chip" data-tag="💪 High Intensity Intervals">💪 High Intensity</button>
-                <button type="button" class="note-tag-chip" data-tag="🎯 Personal Best Record">🎯 Personal Best</button>
-                <button type="button" class="note-tag-chip" data-tag="🥊 Sparring & Combos">🥊 Sparring</button>
-                <button type="button" class="note-tag-chip" data-tag="🧘 Recovery & Stretching">🧘 Recovery</button>
+                <button type="button" class="note-tag-chip" data-note-val="LTS">LTS</button>
+                <button type="button" class="note-tag-chip" data-note-val="Pre Comp">Pre Comp</button>
+                <div class="assist-dropdown-container" id="assist-dropdown-container">
+                  <button type="button" class="note-tag-chip assist-chip-btn" id="btn-assist-dropdown-toggle" aria-haspopup="true" aria-expanded="false">
+                    <span>Assist</span>
+                    <span class="assist-caret">▾</span>
+                  </button>
+                  <div class="assist-dropdown-menu" id="assist-dropdown-menu" style="display: none;">
+                    <div class="assist-dropdown-header">
+                      <span>Select or Add Coach</span>
+                    </div>
+                    <div class="assist-names-list" id="assist-names-list">
+                      <!-- Rendered by JS -->
+                    </div>
+                    <div class="assist-add-box">
+                      <input 
+                        type="text" 
+                        id="input-new-assist-name" 
+                        class="assist-name-input" 
+                        placeholder="Add name (e.g. Coach Brian)" 
+                        maxlength="40"
+                        autocomplete="off"
+                      />
+                      <button type="button" class="assist-add-btn" id="btn-add-assist-name">+ Add</button>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -472,6 +494,6 @@
   <div class="toast-container" id="toast-container" aria-live="polite"></div>
 
   <!-- Main JavaScript App -->
-  <script type="module" src="js/app.js?v=2.4"></script>
+  <script type="module" src="js/app.js?v=2.5"></script>
 </body>
 </html>

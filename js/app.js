@@ -32,6 +32,8 @@ class ClassLoggerApp {
     // 2. Attach UI event listeners immediately so ALL buttons work right away
     this.attachEventListeners();
     this.updateSoundButtonUI();
+    this.renderAssistNamesList();
+    this.updateNoteChipsActiveState();
 
     // 3. Initialize Rotary Dial Picker
     const mountEl = document.getElementById('rotary-picker-mount');
@@ -78,6 +80,12 @@ class ClassLoggerApp {
     this.btnApplyCustomDuration = document.getElementById('btn-apply-custom-duration');
     this.notesInput = document.getElementById('class-notes-input');
     this.quickTagsContainer = document.getElementById('quick-note-tags');
+    this.assistDropdownContainer = document.getElementById('assist-dropdown-container');
+    this.btnAssistDropdownToggle = document.getElementById('btn-assist-dropdown-toggle');
+    this.assistDropdownMenu = document.getElementById('assist-dropdown-menu');
+    this.assistNamesList = document.getElementById('assist-names-list');
+    this.inputNewAssistName = document.getElementById('input-new-assist-name');
+    this.btnAddAssistName = document.getElementById('btn-add-assist-name');
     this.btnSubmit = document.getElementById('btn-submit-class');
     this.btnSubmitText = document.getElementById('btn-submit-text');
     this.btnCancelEdit = document.getElementById('btn-cancel-edit');
@@ -471,20 +479,86 @@ class ClassLoggerApp {
       });
     }
 
-    // 2. Quick Note Tags
+    // 2. Note Options (LTS, Pre Comp, Assist dropdown)
     if (this.quickTagsContainer) {
-      this.quickTagsContainer.querySelectorAll('.note-tag-chip').forEach(chip => {
+      // Direct buttons for LTS and Pre Comp
+      this.quickTagsContainer.querySelectorAll('.note-tag-chip[data-note-val]').forEach(chip => {
         chip.addEventListener('click', () => {
-          const tag = chip.dataset.tag;
-          const current = this.notesInput.value.trim();
-          if (current) {
-            this.notesInput.value = `${current}\n• ${tag}`;
-          } else {
-            this.notesInput.value = `• ${tag}`;
-          }
-          this.notesInput.focus();
-          sound.playTick(1.3);
+          const val = chip.dataset.noteVal;
+          this.setSessionNote(val);
+          sound.playTick(1.2);
         });
+      });
+    }
+
+    // Assist dropdown toggle
+    if (this.btnAssistDropdownToggle) {
+      this.btnAssistDropdownToggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.toggleAssistDropdown();
+        sound.playTick(1.1);
+      });
+    }
+
+    // Assist dropdown list clicks (Select / Delete)
+    if (this.assistNamesList) {
+      this.assistNamesList.addEventListener('click', (e) => {
+        const delBtn = e.target.closest('.assist-name-delete-btn');
+        if (delBtn) {
+          e.stopPropagation();
+          const idx = parseInt(delBtn.dataset.deleteIdx, 10);
+          this.handleDeleteAssistName(idx);
+          return;
+        }
+
+        const selBtn = e.target.closest('.assist-name-select-btn');
+        if (selBtn) {
+          e.stopPropagation();
+          const val = selBtn.dataset.assistVal;
+          this.setSessionNote(val);
+          this.closeAssistDropdown();
+          sound.playTick(1.2);
+        }
+      });
+    }
+
+    // Add new assist name
+    if (this.btnAddAssistName) {
+      this.btnAddAssistName.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.handleAddAssistName();
+      });
+    }
+
+    if (this.inputNewAssistName) {
+      this.inputNewAssistName.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          e.stopPropagation();
+          this.handleAddAssistName();
+        }
+      });
+      this.inputNewAssistName.addEventListener('click', (e) => e.stopPropagation());
+    }
+
+    // Close assist dropdown on outside click
+    document.addEventListener('click', (e) => {
+      if (this.assistDropdownContainer && !this.assistDropdownContainer.contains(e.target)) {
+        this.closeAssistDropdown();
+      }
+    });
+
+    // Close assist dropdown on Escape
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        this.closeAssistDropdown();
+      }
+    });
+
+    // Track user edits in note textarea to dynamically update chip active styling
+    if (this.notesInput) {
+      this.notesInput.addEventListener('input', () => {
+        this.updateNoteChipsActiveState();
       });
     }
 
@@ -815,7 +889,10 @@ class ClassLoggerApp {
       sound.playSuccess();
 
       // Reset note field
-      if (this.notesInput) this.notesInput.value = '';
+      if (this.notesInput) {
+        this.notesInput.value = '';
+        this.updateNoteChipsActiveState();
+      }
     }
 
     await this.loadClasses();
@@ -867,6 +944,7 @@ class ClassLoggerApp {
     // Set note
     if (this.notesInput) {
       this.notesInput.value = item.note || '';
+      this.updateNoteChipsActiveState();
     }
 
     // Update UI for editing
@@ -890,7 +968,10 @@ class ClassLoggerApp {
     if (this.btnCancelEdit) this.btnCancelEdit.style.display = 'none';
     if (this.formHeading) this.formHeading.innerHTML = `<span>⏱️</span> Log Class Session`;
     if (this.modeTag) this.modeTag.textContent = 'New Entry';
-    if (this.notesInput) this.notesInput.value = '';
+    if (this.notesInput) {
+      this.notesInput.value = '';
+      this.updateNoteChipsActiveState();
+    }
     if (this.customDurationWrapper) this.customDurationWrapper.style.display = 'none';
   }
 
@@ -988,6 +1069,186 @@ class ClassLoggerApp {
     return str.replace(/[&<>'"]/g, 
       tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
     );
+  }
+
+  // --- SESSION NOTE & ASSIST DROPDOWN ---
+
+  getAssistNames() {
+    try {
+      const saved = localStorage.getItem('class_logger_assist_names');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch (e) {
+      console.warn('Failed to parse assist names', e);
+    }
+    return ['Coach Allen', 'Charles'];
+  }
+
+  saveAssistNames(names) {
+    try {
+      localStorage.setItem('class_logger_assist_names', JSON.stringify(names));
+    } catch (e) {
+      console.warn('Failed to save assist names', e);
+    }
+  }
+
+  renderAssistNamesList() {
+    if (!this.assistNamesList) return;
+    const names = this.getAssistNames();
+    const currentVal = this.notesInput ? this.notesInput.value.trim() : '';
+
+    const isGenericActive = currentVal === 'Assist' || currentVal.startsWith('Assist -');
+
+    let html = `
+      <div class="assist-name-row generic-assist-row ${isGenericActive ? 'is-selected' : ''}">
+        <button type="button" class="assist-name-select-btn" data-assist-val="Assist">
+          <span class="assist-name-icon">👤</span>
+          <span class="assist-name-label">Assist (No Name)</span>
+          ${isGenericActive ? '<span class="assist-name-check">✓</span>' : ''}
+        </button>
+      </div>
+    `;
+
+    if (names.length === 0) {
+      html += `<div class="assist-no-names">No custom names yet</div>`;
+    } else {
+      names.forEach((name, idx) => {
+        const isNameActive = currentVal === `Assist ${name}` || currentVal.startsWith(`Assist ${name} -`) || currentVal.startsWith(`Assist ${name} `);
+        html += `
+          <div class="assist-name-row ${isNameActive ? 'is-selected' : ''}">
+            <button type="button" class="assist-name-select-btn" data-assist-val="Assist ${this.escapeHTML(name)}">
+              <span class="assist-name-icon">🏊</span>
+              <span class="assist-name-label">${this.escapeHTML(name)}</span>
+              ${isNameActive ? '<span class="assist-name-check">✓</span>' : ''}
+            </button>
+            <button type="button" class="assist-name-delete-btn" data-delete-idx="${idx}" title="Delete ${this.escapeHTML(name)}" aria-label="Delete ${this.escapeHTML(name)}">
+              ✕
+            </button>
+          </div>
+        `;
+      });
+    }
+
+    this.assistNamesList.innerHTML = html;
+  }
+
+  toggleAssistDropdown(forceState) {
+    if (!this.assistDropdownMenu || !this.assistDropdownContainer) return;
+    const isCurrentlyOpen = this.assistDropdownContainer.classList.contains('is-open');
+    const shouldOpen = forceState !== undefined ? forceState : !isCurrentlyOpen;
+
+    if (shouldOpen) {
+      this.renderAssistNamesList();
+      this.assistDropdownContainer.classList.add('is-open');
+      this.assistDropdownMenu.style.display = 'flex';
+      if (this.btnAssistDropdownToggle) {
+        this.btnAssistDropdownToggle.setAttribute('aria-expanded', 'true');
+      }
+      if (window.innerWidth > 600 && this.inputNewAssistName) {
+        setTimeout(() => this.inputNewAssistName.focus(), 50);
+      }
+    } else {
+      this.closeAssistDropdown();
+    }
+  }
+
+  closeAssistDropdown() {
+    if (!this.assistDropdownContainer || !this.assistDropdownMenu) return;
+    this.assistDropdownContainer.classList.remove('is-open');
+    this.assistDropdownMenu.style.display = 'none';
+    if (this.btnAssistDropdownToggle) {
+      this.btnAssistDropdownToggle.setAttribute('aria-expanded', 'false');
+    }
+  }
+
+  setSessionNote(newType) {
+    if (!this.notesInput) return;
+    const current = this.notesInput.value.trim();
+
+    if (!current) {
+      this.notesInput.value = newType;
+    } else {
+      const isKnownType = current === 'LTS' || current.startsWith('LTS ') || current.startsWith('LTS -') ||
+                          current === 'Pre Comp' || current.startsWith('Pre Comp ') || current.startsWith('Pre Comp -') ||
+                          current === 'Assist' || current.startsWith('Assist ') || current.startsWith('Assist -');
+
+      if (isKnownType) {
+        if (current.includes(' - ')) {
+          const remarks = current.split(' - ').slice(1).join(' - ').trim();
+          this.notesInput.value = remarks ? `${newType} - ${remarks}` : newType;
+        } else {
+          this.notesInput.value = newType;
+        }
+      } else {
+        this.notesInput.value = `${newType} - ${current}`;
+      }
+    }
+
+    this.updateNoteChipsActiveState();
+    this.renderAssistNamesList();
+    this.notesInput.focus();
+  }
+
+  updateNoteChipsActiveState() {
+    if (!this.notesInput) return;
+    const val = (this.notesInput.value || '').trim();
+
+    const ltsBtn = document.querySelector('.note-tag-chip[data-note-val="LTS"]');
+    const preCompBtn = document.querySelector('.note-tag-chip[data-note-val="Pre Comp"]');
+    const assistBtn = document.getElementById('btn-assist-dropdown-toggle');
+
+    if (ltsBtn) {
+      const isLTS = val === 'LTS' || val.startsWith('LTS ') || val.startsWith('LTS -');
+      ltsBtn.classList.toggle('is-active', isLTS);
+    }
+
+    if (preCompBtn) {
+      const isPreComp = val === 'Pre Comp' || val.startsWith('Pre Comp ') || val.startsWith('Pre Comp -');
+      preCompBtn.classList.toggle('is-active', isPreComp);
+    }
+
+    if (assistBtn) {
+      const isAssist = val === 'Assist' || val.startsWith('Assist ') || val.startsWith('Assist -');
+      assistBtn.classList.toggle('is-active', isAssist);
+    }
+  }
+
+  handleAddAssistName() {
+    if (!this.inputNewAssistName) return;
+    let rawName = this.inputNewAssistName.value.trim();
+    if (!rawName) return;
+
+    if (rawName.toLowerCase().startsWith('assist ')) {
+      rawName = rawName.slice(7).trim();
+    }
+
+    if (!rawName) return;
+
+    const names = this.getAssistNames();
+    const exists = names.some(n => n.toLowerCase() === rawName.toLowerCase());
+    if (!exists) {
+      names.push(rawName);
+      this.saveAssistNames(names);
+    }
+
+    this.setSessionNote(`Assist ${rawName}`);
+    this.inputNewAssistName.value = '';
+    this.closeAssistDropdown();
+    sound.playTick(1.3);
+    this.showToast(`Selected Assist: ${rawName}`, 'success');
+  }
+
+  handleDeleteAssistName(idx) {
+    const names = this.getAssistNames();
+    if (idx >= 0 && idx < names.length) {
+      const deleted = names.splice(idx, 1)[0];
+      this.saveAssistNames(names);
+      this.renderAssistNamesList();
+      this.showToast(`Removed "${deleted}" from saved list`, 'info');
+      sound.playTick(0.9);
+    }
   }
 
   // --- EXCEL IMPORT ---
