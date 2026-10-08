@@ -56,12 +56,6 @@ class ClassLoggerApp {
 
       // Clean up / migrate any legacy sessions previously imported under subcategories like LTS, PreComp, Swim Clinic
       await this.migrateLegacyImportCategories();
-
-      // If empty, seed initial sample classes for instant demonstration
-      if (this.classes.length === 0) {
-        await db.seedSampleData();
-        await this.loadClasses();
-      }
     } catch (err) {
       console.error('Error during DB init/data load:', err);
     }
