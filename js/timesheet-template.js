@@ -30,23 +30,19 @@ const TEMPLATE_PARTS = {
   },
   "xl/workbook.xml": {
     "type": "utf8",
-    "data": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r<workbook xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\" xmlns:mx=\"http://schemas.microsoft.com/office/mac/excel/2008/main\" xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\" xmlns:mv=\"urn:schemas-microsoft-com:mac:vml\" xmlns:x14=\"http://schemas.microsoft.com/office/spreadsheetml/2009/9/main\" xmlns:x15=\"http://schemas.microsoft.com/office/spreadsheetml/2010/11/main\" xmlns:x14ac=\"http://schemas.microsoft.com/office/spreadsheetml/2009/9/ac\" xmlns:xm=\"http://schemas.microsoft.com/office/excel/2006/main\"><workbookPr/><sheets><sheet state=\"visible\" name=\"Master\" sheetId=\"1\" r:id=\"rId4\"/></sheets><definedNames/><calcPr/><extLst><ext uri=\"GoogleSheetsCustomDataVersion2\"><go:sheetsCustomData xmlns:go=\"http://customooxmlschemas.google.com/\" r:id=\"rId5\" roundtripDataChecksum=\"+H2LMME0qJqlgZqZgaDgjH52vmQNx8rlBf/4/usUamM=\"/></ext></extLst></workbook>"
+    "data": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r<workbook xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\"><workbookPr/><sheets><sheet state=\"visible\" name=\"Master\" sheetId=\"1\" r:id=\"rId4\"/></sheets><definedNames/><calcPr/></workbook>"
   },
   "xl/_rels/workbook.xml.rels": {
     "type": "utf8",
-    "data": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r<Relationships xmlns=\"http://schemas.openxmlformats.org/package/2006/relationships\"><Relationship Id=\"rId1\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/theme\" Target=\"theme/theme1.xml\"/><Relationship Id=\"rId2\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles\" Target=\"styles.xml\"/><Relationship Id=\"rId3\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/sharedStrings\" Target=\"sharedStrings.xml\"/><Relationship Id=\"rId4\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet\" Target=\"worksheets/sheet1.xml\"/><Relationship Id=\"rId5\" Type=\"http://customschemas.google.com/relationships/workbookmetadata\" Target=\"metadata\"/></Relationships>"
+    "data": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r<Relationships xmlns=\"http://schemas.openxmlformats.org/package/2006/relationships\"><Relationship Id=\"rId1\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/theme\" Target=\"theme/theme1.xml\"/><Relationship Id=\"rId2\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles\" Target=\"styles.xml\"/><Relationship Id=\"rId3\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/sharedStrings\" Target=\"sharedStrings.xml\"/><Relationship Id=\"rId4\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet\" Target=\"worksheets/sheet1.xml\"/></Relationships>"
   },
   "_rels/.rels": {
     "type": "utf8",
     "data": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r<Relationships xmlns=\"http://schemas.openxmlformats.org/package/2006/relationships\"><Relationship Id=\"rId1\" Type=\"http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties\" Target=\"docProps/core.xml\"/><Relationship Id=\"rId2\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument\" Target=\"xl/workbook.xml\"/></Relationships>"
   },
-  "xl/metadata": {
-    "type": "base64",
-    "data": "CgMxLjAaEwoBMRIJODQ5NTY2MzA4IOgHKBpKdgoFZW5fVVMSE0FtZXJpY2EvTG9zX0FuZ2VsZXNAFEhkUlQKBAgAGAESBE5PTkUaBkJPVFRPTSIIT1ZFUkZMT1cqDEFwdG9zIE5hcnJvdzALOABAAEgAUABYAGIICAAQAxgAIANqBwgCEP///wd6BAgDGAGYAQA="
-  },
   "[Content_Types].xml": {
     "type": "utf8",
-    "data": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r<Types xmlns=\"http://schemas.openxmlformats.org/package/2006/content-types\"><Default ContentType=\"application/xml\" Extension=\"xml\"/><Default ContentType=\"application/vnd.openxmlformats-officedocument.obfuscatedFont\" Extension=\"odttf\"/><Default ContentType=\"application/vnd.openxmlformats-package.relationships+xml\" Extension=\"rels\"/><Override ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml\" PartName=\"/xl/worksheets/sheet1.xml\"/><Override ContentType=\"application/binary\" PartName=\"/xl/metadata\"/><Override ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.sharedStrings+xml\" PartName=\"/xl/sharedStrings.xml\"/><Override ContentType=\"application/vnd.openxmlformats-officedocument.drawing+xml\" PartName=\"/xl/drawings/drawing1.xml\"/><Override ContentType=\"application/vnd.openxmlformats-package.core-properties+xml\" PartName=\"/docProps/core.xml\"/><Override ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml\" PartName=\"/xl/styles.xml\"/><Override ContentType=\"application/vnd.openxmlformats-officedocument.theme+xml\" PartName=\"/xl/theme/theme1.xml\"/><Override ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml\" PartName=\"/xl/workbook.xml\"/></Types>"
+    "data": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r<Types xmlns=\"http://schemas.openxmlformats.org/package/2006/content-types\"><Default ContentType=\"application/xml\" Extension=\"xml\"/><Default ContentType=\"application/vnd.openxmlformats-officedocument.obfuscatedFont\" Extension=\"odttf\"/><Default ContentType=\"application/vnd.openxmlformats-package.relationships+xml\" Extension=\"rels\"/><Override ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml\" PartName=\"/xl/worksheets/sheet1.xml\"/><Override ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.sharedStrings+xml\" PartName=\"/xl/sharedStrings.xml\"/><Override ContentType=\"application/vnd.openxmlformats-officedocument.drawing+xml\" PartName=\"/xl/drawings/drawing1.xml\"/><Override ContentType=\"application/vnd.openxmlformats-package.core-properties+xml\" PartName=\"/docProps/core.xml\"/><Override ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml\" PartName=\"/xl/styles.xml\"/><Override ContentType=\"application/vnd.openxmlformats-officedocument.theme+xml\" PartName=\"/xl/theme/theme1.xml\"/><Override ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml\" PartName=\"/xl/workbook.xml\"/></Types>"
   }
 };
 
@@ -270,8 +266,10 @@ export function exportCoachTimesheetXLSX(classes, options = {}) {
   // Track shared strings
   const sharedStrings = [];
   const stringIndexMap = new Map();
+  let totalStringRefs = 0;
 
   function getStrIdx(str) {
+    totalStringRefs++;
     const s = String(str);
     if (!stringIndexMap.has(s)) {
       stringIndexMap.set(s, sharedStrings.length);
@@ -365,7 +363,7 @@ export function exportCoachTimesheetXLSX(classes, options = {}) {
 
     let rowXml = `<row r="${r}" ht="14.25" customHeight="1">`;
     rowXml += `<c r="A${r}" s="7"><v>${serial}.0</v></c>`;
-    rowXml += `<c r="B${r}" s="2"><f>TEXT(A${r}, &quot;ddd&quot;)</f><v>${dayStr}</v></c>`;
+    rowXml += `<c r="B${r}" s="2" t="str"><f>TEXT(A${r}, &quot;ddd&quot;)</f><v>${dayStr}</v></c>`;
     rowXml += `<c r="C${r}" s="8"><v>${timeFraction}</v></c>`;
     rowXml += `<c r="D${r}" s="14" t="s"><v>${durIdx}</v></c>`;
     rowXml += `<c r="E${r}" s="15" t="s"><v>${descIdx}</v></c>`;
@@ -447,7 +445,7 @@ export function exportCoachTimesheetXLSX(classes, options = {}) {
   const idxBonus = getStrIdx('Manager bonus :');
   const bonusInfo = calculateManagerBonus(totalUnits);
   const bonusAmount = bonusInfo.bonus;
-  const bonusFormula = `IF(C${rTotal}>=50,350,IF(C${rTotal}>=40,250,IF(C${rTotal}>=30,150,IF(C${rTotal}>=24,100,0))))`;
+  const bonusFormula = `IF(C${rTotal}&gt;=50,350,IF(C${rTotal}&gt;=40,250,IF(C${rTotal}&gt;=30,150,IF(C${rTotal}&gt;=24,100,0))))`;
   rowsXml.push(`<row r="${rBonus}" ht="14.25" customHeight="1"><c r="A${rBonus}" s="1" t="s"><v>${idxBonus}</v></c><c r="C${rBonus}" s="4"><f>${bonusFormula}</f><v>${bonusAmount.toFixed(2)}</v></c><c r="D${rBonus}" s="3"/><c r="F${rBonus}" s="4"/></row>`);
 
   // Row totalRow + 7 (Row 41 when count <= 29): "Total fees to be paid :" with formula =C{rFees}+C{rBonus} (style 23 double underline)
@@ -487,7 +485,7 @@ export function exportCoachTimesheetXLSX(classes, options = {}) {
     return `<si><t>${escaped}</t></si>`;
   }).join('');
 
-  const sharedStringsXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><sst xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" count="${sharedStrings.length}" uniqueCount="${sharedStrings.length}">${siElements}</sst>`;
+  const sharedStringsXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><sst xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" count="${totalStringRefs}" uniqueCount="${sharedStrings.length}">${siElements}</sst>`;
 
   // Prepare full files map
   const outFiles = {};
