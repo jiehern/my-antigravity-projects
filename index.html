@@ -12,7 +12,7 @@
   <meta name="apple-mobile-web-app-title" content="ClassLogger">
   <link rel="apple-touch-icon" href="assets/app-icon.jpg">
   <link rel="icon" type="image/jpeg" href="assets/app-icon.jpg">
-  <link rel="stylesheet" href="styles.css?v=2.2">
+  <link rel="stylesheet" href="styles.css?v=2.3">
   <script type="importmap">
   {
     "imports": {
@@ -153,10 +153,30 @@
             <div class="duration-pills" id="duration-pills-container">
               <button type="button" class="duration-pill" data-mins="30">30m</button>
               <button type="button" class="duration-pill" data-mins="45">45m</button>
+              <button type="button" class="duration-pill" data-mins="50">50m</button>
               <button type="button" class="duration-pill is-active" data-mins="60">60m</button>
               <button type="button" class="duration-pill" data-mins="75">75m</button>
               <button type="button" class="duration-pill" data-mins="90">90m</button>
               <button type="button" class="duration-pill" data-mins="120">2h</button>
+              <button type="button" class="duration-pill" data-mins="custom" id="duration-pill-custom">Custom</button>
+            </div>
+
+            <!-- Custom duration input box (revealed when Custom is chosen) -->
+            <div class="custom-duration-wrapper" id="custom-duration-wrapper" style="display: none;">
+              <div class="custom-duration-input-box">
+                <input 
+                  type="number" 
+                  id="custom-duration-input" 
+                  class="form-input" 
+                  placeholder="Minutes (e.g. 50)" 
+                  min="1" 
+                  max="1440"
+                >
+                <span class="custom-duration-unit">mins</span>
+              </div>
+              <button type="button" class="quick-pill-btn primary" id="btn-apply-custom-duration">
+                Set
+              </button>
             </div>
           </div>
 
@@ -452,6 +472,6 @@
   <div class="toast-container" id="toast-container" aria-live="polite"></div>
 
   <!-- Main JavaScript App -->
-  <script type="module" src="js/app.js?v=2.2"></script>
+  <script type="module" src="js/app.js?v=2.3"></script>
 </body>
 </html>

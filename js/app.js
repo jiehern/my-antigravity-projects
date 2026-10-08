@@ -79,6 +79,9 @@ class ClassLoggerApp {
     this.categoryGrid = document.getElementById('category-picker-grid');
     this.durationContainer = document.getElementById('duration-pills-container');
     this.durationLabel = document.getElementById('selected-duration-label');
+    this.customDurationWrapper = document.getElementById('custom-duration-wrapper');
+    this.customDurationInput = document.getElementById('custom-duration-input');
+    this.btnApplyCustomDuration = document.getElementById('btn-apply-custom-duration');
     this.notesInput = document.getElementById('class-notes-input');
     this.quickTagsContainer = document.getElementById('quick-note-tags');
     this.btnSubmit = document.getElementById('btn-submit-class');
@@ -414,12 +417,63 @@ class ClassLoggerApp {
         pill.addEventListener('click', () => {
           this.durationContainer.querySelectorAll('.duration-pill').forEach(p => p.classList.remove('is-active'));
           pill.classList.add('is-active');
-          this.selectedDuration = parseInt(pill.dataset.mins, 10);
-          if (this.durationLabel) {
-            this.durationLabel.textContent = `${this.selectedDuration} mins`;
+
+          if (pill.dataset.mins === 'custom') {
+            if (this.customDurationWrapper) this.customDurationWrapper.style.display = 'flex';
+            if (this.customDurationInput) {
+              this.customDurationInput.focus();
+              const existingVal = parseInt(this.customDurationInput.value, 10);
+              if (existingVal && existingVal > 0) {
+                this.selectedDuration = existingVal;
+                if (this.durationLabel) this.durationLabel.textContent = `${this.selectedDuration} mins`;
+              }
+            }
+          } else {
+            if (this.customDurationWrapper) this.customDurationWrapper.style.display = 'none';
+            this.selectedDuration = parseInt(pill.dataset.mins, 10);
+            if (this.durationLabel) {
+              this.durationLabel.textContent = `${this.selectedDuration} mins`;
+            }
           }
           sound.playTick(1.1);
         });
+      });
+    }
+
+    if (this.customDurationInput) {
+      const handleCustomInput = () => {
+        const val = parseInt(this.customDurationInput.value, 10);
+        if (val && val > 0) {
+          this.selectedDuration = val;
+          if (this.durationLabel) {
+            this.durationLabel.textContent = `${this.selectedDuration} mins`;
+          }
+        }
+      };
+      this.customDurationInput.addEventListener('input', handleCustomInput);
+      this.customDurationInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          handleCustomInput();
+          sound.playTick(1.2);
+          if (this.notesInput) this.notesInput.focus();
+        }
+      });
+    }
+
+    if (this.btnApplyCustomDuration) {
+      this.btnApplyCustomDuration.addEventListener('click', () => {
+        const val = parseInt(this.customDurationInput?.value, 10);
+        if (val && val > 0) {
+          this.selectedDuration = val;
+          if (this.durationLabel) {
+            this.durationLabel.textContent = `${this.selectedDuration} mins`;
+          }
+          sound.playTick(1.2);
+          this.showToast(`Custom duration set to ${val} mins`, 'info');
+        } else {
+          this.showToast('Please enter a valid number of minutes', 'danger');
+        }
       });
     }
 
@@ -798,9 +852,22 @@ class ClassLoggerApp {
       this.durationLabel.textContent = `${this.selectedDuration} mins`;
     }
     if (this.durationContainer) {
+      let matched = false;
       this.durationContainer.querySelectorAll('.duration-pill').forEach(pill => {
-        pill.classList.toggle('is-active', parseInt(pill.dataset.mins, 10) === this.selectedDuration);
+        const isMatch = parseInt(pill.dataset.mins, 10) === this.selectedDuration;
+        pill.classList.toggle('is-active', isMatch);
+        if (isMatch) matched = true;
       });
+
+      const customPill = this.durationContainer.querySelector('[data-mins="custom"]');
+      if (!matched) {
+        if (customPill) customPill.classList.add('is-active');
+        if (this.customDurationWrapper) this.customDurationWrapper.style.display = 'flex';
+        if (this.customDurationInput) this.customDurationInput.value = this.selectedDuration;
+      } else {
+        if (customPill) customPill.classList.remove('is-active');
+        if (this.customDurationWrapper) this.customDurationWrapper.style.display = 'none';
+      }
     }
 
     // Set note
@@ -830,6 +897,7 @@ class ClassLoggerApp {
     if (this.formHeading) this.formHeading.innerHTML = `<span>⏱️</span> Log Class Session`;
     if (this.modeTag) this.modeTag.textContent = 'New Entry';
     if (this.notesInput) this.notesInput.value = '';
+    if (this.customDurationWrapper) this.customDurationWrapper.style.display = 'none';
   }
 
   async duplicateClass(item) {
