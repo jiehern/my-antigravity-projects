@@ -409,39 +409,44 @@ class ClassLoggerApp {
       card.innerHTML = `
         <div class="card-top-row">
           <div class="card-category-badge">
-            <span>${catObj.icon}</span>
-            <span>${item.category}</span>
+            <span class="category-badge-icon">${catObj.icon}</span>
+            <span class="category-badge-text">${this.escapeHTML(item.category)}</span>
           </div>
-          <div class="card-top-meta">
-            <span class="card-units-badge ${unitBadgeClass}">${unitBadgeLabel}</span>
-            <div class="card-date-group">
-              ${isToday ? '<span class="card-relative-badge is-today">Today</span>' : ''}
-              <span>${formattedDate}</span>
-            </div>
-          </div>
+          <span class="card-units-badge ${unitBadgeClass}">
+            ${unitBadgeLabel}
+          </span>
         </div>
 
         <div class="card-main-row">
-          <div class="card-time-display">
-            <span class="card-time-large">${item.displayTime || item.time}</span>
-            <span class="card-duration-badge">${item.duration || 60}m</span>
+          <div class="card-time-block">
+            <div class="card-time-display">
+              <span class="card-time-large">${item.displayTime || item.time}</span>
+              <span class="card-duration-badge">${item.duration || 60}m</span>
+            </div>
+            <div class="card-date-line">
+              ${isToday ? '<span class="card-relative-badge is-today">Today</span>' : ''}
+              <span class="card-date-text">${formattedDate}</span>
+            </div>
           </div>
 
           <div class="card-actions">
-            <button type="button" class="card-action-btn edit" title="Edit this entry" data-id="${item.id}">
+            <button type="button" class="card-action-btn edit" title="Edit this entry" data-id="${item.id}" aria-label="Edit class">
               ✏️
             </button>
-            <button type="button" class="card-action-btn duplicate" title="Duplicate entry" data-id="${item.id}">
+            <button type="button" class="card-action-btn duplicate" title="Duplicate entry" data-id="${item.id}" aria-label="Duplicate class">
               📋
             </button>
-            <button type="button" class="card-action-btn delete" title="Delete entry" data-id="${item.id}">
+            <button type="button" class="card-action-btn delete" title="Delete entry" data-id="${item.id}" aria-label="Delete class">
               🗑️
             </button>
           </div>
         </div>
 
         ${item.note ? `
-          <div class="card-note-box">${this.escapeHTML(item.note)}</div>
+          <div class="card-note-box">
+            <span class="card-note-icon">📝</span>
+            <span class="card-note-text">${this.escapeHTML(item.note)}</span>
+          </div>
         ` : ''}
       `;
 
@@ -542,24 +547,57 @@ class ClassLoggerApp {
       <div class="bonus-progress-wrap">
         <div class="bonus-progress-track">
           <div class="bonus-progress-fill" style="width: ${progressPct}%;"></div>
-          <!-- Milestone markers -->
+          <!-- Milestone markers with concise hour badges -->
           <div class="bonus-milestone mark-24 ${totalUnits >= 24 ? 'is-active' : ''}" style="left: 48%;" title="24 hrs: RM100">
+            <span class="milestone-tag">24h</span>
             <span class="milestone-tick"></span>
-            <span class="milestone-tag">24h • RM100</span>
           </div>
           <div class="bonus-milestone mark-30 ${totalUnits >= 30 ? 'is-active' : ''}" style="left: 60%;" title="30 hrs: RM150">
+            <span class="milestone-tag">30h</span>
             <span class="milestone-tick"></span>
-            <span class="milestone-tag">30h • RM150</span>
           </div>
           <div class="bonus-milestone mark-40 ${totalUnits >= 40 ? 'is-active' : ''}" style="left: 80%;" title="40 hrs: RM250">
+            <span class="milestone-tag">40h</span>
             <span class="milestone-tick"></span>
-            <span class="milestone-tag">40h • RM250</span>
           </div>
           <div class="bonus-milestone mark-50 ${totalUnits >= 50 ? 'is-active' : ''}" style="left: 100%;" title="50 hrs: RM350">
+            <span class="milestone-tag">50h</span>
             <span class="milestone-tick"></span>
-            <span class="milestone-tag">50h • RM350</span>
           </div>
         </div>
+
+        <!-- 4-Tier Milestone Cards (Spacious, beautifully aligned on mobile & desktop) -->
+        <div class="bonus-tiers-grid">
+          <div class="bonus-tier-pill ${totalUnits >= 24 ? 'is-achieved' : (totalUnits < 24 ? 'is-next' : '')}">
+            <div class="tier-pill-hours-row">
+              <span class="tier-pill-hours">24h</span>
+              ${totalUnits >= 24 ? '<span class="tier-pill-check">✓</span>' : ''}
+            </div>
+            <span class="tier-pill-reward">+RM100</span>
+          </div>
+          <div class="bonus-tier-pill ${totalUnits >= 30 ? 'is-achieved' : (totalUnits >= 24 && totalUnits < 30 ? 'is-next' : '')}">
+            <div class="tier-pill-hours-row">
+              <span class="tier-pill-hours">30h</span>
+              ${totalUnits >= 30 ? '<span class="tier-pill-check">✓</span>' : ''}
+            </div>
+            <span class="tier-pill-reward">+RM150</span>
+          </div>
+          <div class="bonus-tier-pill ${totalUnits >= 40 ? 'is-achieved' : (totalUnits >= 30 && totalUnits < 40 ? 'is-next' : '')}">
+            <div class="tier-pill-hours-row">
+              <span class="tier-pill-hours">40h</span>
+              ${totalUnits >= 40 ? '<span class="tier-pill-check">✓</span>' : ''}
+            </div>
+            <span class="tier-pill-reward">+RM250</span>
+          </div>
+          <div class="bonus-tier-pill ${totalUnits >= 50 ? 'is-achieved' : (totalUnits >= 40 && totalUnits < 50 ? 'is-next' : '')}">
+            <div class="tier-pill-hours-row">
+              <span class="tier-pill-hours">50h</span>
+              ${totalUnits >= 50 ? '<span class="tier-pill-check">✓</span>' : ''}
+            </div>
+            <span class="tier-pill-reward">+RM350</span>
+          </div>
+        </div>
+
         <div class="bonus-footer-row">
           <span class="bonus-next-goal">${nextGoalText}</span>
           <span class="bonus-unit-formula">LTS (50m) = 1.0 unit (RM${ratePerClass.toFixed(0)}) • Pre Comp (90m) = 1.5 units (RM${(ratePerClass * 1.5).toFixed(0)})</span>

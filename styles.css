@@ -1266,7 +1266,7 @@ body::after {
   border: 1px solid var(--border-subtle);
   border-left: 4px solid var(--card-accent, var(--apple-orange));
   border-radius: var(--radius-md);
-  padding: 16px 18px;
+  padding: 13px 15px;
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -1285,6 +1285,7 @@ body::after {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 10px;
 }
 
 .card-category-badge {
@@ -1298,20 +1299,68 @@ body::after {
   background: rgba(255, 255, 255, 0.05);
   color: var(--card-accent, var(--apple-orange));
   border: 1px solid rgba(255, 255, 255, 0.1);
+  white-space: nowrap;
+  max-width: 60%;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.card-date-group {
+.card-main-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.card-time-block {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.card-time-display {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 0.8rem;
+}
+
+.card-time-large {
+  font-size: 1.35rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: #ffffff;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+
+.card-duration-badge {
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 2px 7px;
+  border-radius: 6px;
+  line-height: 1.2;
+}
+
+.card-date-line {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.78rem;
+  color: var(--text-tertiary);
+  font-weight: 500;
+}
+
+.card-date-text {
   color: var(--text-secondary);
 }
 
 .card-relative-badge {
-  font-size: 0.72rem;
-  font-weight: 600;
-  padding: 2px 7px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 1px 6px;
   border-radius: 4px;
   background: var(--bg-surface-3);
   color: var(--text-tertiary);
@@ -1320,48 +1369,21 @@ body::after {
 .card-relative-badge.is-today {
   background: rgba(255, 159, 10, 0.15);
   color: var(--apple-orange);
-}
-
-.card-main-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.card-time-display {
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
-}
-
-.card-time-large {
-  font-size: 1.3rem;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  color: var(--text-primary);
-  font-variant-numeric: tabular-nums;
-}
-
-.card-duration-badge {
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: var(--text-secondary);
-  background: var(--bg-surface-3);
-  padding: 3px 8px;
-  border-radius: 6px;
+  border: 1px solid rgba(255, 159, 10, 0.3);
 }
 
 .card-actions {
   display: flex;
   align-items: center;
   gap: 6px;
+  flex-shrink: 0;
 }
 
 .card-action-btn {
-  width: 32px;
-  height: 32px;
+  width: 34px;
+  height: 34px;
   border-radius: 8px;
-  background: var(--bg-surface-3);
+  background: rgba(255, 255, 255, 0.05);
   border: 1px solid var(--border-subtle);
   color: var(--text-secondary);
   display: flex;
@@ -1384,15 +1406,28 @@ body::after {
 }
 
 .card-note-box {
-  background: rgba(0, 0, 0, 0.25);
-  border: 1px solid rgba(255, 255, 255, 0.04);
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(255, 255, 255, 0.07);
   border-radius: 8px;
-  padding: 8px 12px;
-  font-size: 0.82rem;
+  padding: 6px 11px;
+  font-size: 0.78rem;
   color: var(--text-secondary);
-  line-height: 1.45;
-  white-space: pre-wrap;
+  line-height: 1.4;
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
   word-break: break-word;
+}
+
+.card-note-icon {
+  font-size: 0.82rem;
+  opacity: 0.75;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.card-note-text {
+  flex: 1;
 }
 
 /* Empty State */
@@ -1979,9 +2014,9 @@ body::after {
   }
 
   .card-action-btn {
-    width: 36px;
-    height: 36px;
-    font-size: 0.9rem;
+    width: 32px;
+    height: 32px;
+    font-size: 0.85rem;
   }
 }
 
@@ -2060,16 +2095,17 @@ body::after {
 }
 
 .card-units-badge {
-  font-size: 0.72rem;
+  font-size: 0.74rem;
   font-weight: 700;
   letter-spacing: 0.01em;
-  padding: 2px 8px;
-  border-radius: 6px;
+  padding: 4px 9px;
+  border-radius: 8px;
   background: rgba(255, 255, 255, 0.08);
   color: var(--text-secondary);
   border: 1px solid rgba(255, 255, 255, 0.1);
   display: inline-flex;
   align-items: center;
+  white-space: nowrap;
 }
 
 .card-units-badge.is-precomp {
@@ -2240,7 +2276,7 @@ body::after {
 .bonus-progress-wrap {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
 }
 
 .bonus-progress-track {
@@ -2248,7 +2284,7 @@ body::after {
   height: 8px;
   background: rgba(255, 255, 255, 0.08);
   border-radius: 999px;
-  margin: 18px 0 24px 0;
+  margin: 22px 0 10px 0;
 }
 
 .bonus-progress-fill {
@@ -2273,6 +2309,10 @@ body::after {
   pointer-events: none;
 }
 
+.bonus-milestone.mark-50 {
+  transform: translate(-100%, -50%);
+}
+
 .milestone-tick {
   width: 12px;
   height: 12px;
@@ -2280,6 +2320,7 @@ body::after {
   background: var(--bg-surface-1);
   border: 2px solid rgba(255, 255, 255, 0.25);
   transition: all 0.25s ease;
+  z-index: 2;
 }
 
 .bonus-milestone.is-active .milestone-tick {
@@ -2290,16 +2331,96 @@ body::after {
 
 .milestone-tag {
   position: absolute;
-  top: 14px;
-  font-size: 0.65rem;
+  top: -19px;
+  font-size: 0.68rem;
   font-weight: 700;
   white-space: nowrap;
   color: var(--text-tertiary);
   transition: color 0.25s ease;
+  letter-spacing: -0.01em;
+}
+
+.bonus-milestone.mark-50 .milestone-tag {
+  right: 0;
+  left: auto;
+  transform: none;
 }
 
 .bonus-milestone.is-active .milestone-tag {
   color: #30d158;
+}
+
+/* 4-Tier Milestone Cards Grid - Never squeezed on mobile */
+.bonus-tiers-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  margin: 4px 0 6px 0;
+}
+
+.bonus-tier-pill {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 6px 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 2px;
+  transition: all 0.25s ease;
+}
+
+.tier-pill-hours-row {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.tier-pill-hours {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+
+.tier-pill-check {
+  font-size: 0.68rem;
+  font-weight: 900;
+  color: #30d158;
+}
+
+.tier-pill-reward {
+  font-size: 0.74rem;
+  font-weight: 800;
+  color: var(--text-tertiary);
+}
+
+/* Achieved tier */
+.bonus-tier-pill.is-achieved {
+  background: rgba(48, 209, 88, 0.12);
+  border-color: rgba(48, 209, 88, 0.4);
+}
+
+.bonus-tier-pill.is-achieved .tier-pill-hours {
+  color: #ffffff;
+}
+
+.bonus-tier-pill.is-achieved .tier-pill-reward {
+  color: #30d158;
+}
+
+/* Next target tier to unlock */
+.bonus-tier-pill.is-next {
+  background: rgba(10, 132, 255, 0.09);
+  border-color: rgba(10, 132, 255, 0.4);
+}
+
+.bonus-tier-pill.is-next .tier-pill-hours {
+  color: var(--apple-cyan);
+}
+
+.bonus-tier-pill.is-next .tier-pill-reward {
+  color: var(--apple-cyan);
 }
 
 .bonus-footer-row {
@@ -2308,7 +2429,7 @@ body::after {
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 6px;
-  padding-top: 4px;
+  padding-top: 6px;
   border-top: 1px solid rgba(255, 255, 255, 0.05);
 }
 
