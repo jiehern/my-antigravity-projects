@@ -6,7 +6,28 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap');
 
 :root {
-  /* Color Palette (Apple iOS Dark Theme) */
+  /* Dynamic Accent Color System */
+  --accent-color: #ff9f0a;
+  --accent-color-rgb: 255, 159, 10;
+  --accent-glow: rgba(var(--accent-color-rgb), 0.35);
+  --accent-contrast: #000000;
+  --border-focus: var(--accent-color);
+  --card-accent: var(--accent-color);
+
+  /* Apple System Accent Colors */
+  --apple-orange: var(--accent-color);     /* Mapped to active accent */
+  --apple-orange-glow: var(--accent-glow);
+  --apple-blue: #0a84ff;       /* AeroSplash blue */
+  --apple-blue-glow: rgba(10, 132, 255, 0.3);
+  --apple-green: #30d158;
+  --apple-green-glow: rgba(48, 209, 88, 0.3);
+  --apple-purple: #bf5af2;
+  --apple-red: #ff453a;
+  --apple-yellow: #ffd60a;
+  --apple-cyan: #64d2ff;
+  --apple-pink: #ff375f;
+
+  /* Color Palette (Apple iOS Dark Theme Default) */
   --bg-deep: #000000;
   --bg-surface-1: #121215;
   --bg-surface-2: #1c1c20;
@@ -17,19 +38,6 @@
 
   --border-subtle: rgba(255, 255, 255, 0.08);
   --border-medium: rgba(255, 255, 255, 0.16);
-  --border-focus: #ff9f0a;
-
-  /* Apple System Accent Colors */
-  --apple-orange: #ff9f0a;     /* Apple Clock Alarm Accent */
-  --apple-orange-glow: rgba(255, 159, 10, 0.35);
-  --apple-blue: #0a84ff;       /* Aerosplash default */
-  --apple-blue-glow: rgba(10, 132, 255, 0.3);
-  --apple-green: #30d158;      /* Charles default */
-  --apple-green-glow: rgba(48, 209, 88, 0.3);
-  --apple-purple: #bf5af2;
-  --apple-red: #ff453a;
-  --apple-yellow: #ffd60a;
-  --apple-cyan: #64d2ff;
 
   /* Typography Colors */
   --text-primary: #ffffff;
@@ -52,6 +60,27 @@
   --transition-fast: 0.15s cubic-bezier(0.16, 1, 0.3, 1);
   --transition-normal: 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   --transition-bounce: 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Apple iOS Light Theme */
+[data-theme="light"] {
+  --bg-deep: #f2f2f7;
+  --bg-surface-1: #ffffff;
+  --bg-surface-2: #e5e5ea;
+  --bg-surface-3: #d1d1d6;
+  --bg-glass: rgba(255, 255, 255, 0.88);
+  --bg-glass-subtle: rgba(0, 0, 0, 0.04);
+  --bg-glass-hover: rgba(0, 0, 0, 0.07);
+
+  --border-subtle: rgba(0, 0, 0, 0.08);
+  --border-medium: rgba(0, 0, 0, 0.16);
+
+  --text-primary: #1c1c1e;
+  --text-secondary: #636366;
+  --text-tertiary: #8e8e93;
+  --text-muted: #aeaeb2;
+
+  color-scheme: light;
 }
 
 /* Base Styles */
@@ -167,22 +196,24 @@ body::after {
 }
 
 .brand-icon-wrapper {
-  width: 46px;
-  height: 46px;
-  border-radius: 12px;
+  width: 48px;
+  height: 48px;
+  border-radius: 13px;
   overflow: hidden;
-  box-shadow: 0 4px 16px rgba(255, 159, 10, 0.25);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 4px 16px var(--accent-glow);
+  border: 1px solid var(--border-medium);
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #111;
+  background: #ffffff;
+  padding: 4px;
+  flex-shrink: 0;
 }
 
 .brand-icon-img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
 }
 
 .brand-title {
@@ -1078,8 +1109,8 @@ body::after {
 }
 
 .assist-add-btn {
-  background: var(--apple-orange);
-  color: #000;
+  background: var(--accent-color);
+  color: var(--accent-contrast, #000000);
   font-weight: 600;
   font-size: 0.78rem;
   border: none;
@@ -1100,10 +1131,10 @@ body::after {
 .submit-btn {
   width: 100%;
   height: 52px;
-  background: linear-gradient(135deg, #ff9f0a 0%, #ff8000 100%);
+  background: var(--accent-color);
   border: none;
   border-radius: var(--radius-md);
-  color: #000000;
+  color: var(--accent-contrast, #000000);
   font-size: 1rem;
   font-weight: 700;
   letter-spacing: -0.01em;
@@ -1112,14 +1143,14 @@ body::after {
   align-items: center;
   justify-content: center;
   gap: 10px;
-  box-shadow: 0 4px 20px rgba(255, 159, 10, 0.4);
+  box-shadow: 0 4px 20px var(--accent-glow);
   transition: all var(--transition-fast);
   margin-top: 10px;
 }
 
 .submit-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 26px rgba(255, 159, 10, 0.55);
+  box-shadow: 0 6px 26px var(--accent-glow);
   filter: brightness(1.08);
 }
 
@@ -2546,6 +2577,428 @@ body::after {
   font-size: 0.72rem;
   color: var(--text-tertiary);
   line-height: 1.4;
+}
+
+/* ==========================================================================
+   Appearance & Custom Accent Color Settings Styles
+   ========================================================================== */
+.settings-appearance-box {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.settings-appearance-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.settings-appearance-title {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--accent-color);
+  letter-spacing: -0.01em;
+}
+
+.settings-appearance-subtitle {
+  font-size: 0.74rem;
+  color: var(--text-tertiary);
+  margin-top: 2px;
+}
+
+.settings-appearance-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.settings-field-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.theme-switch-pills {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.theme-pill {
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-surface-2);
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all var(--transition-fast);
+}
+
+.theme-pill:hover {
+  background: var(--bg-surface-3);
+  color: var(--text-primary);
+  border-color: var(--border-medium);
+}
+
+.theme-pill.is-active {
+  background: var(--accent-color);
+  color: var(--accent-contrast, #000000);
+  border-color: var(--accent-color);
+  font-weight: 700;
+  box-shadow: 0 2px 10px var(--accent-glow);
+}
+
+.accent-current-preview {
+  font-size: 0.76rem;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  color: var(--accent-color);
+}
+
+.accent-palette-grid {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.accent-color-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  background: var(--btn-color);
+  cursor: pointer;
+  transition: transform var(--transition-fast), border-color var(--transition-fast), box-shadow var(--transition-fast);
+  position: relative;
+  outline: none;
+}
+
+.accent-color-btn:hover {
+  transform: scale(1.15);
+}
+
+.accent-color-btn.is-active {
+  border-color: #ffffff;
+  transform: scale(1.18);
+  box-shadow: 0 0 10px var(--btn-color);
+}
+
+[data-theme="light"] .accent-color-btn.is-active {
+  border-color: #1c1c1e;
+}
+
+.accent-color-custom-label {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px dashed var(--border-medium);
+  background: var(--bg-surface-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 0.82rem;
+  position: relative;
+  overflow: hidden;
+  transition: transform var(--transition-fast), border-color var(--transition-fast);
+}
+
+.accent-color-custom-label:hover {
+  transform: scale(1.15);
+  border-color: var(--accent-color);
+}
+
+.accent-custom-picker-input {
+  position: absolute;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
+
+/* ==========================================================================
+   Full Apple iOS Light Mode Styling System
+   ========================================================================== */
+[data-theme="light"] body {
+  background-color: var(--bg-deep);
+  color: var(--text-primary);
+}
+
+[data-theme="light"] body::before {
+  background: radial-gradient(circle, rgba(var(--accent-color-rgb), 0.08) 0%, transparent 70%);
+}
+
+[data-theme="light"] body::after {
+  background: radial-gradient(circle, rgba(10, 132, 255, 0.05) 0%, transparent 70%);
+}
+
+[data-theme="light"] .app-header {
+  background: rgba(255, 255, 255, 0.9);
+  border-color: rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+}
+
+[data-theme="light"] .db-status-pill,
+[data-theme="light"] .icon-btn,
+[data-theme="light"] .quick-pill-btn {
+  background: var(--bg-surface-2);
+  border-color: var(--border-subtle);
+  color: var(--text-primary);
+}
+
+[data-theme="light"] .quick-pill-btn:hover,
+[data-theme="light"] .icon-btn:hover {
+  background: var(--bg-surface-3);
+}
+
+[data-theme="light"] .quick-pill-btn.primary {
+  background: rgba(var(--accent-color-rgb), 0.12);
+  color: var(--accent-color);
+  border-color: rgba(var(--accent-color-rgb), 0.3);
+}
+
+[data-theme="light"] .mobile-segmented-nav {
+  background: rgba(255, 255, 255, 0.9);
+  border-color: rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="light"] .mobile-nav-pill {
+  color: var(--text-secondary);
+}
+
+[data-theme="light"] .mobile-nav-pill.is-active {
+  background: #ffffff;
+  color: var(--text-primary);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="light"] .panel-card {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.08);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.03);
+}
+
+/* Light Mode Rotary Dial */
+[data-theme="light"] .rotary-picker-container {
+  background: #f4f5f8;
+  border-color: rgba(0, 0, 0, 0.09);
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+[data-theme="light"] .rotary-display-badge {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+[data-theme="light"] .apple-rotary-picker {
+  background: #e4e5eb;
+}
+
+[data-theme="light"] .rotary-dial-lens {
+  background: rgba(0, 0, 0, 0.04);
+  border-top-color: rgba(0, 0, 0, 0.12);
+  border-bottom-color: rgba(0, 0, 0, 0.12);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="light"] .rotary-dial-vignette {
+  background: linear-gradient(
+    to bottom,
+    rgba(228, 229, 235, 0.96) 0%,
+    rgba(228, 229, 235, 0.65) 15%,
+    rgba(228, 229, 235, 0) 38%,
+    rgba(228, 229, 235, 0) 62%,
+    rgba(228, 229, 235, 0.65) 85%,
+    rgba(228, 229, 235, 0.96) 100%
+  );
+}
+
+[data-theme="light"] .rotary-item {
+  color: #8e8e93;
+}
+
+[data-theme="light"] .rotary-item.is-active,
+[data-theme="light"] .rotary-column-hour .rotary-item.is-active,
+[data-theme="light"] .rotary-column-minute .rotary-item.is-active {
+  color: #1c1c1e;
+  font-weight: 700;
+}
+
+/* Light Mode Duration Pills */
+[data-theme="light"] .duration-pill {
+  background: #f0f1f5;
+  border-color: rgba(0, 0, 0, 0.08);
+  color: #1c1c1e;
+}
+
+[data-theme="light"] .duration-pill:hover {
+  background: #e4e5ea;
+}
+
+[data-theme="light"] .duration-pill.is-active {
+  background: var(--accent-color);
+  color: var(--accent-contrast, #000000);
+  border-color: var(--accent-color);
+}
+
+/* Light Mode Notes & Assist */
+[data-theme="light"] .form-input,
+[data-theme="light"] .note-textarea,
+[data-theme="light"] .search-input {
+  background: #f4f5f8;
+  border-color: rgba(0, 0, 0, 0.1);
+  color: #1c1c1e;
+}
+
+[data-theme="light"] .form-input:focus,
+[data-theme="light"] .note-textarea:focus,
+[data-theme="light"] .search-input:focus {
+  background: #ffffff;
+}
+
+[data-theme="light"] .note-tag-chip {
+  background: #f0f1f5;
+  border-color: rgba(0, 0, 0, 0.08);
+  color: #1c1c1e;
+}
+
+[data-theme="light"] .note-tag-chip:hover {
+  background: #e4e5ea;
+}
+
+[data-theme="light"] .note-tag-chip.is-active {
+  background: var(--accent-color);
+  color: var(--accent-contrast, #000000);
+}
+
+[data-theme="light"] .assist-dropdown-menu {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.12);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+[data-theme="light"] .assist-name-row {
+  background: #f4f5f8;
+}
+
+[data-theme="light"] .assist-name-row:hover {
+  background: #e9eaf0;
+}
+
+[data-theme="light"] .assist-name-row.is-active {
+  background: rgba(var(--accent-color-rgb), 0.12);
+  color: var(--accent-color);
+}
+
+/* Light Mode History & Cards */
+[data-theme="light"] .monthly-bonus-card {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
+}
+
+[data-theme="light"] .bonus-stat-box,
+[data-theme="light"] .bonus-tier-pill {
+  background: #f7f8fa;
+  border-color: rgba(0, 0, 0, 0.06);
+}
+
+[data-theme="light"] .class-log-card {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+}
+
+[data-theme="light"] .class-log-card:hover {
+  background: #ffffff;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+}
+
+[data-theme="light"] .card-action-btn {
+  background: #f0f1f5;
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="light"] .card-action-btn:hover {
+  background: #e4e5ea;
+  color: #1c1c1e;
+}
+
+[data-theme="light"] .card-note-box {
+  background: #f4f5f8;
+  border-color: rgba(0, 0, 0, 0.06);
+  color: #3a3a3c;
+}
+
+[data-theme="light"] .empty-state {
+  background: #f7f8fa;
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+/* Light Mode Modals */
+[data-theme="light"] .modal-overlay {
+  background: rgba(0, 0, 0, 0.45);
+}
+
+[data-theme="light"] .modal-window {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.12);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.18);
+}
+
+[data-theme="light"] .modal-close-btn {
+  background: #f0f1f5;
+  border-color: rgba(0, 0, 0, 0.08);
+  color: #636366;
+}
+
+[data-theme="light"] .modal-close-btn:hover {
+  background: #e4e5ea;
+  color: #1c1c1e;
+}
+
+[data-theme="light"] .settings-base-rate-box,
+[data-theme="light"] .settings-appearance-box {
+  background: #f7f8fa;
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="light"] .settings-rate-input {
+  color: #1c1c1e !important;
+  background: #ffffff !important;
+}
+
+[data-theme="light"] .export-preview-box {
+  background: #f4f5f8;
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+/* Light Mode Scrollbars */
+[data-theme="light"] ::-webkit-scrollbar-track {
+  background: #f2f2f7;
+}
+
+[data-theme="light"] ::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+[data-theme="light"] ::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.35);
 }
 
 

@@ -3,16 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>ClassLogger • Apple Clock Rotary Dial Class Tracker</title>
-  <meta name="description" content="A sleek Apple Clock-style class logging tool with authentic 3D rotary drum dial picker, category management, and local database storage.">
-  <meta name="theme-color" content="#0a0a0c">
-  <meta name="color-scheme" content="dark">
+  <title>AeroSplash Class Logger</title>
+  <meta name="description" content="AeroSplash Class Logger • Sleek Apple Clock-style class logging tool with 3D rotary drum dial picker, bonus tracking, and local database storage.">
+  <meta name="theme-color" content="#0a0a0c" id="meta-theme-color">
+  <meta name="color-scheme" content="dark" id="meta-color-scheme">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="ClassLogger">
-  <link rel="apple-touch-icon" href="assets/app-icon.jpg">
-  <link rel="icon" type="image/jpeg" href="assets/app-icon.jpg">
-  <link rel="stylesheet" href="styles.css?v=3.0">
+  <meta name="apple-mobile-web-app-title" content="AeroSplash">
+  <link rel="apple-touch-icon" href="assets/app-icon.png">
+  <link rel="icon" type="image/png" href="assets/app-icon.png">
+  <link rel="stylesheet" href="styles.css?v=3.1">
   <script type="importmap">
   {
     "imports": {
@@ -26,15 +26,15 @@
     <!-- Header -->
     <header class="app-header">
       <div class="brand-wrapper">
-        <div class="brand-icon-wrapper">
-          <img src="assets/app-icon.jpg" alt="ClassLogger Icon" class="brand-icon-img" id="app-logo">
+        <div class="brand-icon-wrapper" title="AeroSplash Class Logger">
+          <img src="assets/aerosplash-logo.png" alt="AeroSplash Logo" class="brand-icon-img" id="app-logo">
         </div>
         <div>
           <h1 class="brand-title">
-            ClassLogger
-            <span class="brand-badge">Apple Dial</span>
+            AeroSplash
+            <span class="brand-badge">Class Logger</span>
           </h1>
-          <p class="brand-subtitle">Rotary dial class tracker with local offline database</p>
+          <p class="brand-subtitle">Swimming class logger with Apple rotary dial</p>
         </div>
       </div>
 
@@ -58,7 +58,7 @@
           <input type="file" id="import-excel-btn" accept=".xlsx, .xls" style="display: none;">
         </label>
 
-        <button type="button" class="quick-pill-btn" id="btn-header-export" style="cursor: pointer; margin: 0; display: inline-flex; align-items: center; gap: 5px;" title="Export classes by category and date range">
+        <button type="button" class="quick-pill-btn" id="btn-header-export" style="cursor: pointer; margin: 0; display: inline-flex; align-items: center; gap: 5px;" title="Export classes and timesheets">
           <span>📤 Export</span>
         </button>
 
@@ -66,7 +66,11 @@
           <span id="sound-icon">🔊</span>
         </button>
 
-        <button type="button" class="icon-btn" id="data-menu-btn" title="Backup & Export Database" aria-label="Database Settings">
+        <button type="button" class="icon-btn" id="theme-toggle-btn" title="Toggle Light / Dark Mode" aria-label="Toggle Theme">
+          <span id="theme-icon">☀️</span>
+        </button>
+
+        <button type="button" class="icon-btn" id="data-menu-btn" title="Settings & Appearance" aria-label="Settings and Appearance">
           <span>⚙️</span>
         </button>
       </div>
@@ -133,23 +137,7 @@
             </div>
           </div>
 
-          <!-- 2. Class Category Selector -->
-          <div class="form-section">
-            <div class="section-label-row">
-              <label class="section-label">
-                <span>🏷️</span> Class Category
-              </label>
-              <button type="button" class="quick-pill-btn" id="btn-manage-categories" style="font-size: 0.72rem; padding: 2px 8px;">
-                <span>+ Custom Type</span>
-              </button>
-            </div>
-
-            <div class="category-grid" id="category-picker-grid">
-              <!-- Populated dynamically via JS: Coach Allen, Aerosplash, Charles, etc. -->
-            </div>
-          </div>
-
-          <!-- 3. Class Duration -->
+          <!-- 2. Class Duration -->
           <div class="form-section">
             <div class="section-label-row">
               <label class="section-label">
@@ -270,17 +258,9 @@
               type="text" 
               class="search-input" 
               id="history-search-input" 
-              placeholder="Search notes, categories, or dates..."
+              placeholder="Search notes, dates, or times..."
               autocomplete="off"
             >
-          </div>
-
-          <!-- Category filter tabs -->
-          <div class="category-filter-tabs" id="history-filter-tabs">
-            <button type="button" class="filter-tab is-active" data-cat="all">
-              All Classes <span class="filter-count" id="count-cat-all">0</span>
-            </button>
-            <!-- Populated via JS -->
           </div>
         </div>
 
@@ -292,62 +272,60 @@
     </main>
   </div>
 
-  <!-- Modal: Custom Category Manager -->
-  <div class="modal-overlay" id="modal-category">
-    <div class="modal-window">
-      <div class="modal-header">
-        <h3 class="modal-title">Class Categories</h3>
-        <button type="button" class="modal-close-btn" id="btn-close-cat-modal">✕</button>
-      </div>
-
-      <!-- Manage Existing Categories List -->
-      <div style="margin-bottom: 16px;">
-        <div style="font-size: 0.72rem; font-weight: 700; text-transform: uppercase; color: var(--text-tertiary); letter-spacing: 0.05em; margin-bottom: 8px;">
-          Manage Existing Categories
-        </div>
-        <div class="modal-categories-list" id="modal-categories-list" style="max-height: 150px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; padding-right: 2px;">
-          <!-- Rendered dynamically by JS -->
-        </div>
-      </div>
-
-      <div style="font-size: 0.72rem; font-weight: 700; text-transform: uppercase; color: var(--text-tertiary); letter-spacing: 0.05em; margin-bottom: 10px; border-top: 1px solid var(--border-subtle); padding-top: 14px;">
-        Add New Category
-      </div>
-
-      <form id="category-form" onsubmit="return false;">
-        <div class="form-group">
-          <label for="new-cat-name">Category Name</label>
-          <input type="text" id="new-cat-name" class="form-input" placeholder="e.g. Kickboxing, Pilates, Spin..." required>
-        </div>
-        <div class="form-group">
-          <label for="new-cat-icon">Emoji Icon</label>
-          <input type="text" id="new-cat-icon" class="form-input" value="⚡" maxlength="4">
-        </div>
-        <div class="form-group">
-          <label>Theme Accent Color</label>
-          <div class="color-palette-options" id="color-palette-options">
-            <div class="color-option is-selected" data-color="#ff9f0a" style="background: #ff9f0a;"></div>
-            <div class="color-option" data-color="#0a84ff" style="background: #0a84ff;"></div>
-            <div class="color-option" data-color="#30d158" style="background: #30d158;"></div>
-            <div class="color-option" data-color="#bf5af2" style="background: #bf5af2;"></div>
-            <div class="color-option" data-color="#ff453a" style="background: #ff453a;"></div>
-            <div class="color-option" data-color="#64d2ff" style="background: #64d2ff;"></div>
-            <div class="color-option" data-color="#ffd60a" style="background: #ffd60a;"></div>
-          </div>
-        </div>
-        <button type="submit" class="submit-btn" id="btn-save-category" style="margin-top: 16px;">
-          Add Category
-        </button>
-      </form>
-    </div>
-  </div>
-
   <!-- Modal: Data Management & Backups -->
   <div class="modal-overlay" id="modal-data">
     <div class="modal-window">
       <div class="modal-header">
-        <h3 class="modal-title">⚙️ Settings & Database Manager</h3>
+        <h3 class="modal-title">⚙️ Settings & Database</h3>
         <button type="button" class="modal-close-btn" id="btn-close-data-modal">✕</button>
+      </div>
+
+      <!-- Appearance & Theme Customization Box -->
+      <div class="settings-appearance-box">
+        <div class="settings-appearance-header">
+          <div>
+            <div class="settings-appearance-title">🎨 Appearance & Theme</div>
+            <div class="settings-appearance-subtitle">Switch between dark/light mode and customize your accent colors</div>
+          </div>
+        </div>
+
+        <!-- Mode Toggle -->
+        <div class="settings-appearance-row">
+          <label class="settings-field-label">Display Mode</label>
+          <div class="theme-switch-pills" id="theme-switch-pills">
+            <button type="button" class="theme-pill is-active" data-theme-val="dark">
+              <span>🌙 Dark</span>
+            </button>
+            <button type="button" class="theme-pill" data-theme-val="light">
+              <span>☀️ Light</span>
+            </button>
+            <button type="button" class="theme-pill" data-theme-val="system">
+              <span>🖥️ System</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Accent Color Picker -->
+        <div class="settings-appearance-row" style="margin-top: 12px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <label class="settings-field-label" style="margin-bottom: 0;">Accent Color</label>
+            <span class="accent-current-preview" id="accent-current-preview">#ff9f0a</span>
+          </div>
+          <div class="accent-palette-grid" id="accent-palette-grid">
+            <button type="button" class="accent-color-btn is-active" data-accent="#ff9f0a" title="Apple Orange (Default)" style="--btn-color: #ff9f0a;"></button>
+            <button type="button" class="accent-color-btn" data-accent="#0a84ff" title="AeroSplash Blue" style="--btn-color: #0a84ff;"></button>
+            <button type="button" class="accent-color-btn" data-accent="#30d158" title="Emerald Green" style="--btn-color: #30d158;"></button>
+            <button type="button" class="accent-color-btn" data-accent="#bf5af2" title="Vivid Purple" style="--btn-color: #bf5af2;"></button>
+            <button type="button" class="accent-color-btn" data-accent="#ff453a" title="Apple Red" style="--btn-color: #ff453a;"></button>
+            <button type="button" class="accent-color-btn" data-accent="#ffd60a" title="Sun Gold" style="--btn-color: #ffd60a;"></button>
+            <button type="button" class="accent-color-btn" data-accent="#64d2ff" title="Aqua Cyan" style="--btn-color: #64d2ff;"></button>
+            <button type="button" class="accent-color-btn" data-accent="#ff375f" title="Hot Pink" style="--btn-color: #ff375f;"></button>
+            <label class="accent-color-custom-label" title="Custom Accent Color Picker">
+              <span>🎨</span>
+              <input type="color" id="input-custom-accent-color" value="#ff9f0a" class="accent-custom-picker-input">
+            </label>
+          </div>
+        </div>
       </div>
 
       <!-- Coach Base Rate Adjustment Box -->
@@ -388,12 +366,12 @@
 
       <div style="display: flex; flex-direction: column; gap: 10px;">
         <button type="button" class="submit-btn" id="btn-open-export-modal" style="background: rgba(10, 132, 255, 0.2); color: var(--apple-cyan); box-shadow: none; border: 1px solid rgba(10, 132, 255, 0.4); font-weight: 600;">
-          📤 Export Filtered Classes (Choose Category & Dates)
+          📤 Export Classes (Filter Dates & Timesheet)
         </button>
-        <button type="button" class="submit-btn" id="btn-export-csv" style="background: var(--bg-surface-2); color: #fff; box-shadow: none; border: 1px solid var(--border-medium);">
+        <button type="button" class="submit-btn" id="btn-export-csv" style="background: var(--bg-surface-2); color: var(--text-primary); box-shadow: none; border: 1px solid var(--border-medium);">
           📊 Export as CSV (Quick All Classes)
         </button>
-        <button type="button" class="submit-btn" id="btn-export-json" style="background: var(--bg-surface-2); color: #fff; box-shadow: none; border: 1px solid var(--border-medium);">
+        <button type="button" class="submit-btn" id="btn-export-json" style="background: var(--bg-surface-2); color: var(--text-primary); box-shadow: none; border: 1px solid var(--border-medium);">
           💾 Backup Full Database (JSON)
         </button>
         
@@ -407,8 +385,8 @@
           <input type="file" id="import-excel-modal-input" accept=".xlsx, .xls" style="display: none;">
         </label>
 
-        <button type="button" class="submit-btn" id="btn-import-september" style="background: rgba(255, 159, 10, 0.15); color: var(--apple-orange); box-shadow: none; border: 1px solid rgba(255, 159, 10, 0.35);">
-          ⚡ One-Click Import "JieHern_CoachTimesheet September2026" (26 Aerosplash sessions)
+        <button type="button" class="submit-btn" id="btn-import-september" style="background: rgba(var(--accent-color-rgb), 0.15); color: var(--accent-color); box-shadow: none; border: 1px solid rgba(var(--accent-color-rgb), 0.35);">
+          ⚡ One-Click Import "JieHern_CoachTimesheet September2026" (26 sessions)
         </button>
 
         <button type="button" class="submit-btn" id="btn-seed-sample" style="background: rgba(10, 132, 255, 0.15); color: var(--apple-blue); box-shadow: none; border: 1px solid rgba(10, 132, 255, 0.35);">
@@ -429,23 +407,14 @@
         <div>
           <h3 class="modal-title"><span>📤</span> Export Classes</h3>
           <p style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 3px;">
-            Filter by category and date range before exporting
+            Filter by date range and generate coach timesheets
           </p>
         </div>
         <button type="button" class="modal-close-btn" id="btn-close-export-modal">✕</button>
       </div>
 
       <div class="export-form-body">
-        <!-- 1. Category Selection -->
-        <div class="form-group">
-          <label for="export-category-select">Class Category</label>
-          <select id="export-category-select" class="form-input export-select">
-            <option value="all">🌟 All Categories</option>
-            <!-- Dynamically populated: Aerosplash, Coach Allen, Charles, etc. -->
-          </select>
-        </div>
-
-        <!-- 2. Date Range Quick Presets -->
+        <!-- 1. Date Range Quick Presets -->
         <div class="form-group">
           <label>Quick Date Range Presets</label>
           <div class="export-preset-pills" id="export-preset-pills">
@@ -563,6 +532,6 @@
   <div class="toast-container" id="toast-container" aria-live="polite"></div>
 
   <!-- Main JavaScript App -->
-  <script type="module" src="js/app.js?v=3.0"></script>
+  <script type="module" src="js/app.js?v=3.1"></script>
 </body>
 </html>

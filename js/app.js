@@ -1,9 +1,9 @@
 /**
- * app.js - Main Application Orchestrator for ClassLogger
- * Integrates Apple Rotary Dial Picker, Localized IndexedDB Storage, Categories, Audio & Analytics
+ * app.js - Main Application Orchestrator for AeroSplash Class Logger
+ * Integrates Apple Rotary Dial Picker, Localized IndexedDB Storage, Audio & Analytics
  */
 
-import { db, DEFAULT_CATEGORIES } from './db.js';
+import { db } from './db.js';
 import { RotaryDialPicker } from './rotary-picker.js';
 import { sound } from './audio.js';
 import { ExcelTimesheetImporter, ExcelTimesheetExporter, getClassCreditUnits, calculateManagerBonus } from './excel-importer.js';
@@ -11,11 +11,8 @@ import { ExcelTimesheetImporter, ExcelTimesheetExporter, getClassCreditUnits, ca
 class ClassLoggerApp {
   constructor() {
     this.classes = [];
-    this.categories = [...DEFAULT_CATEGORIES];
-    this.selectedCategoryId = DEFAULT_CATEGORIES[0]?.id || 'cat_coach_allen';
     this.selectedDuration = 60;
     this.editingClassId = null;
-    this.activeFilter = 'all';
     this.searchQuery = '';
 
     // Initialize DOM hooks
@@ -23,13 +20,13 @@ class ClassLoggerApp {
   }
 
   async init() {
-    console.log('ClassLoggerApp initializing...');
+    console.log('AeroSplash Class Logger initializing...');
 
-    // 1. Render default categories immediately so cards are visible and clickable
-    this.renderCategoryGrid();
-    this.renderFilterTabs();
+    // 1. Initialize Theme and Accent Color immediately
+    this.initTheme();
+    this.initAccentColor();
 
-    // 2. Attach UI event listeners immediately so ALL buttons work right away
+    // 2. Attach UI event listeners immediately so all buttons work right away
     this.attachEventListeners();
     this.updateSoundButtonUI();
     this.renderAssistNamesList();
@@ -54,16 +51,15 @@ class ClassLoggerApp {
         statusText.textContent = db.isIndexedDBAvailable ? 'Local DB: IndexedDB' : 'Local DB: LocalStorage';
       }
 
-      await this.loadCategories();
       await this.loadClasses();
 
-      // Clean up / migrate any legacy sessions previously imported under subcategories like LTS, PreComp, Swim Clinic
+      // Clean up / migrate any legacy sessions previously imported under subcategories
       await this.migrateLegacyImportCategories();
     } catch (err) {
       console.error('Error during DB init/data load:', err);
     }
 
-    console.log('ClassLoggerApp ready!');
+    console.log('AeroSplash Class Logger ready!');
   }
 
   initElements() {
@@ -73,7 +69,6 @@ class ClassLoggerApp {
 
     // Form elements
     this.classForm = document.getElementById('class-form');
-    this.categoryGrid = document.getElementById('category-picker-grid');
     this.durationContainer = document.getElementById('duration-pills-container');
     this.durationLabel = document.getElementById('selected-duration-label');
     this.customDurationWrapper = document.getElementById('custom-duration-wrapper');
@@ -102,21 +97,16 @@ class ClassLoggerApp {
     // History & list elements
     this.classesList = document.getElementById('classes-list');
     this.searchInput = document.getElementById('history-search-input');
-    this.filterTabs = document.getElementById('history-filter-tabs');
     this.logCountTag = document.getElementById('log-count-tag');
 
     // Header buttons
     this.soundToggleBtn = document.getElementById('sound-toggle-btn');
     this.soundIcon = document.getElementById('sound-icon');
+    this.themeToggleBtn = document.getElementById('theme-toggle-btn');
+    this.themeIcon = document.getElementById('theme-icon');
     this.dataMenuBtn = document.getElementById('data-menu-btn');
 
     // Modals
-    this.modalCategory = document.getElementById('modal-category');
-    this.categoryForm = document.getElementById('category-form');
-    this.btnCloseCatModal = document.getElementById('btn-close-cat-modal');
-    this.btnManageCategories = document.getElementById('btn-manage-categories');
-    this.colorPaletteOptions = document.getElementById('color-palette-options');
-
     this.modalData = document.getElementById('modal-data');
     this.btnCloseDataModal = document.getElementById('btn-close-data-modal');
     this.btnExportCsv = document.getElementById('btn-export-csv');
@@ -125,6 +115,12 @@ class ClassLoggerApp {
     this.importJsonHeaderBtn = document.getElementById('import-json-header-btn');
     this.btnSeedSample = document.getElementById('btn-seed-sample');
     this.btnClearDb = document.getElementById('btn-clear-db');
+
+    // Appearance & Accent settings elements
+    this.themeSwitchPills = document.getElementById('theme-switch-pills');
+    this.accentPaletteGrid = document.getElementById('accent-palette-grid');
+    this.accentCurrentPreview = document.getElementById('accent-current-preview');
+    this.inputCustomAccentColor = document.getElementById('input-custom-accent-color');
 
     // Excel import elements
     this.importExcelBtn = document.getElementById('import-excel-btn');
@@ -141,7 +137,6 @@ class ClassLoggerApp {
     this.btnOpenExportModal = document.getElementById('btn-open-export-modal');
     this.modalExport = document.getElementById('modal-export');
     this.btnCloseExportModal = document.getElementById('btn-close-export-modal');
-    this.exportCategorySelect = document.getElementById('export-category-select');
     this.exportDateFrom = document.getElementById('export-date-from');
     this.exportDateTo = document.getElementById('export-date-to');
     this.exportPresetPills = document.getElementById('export-preset-pills');
@@ -190,121 +185,158 @@ class ClassLoggerApp {
     }
   }
 
-  // --- DATA LOADING & RENDERING ---
+  // --- THEME & ACCENT COLOR SYSTEM ---
 
-  async loadCategories() {
+  initTheme() {
+    let savedTheme = 'dark';
     try {
-      const cats = await db.getAllCategories();
-      if (Array.isArray(cats)) {
-        this.categories = cats;
-      }
+      savedTheme = localStorage.getItem('aerosplash_theme') || 'dark';
     } catch (e) {
-      console.warn('Failed to load categories, using defaults:', e);
+      console.warn('Could not read theme from localStorage:', e);
+    }
+    this.setTheme(savedTheme, false);
+
+    // Watch for OS preference changes if system theme is selected
+    if (window.matchMedia) {
+      window.matchMedia('(prefers-color-scheme: light)').addEventListener('change', () => {
+        let currentTheme = 'dark';
+        try {
+          currentTheme = localStorage.getItem('aerosplash_theme') || 'dark';
+        } catch (e) {}
+        if (currentTheme === 'system') {
+          this.setTheme('system', false);
+        }
+      });
+    }
+  }
+
+  getEffectiveTheme(theme) {
+    if (theme === 'system') {
+      return (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) ? 'light' : 'dark';
+    }
+    return theme === 'light' ? 'light' : 'dark';
+  }
+
+  setTheme(theme, save = true) {
+    if (save) {
+      try {
+        localStorage.setItem('aerosplash_theme', theme);
+      } catch (e) {
+        console.warn('Could not save theme to localStorage:', e);
+      }
     }
 
-    if (this.categories.length > 0) {
-      if (!this.selectedCategoryId || !this.categories.some(c => c.id === this.selectedCategoryId)) {
-        const defaultCat = this.categories.find(c => c.name === 'Coach Allen') || this.categories[0];
-        this.selectedCategoryId = defaultCat.id;
-      }
-    } else {
-      this.selectedCategoryId = null;
+    const effectiveTheme = this.getEffectiveTheme(theme);
+    document.documentElement.setAttribute('data-theme', effectiveTheme);
+
+    // Update meta theme colors for Safari / Chrome mobile address bar
+    const metaThemeColor = document.getElementById('meta-theme-color');
+    if (metaThemeColor) {
+      metaThemeColor.setAttribute('content', effectiveTheme === 'light' ? '#f2f2f7' : '#0a0a0c');
     }
-    this.renderCategoryGrid();
-    this.renderFilterTabs();
+    const metaColorScheme = document.getElementById('meta-color-scheme');
+    if (metaColorScheme) {
+      metaColorScheme.setAttribute('content', effectiveTheme);
+    }
+
+    // Update Header Theme Icon
+    if (this.themeIcon) {
+      this.themeIcon.textContent = effectiveTheme === 'light' ? '🌙' : '☀️';
+    }
+    if (this.themeToggleBtn) {
+      this.themeToggleBtn.title = effectiveTheme === 'light' ? 'Switch to Dark Mode' : 'Switch to Light Mode';
+    }
+
+    // Update Settings Theme Switch Pills
+    if (this.themeSwitchPills) {
+      this.themeSwitchPills.querySelectorAll('.theme-pill').forEach(pill => {
+        pill.classList.toggle('is-active', pill.dataset.themeVal === theme);
+      });
+    }
   }
 
-  renderCategoryGrid() {
-    if (!this.categoryGrid) return;
-    this.categoryGrid.innerHTML = '';
+  toggleTheme() {
+    let currentTheme = 'dark';
+    try {
+      currentTheme = localStorage.getItem('aerosplash_theme') || 'dark';
+    } catch (e) {}
+    const effectiveTheme = this.getEffectiveTheme(currentTheme);
+    const newTheme = effectiveTheme === 'dark' ? 'light' : 'dark';
+    this.setTheme(newTheme, true);
+    sound.playTick(1.2);
+    this.showToast(`Switched to ${newTheme === 'dark' ? 'Dark' : 'Light'} Mode`, 'info');
+  }
 
-    this.categories.forEach(cat => {
-      const card = document.createElement('div');
-      card.className = `category-card ${cat.id === this.selectedCategoryId ? 'is-selected' : ''}`;
-      card.dataset.id = cat.id;
-      card.style.setProperty('--category-color', cat.color || '#ff9f0a');
-      card.style.setProperty('--category-glow', `${cat.color || '#ff9f0a'}40`);
+  initAccentColor() {
+    let savedAccent = '#ff9f0a';
+    try {
+      savedAccent = localStorage.getItem('aerosplash_accent_color') || '#ff9f0a';
+    } catch (e) {
+      console.warn('Could not read accent color from localStorage:', e);
+    }
+    this.setAccentColor(savedAccent, false);
+  }
 
-      card.innerHTML = `
-        <div class="category-check">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-            <polyline points="20 6 9 17 4 12"></polyline>
-          </svg>
-        </div>
-        <button type="button" class="category-delete-btn" title="Delete ${this.escapeHTML(cat.name)}" aria-label="Delete ${this.escapeHTML(cat.name)}">
-          ✕
-        </button>
-        <div class="category-icon">${cat.icon || '📌'}</div>
-        <div class="category-name" title="${this.escapeHTML(cat.name)}">${this.escapeHTML(cat.name)}</div>
-      `;
+  hexToRgb(hex) {
+    let cleanHex = hex.replace('#', '').trim();
+    if (cleanHex.length === 3) {
+      cleanHex = cleanHex.split('').map(c => c + c).join('');
+    }
+    if (cleanHex.length !== 6) {
+      return { r: 255, g: 159, b: 10 }; // Fallback orange
+    }
+    const num = parseInt(cleanHex, 16);
+    return {
+      r: (num >> 16) & 255,
+      g: (num >> 8) & 255,
+      b: num & 255
+    };
+  }
 
-      card.addEventListener('click', (e) => {
-        if (e.target.closest('.category-delete-btn')) return;
-        this.selectedCategoryId = cat.id;
-        sound.playTick(1.2);
-        this.renderCategoryGrid();
-      });
+  setAccentColor(hex, save = true) {
+    if (!hex || typeof hex !== 'string') return;
+    let formattedHex = hex.trim();
+    if (!formattedHex.startsWith('#')) formattedHex = '#' + formattedHex;
 
-      const delBtn = card.querySelector('.category-delete-btn');
-      if (delBtn) {
-        delBtn.addEventListener('click', async (e) => {
-          e.stopPropagation();
-          e.preventDefault();
-          if (confirm(`Remove category "${cat.name}"?`)) {
-            await this.handleDeleteCategory(cat.id, cat.name);
-          }
-        });
+    const rgb = this.hexToRgb(formattedHex);
+    // Perceived luminance formula (ITU-R BT.601)
+    const luminance = (rgb.r * 299 + rgb.g * 587 + rgb.b * 114) / 1000;
+    const contrastText = luminance > 140 ? '#000000' : '#ffffff';
+
+    const rootStyle = document.documentElement.style;
+    rootStyle.setProperty('--accent-color', formattedHex);
+    rootStyle.setProperty('--accent-color-rgb', `${rgb.r}, ${rgb.g}, ${rgb.b}`);
+    rootStyle.setProperty('--accent-glow', `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.35)`);
+    rootStyle.setProperty('--accent-contrast', contrastText);
+    rootStyle.setProperty('--apple-orange', formattedHex);
+    rootStyle.setProperty('--apple-orange-glow', `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.35)`);
+    rootStyle.setProperty('--border-focus', formattedHex);
+    rootStyle.setProperty('--card-accent', formattedHex);
+
+    if (save) {
+      try {
+        localStorage.setItem('aerosplash_accent_color', formattedHex);
+      } catch (e) {
+        console.warn('Could not save accent color to localStorage:', e);
       }
+    }
 
-      this.categoryGrid.appendChild(card);
-    });
-
-    // Add "+ Custom Type" button
-    const addCard = document.createElement('div');
-    addCard.className = 'category-card add-category-btn';
-    addCard.innerHTML = `
-      <div class="category-icon">➕</div>
-      <div class="category-name">New Type</div>
-    `;
-    addCard.addEventListener('click', () => {
-      this.openModal(this.modalCategory);
-    });
-    this.categoryGrid.appendChild(addCard);
-  }
-
-  renderFilterTabs() {
-    if (!this.filterTabs) return;
-    this.filterTabs.innerHTML = '';
-
-    // "All Classes" Tab
-    const allTab = document.createElement('button');
-    allTab.type = 'button';
-    allTab.className = `filter-tab ${this.activeFilter === 'all' ? 'is-active' : ''}`;
-    allTab.dataset.cat = 'all';
-    allTab.innerHTML = `All Classes <span class="filter-count">${this.classes.length}</span>`;
-    allTab.addEventListener('click', () => {
-      this.activeFilter = 'all';
-      this.renderFilterTabs();
-      this.renderClassesList();
-    });
-    this.filterTabs.appendChild(allTab);
-
-    // Individual Category Tabs
-    this.categories.forEach(cat => {
-      const count = this.classes.filter(c => c.category === cat.name).length;
-      const tab = document.createElement('button');
-      tab.type = 'button';
-      tab.className = `filter-tab ${this.activeFilter === cat.id ? 'is-active' : ''}`;
-      tab.dataset.cat = cat.id;
-      tab.innerHTML = `${cat.icon || ''} ${cat.name} <span class="filter-count">${count}</span>`;
-      tab.addEventListener('click', () => {
-        this.activeFilter = cat.id;
-        this.renderFilterTabs();
-        this.renderClassesList();
+    // Update UI elements
+    if (this.accentCurrentPreview) {
+      this.accentCurrentPreview.textContent = formattedHex.toUpperCase();
+      this.accentCurrentPreview.style.color = formattedHex;
+    }
+    if (this.inputCustomAccentColor) {
+      this.inputCustomAccentColor.value = formattedHex;
+    }
+    if (this.accentPaletteGrid) {
+      this.accentPaletteGrid.querySelectorAll('.accent-color-btn').forEach(btn => {
+        btn.classList.toggle('is-active', btn.dataset.accent.toLowerCase() === formattedHex.toLowerCase());
       });
-      this.filterTabs.appendChild(tab);
-    });
+    }
   }
+
+  // --- DATA LOADING & RENDERING ---
 
   async loadClasses() {
     try {
@@ -314,21 +346,12 @@ class ClassLoggerApp {
       this.classes = [];
     }
     this.renderClassesList();
-    this.renderFilterTabs();
   }
 
   renderClassesList() {
     if (!this.classesList) return;
 
     let filtered = [...this.classes];
-
-    // Filter by active category tab
-    if (this.activeFilter !== 'all') {
-      const targetCat = this.categories.find(c => c.id === this.activeFilter);
-      if (targetCat) {
-        filtered = filtered.filter(c => c.category === targetCat.name);
-      }
-    }
 
     // Filter by search query
     if (this.searchQuery.trim()) {
@@ -381,11 +404,6 @@ class ClassLoggerApp {
     this.classesList.innerHTML = '';
 
     filtered.forEach(item => {
-      const catObj = this.categories.find(c => c.name === item.category) || {
-        color: '#ff9f0a',
-        icon: '📌'
-      };
-
       // Actual formatted calendar date
       const itemDate = new Date(item.date + 'T00:00:00');
       const formattedDate = itemDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
@@ -404,13 +422,13 @@ class ClassLoggerApp {
 
       const card = document.createElement('article');
       card.className = 'class-log-card';
-      card.style.setProperty('--card-accent', catObj.color);
+      card.style.setProperty('--card-accent', 'var(--accent-color)');
 
       card.innerHTML = `
         <div class="card-top-row">
           <div class="card-category-badge">
-            <span class="category-badge-icon">${catObj.icon}</span>
-            <span class="category-badge-text">${this.escapeHTML(item.category)}</span>
+            <span class="category-badge-icon">🌊</span>
+            <span class="category-badge-text">AeroSplash</span>
           </div>
           <span class="card-units-badge ${unitBadgeClass}">
             ${unitBadgeLabel}
@@ -482,9 +500,6 @@ class ClassLoggerApp {
         const now = new Date();
         periodLabel = now.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
       }
-    } else if (this.activeFilter !== 'all') {
-      const cat = this.categories.find(c => c.id === this.activeFilter);
-      periodLabel = cat ? cat.name : 'Filtered View';
     } else if (this.searchQuery) {
       periodLabel = 'Search Results';
     }
@@ -866,7 +881,7 @@ class ClassLoggerApp {
       });
     }
 
-    // 6. Sound Toggle
+    // 6. Sound & Theme Controls
     if (this.soundToggleBtn) {
       this.soundToggleBtn.addEventListener('click', () => {
         const isMuted = sound.toggleMute();
@@ -876,14 +891,37 @@ class ClassLoggerApp {
       });
     }
 
-    // 7. Modal Open & Close Triggers
-    if (this.btnManageCategories) {
-      this.btnManageCategories.addEventListener('click', () => this.openModal(this.modalCategory));
-    }
-    if (this.btnCloseCatModal) {
-      this.btnCloseCatModal.addEventListener('click', () => this.closeModal(this.modalCategory));
+    if (this.themeToggleBtn) {
+      this.themeToggleBtn.addEventListener('click', () => {
+        this.toggleTheme();
+      });
     }
 
+    // Appearance & Accent Settings Listeners
+    if (this.themeSwitchPills) {
+      this.themeSwitchPills.querySelectorAll('.theme-pill').forEach(pill => {
+        pill.addEventListener('click', () => {
+          this.setTheme(pill.dataset.themeVal);
+        });
+      });
+    }
+
+    if (this.accentPaletteGrid) {
+      this.accentPaletteGrid.querySelectorAll('.accent-color-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          this.setAccentColor(btn.dataset.accent);
+          sound.playTick(1.1);
+        });
+      });
+    }
+
+    if (this.inputCustomAccentColor) {
+      this.inputCustomAccentColor.addEventListener('input', (e) => {
+        this.setAccentColor(e.target.value);
+      });
+    }
+
+    // 7. Modal Open & Close Triggers
     if (this.dataMenuBtn) {
       this.dataMenuBtn.addEventListener('click', () => this.openModal(this.modalData));
     }
@@ -926,7 +964,7 @@ class ClassLoggerApp {
     }
 
     // Close modals on clicking overlay background
-    [this.modalCategory, this.modalData, this.modalDateJump, this.modalExport].forEach(modal => {
+    [this.modalData, this.modalDateJump, this.modalExport].forEach(modal => {
       if (modal) {
         modal.addEventListener('click', (e) => {
           if (e.target === modal) this.closeModal(modal);
@@ -934,10 +972,7 @@ class ClassLoggerApp {
       }
     });
 
-    // Export modal filters & buttons
-    if (this.exportCategorySelect) {
-      this.exportCategorySelect.addEventListener('change', () => this.updateExportPreview());
-    }
+    // Export modal date filters & buttons
     if (this.exportDateFrom) {
       this.exportDateFrom.addEventListener('change', () => {
         this.clearActivePresetPill();
@@ -977,23 +1012,6 @@ class ClassLoggerApp {
     }
     if (this.btnExportFilteredJson) {
       this.btnExportFilteredJson.addEventListener('click', () => this.handleExportJson());
-    }
-
-    // 8. Custom Category Creation
-    if (this.colorPaletteOptions) {
-      this.colorPaletteOptions.querySelectorAll('.color-option').forEach(opt => {
-        opt.addEventListener('click', () => {
-          this.colorPaletteOptions.querySelectorAll('.color-option').forEach(o => o.classList.remove('is-selected'));
-          opt.classList.add('is-selected');
-        });
-      });
-    }
-
-    if (this.categoryForm) {
-      this.categoryForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        await this.handleSaveCustomCategory();
-      });
     }
 
     // 9. Data Management & Backups
@@ -1173,13 +1191,6 @@ class ClassLoggerApp {
     if (!this.rotaryPicker) return;
 
     const rotaryVal = this.rotaryPicker.getValue();
-    const selectedCategory = this.categories.find(c => c.id === this.selectedCategoryId);
-
-    if (!selectedCategory) {
-      this.showToast('Please select a class category', 'danger');
-      return;
-    }
-
     const note = this.notesInput ? this.notesInput.value.trim() : '';
 
     const recordData = {
@@ -1187,7 +1198,7 @@ class ClassLoggerApp {
       time: rotaryVal.time24,
       displayTime: rotaryVal.displayTime,
       timestamp: rotaryVal.timestamp,
-      category: selectedCategory.name,
+      category: 'AeroSplash',
       duration: this.selectedDuration,
       note: note
     };
@@ -1195,13 +1206,13 @@ class ClassLoggerApp {
     if (this.editingClassId) {
       // Update existing record
       await db.updateClass(this.editingClassId, recordData);
-      this.showToast(`Updated session for ${selectedCategory.name}`, 'success');
+      this.showToast('Updated AeroSplash session', 'success');
       sound.playSuccess();
       this.cancelEdit();
     } else {
       // Create new record
       await db.addClass(recordData);
-      this.showToast(`Logged session for ${selectedCategory.name} at ${rotaryVal.displayTime}`, 'success');
+      this.showToast(`Logged AeroSplash session at ${rotaryVal.displayTime}`, 'success');
       sound.playSuccess();
 
       // Reset note field
@@ -1224,13 +1235,6 @@ class ClassLoggerApp {
       const [hh, mm] = (item.time || '12:00').split(':').map(Number);
       const dateObj = new Date(y, m - 1, d, hh, mm);
       this.rotaryPicker.setValue(dateObj, true);
-    }
-
-    // Set category
-    const cat = this.categories.find(c => c.name === item.category);
-    if (cat) {
-      this.selectedCategoryId = cat.id;
-      this.renderCategoryGrid();
     }
 
     // Set duration
@@ -1295,12 +1299,13 @@ class ClassLoggerApp {
     const clone = {
       ...item,
       id: undefined,
+      category: 'AeroSplash',
       note: item.note ? `${item.note} (Copy)` : ''
     };
     await db.addClass(clone);
     await this.loadClasses();
     sound.playSuccess();
-    this.showToast(`Duplicated session for ${item.category}`, 'success');
+    this.showToast('Duplicated AeroSplash session', 'success');
   }
 
   async deleteClass(id) {
@@ -1312,84 +1317,12 @@ class ClassLoggerApp {
     }
   }
 
-  async handleSaveCustomCategory() {
-    const nameInput = document.getElementById('new-cat-name');
-    const iconInput = document.getElementById('new-cat-icon');
-    const name = nameInput ? nameInput.value.trim() : '';
-    const icon = (iconInput ? iconInput.value.trim() : '') || '⚡';
-
-    if (!name) return;
-
-    const selectedColorEl = this.colorPaletteOptions ? this.colorPaletteOptions.querySelector('.color-option.is-selected') : null;
-    const color = selectedColorEl ? selectedColorEl.dataset.color : '#ff9f0a';
-
-    const newCat = await db.addCategory({
-      name,
-      icon,
-      color
-    });
-
-    this.selectedCategoryId = newCat.id;
-    await this.loadCategories();
-    this.closeModal(this.modalCategory);
-    if (nameInput) nameInput.value = '';
-    sound.playSuccess();
-    this.showToast(`Category "${name}" created!`, 'success');
-  }
-
-  async handleDeleteCategory(catId, catName) {
-    await db.deleteCategory(catId);
-    this.categories = this.categories.filter(c => c.id !== catId);
-    if (this.selectedCategoryId === catId) {
-      this.selectedCategoryId = this.categories.length > 0 ? this.categories[0].id : null;
-    }
-    this.renderCategoryGrid();
-    this.renderFilterTabs();
-    this.renderModalCategoriesList();
-    sound.playTrash();
-    this.showToast(`Removed category "${catName}"`, 'info');
-  }
-
-  renderModalCategoriesList() {
-    const listEl = document.getElementById('modal-categories-list');
-    if (!listEl) return;
-    if (this.categories.length === 0) {
-      listEl.innerHTML = `<div style="font-size: 0.8rem; color: var(--text-muted); font-style: italic; padding: 6px 0;">No categories available. Add one below.</div>`;
-      return;
-    }
-
-    listEl.innerHTML = this.categories.map(cat => `
-      <div class="modal-cat-item" style="display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; background: rgba(255,255,255,0.04); border-radius: 8px; border: 1px solid var(--border-subtle);">
-        <div style="display: flex; align-items: center; gap: 8px;">
-          <span style="font-size: 1.1rem;">${cat.icon || '📌'}</span>
-          <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-primary);">${this.escapeHTML(cat.name)}</span>
-        </div>
-        <button type="button" class="btn-delete-modal-cat" data-id="${cat.id}" data-name="${this.escapeHTML(cat.name)}" style="background: rgba(255,69,58,0.15); border: 1px solid rgba(255,69,58,0.3); color: #ff453a; border-radius: 6px; padding: 4px 10px; font-size: 0.75rem; font-weight: 600; cursor: pointer; transition: all 0.15s ease;">
-          Remove
-        </button>
-      </div>
-    `).join('');
-
-    listEl.querySelectorAll('.btn-delete-modal-cat').forEach(btn => {
-      btn.addEventListener('click', async (e) => {
-        e.preventDefault();
-        const id = btn.dataset.id;
-        const name = btn.dataset.name;
-        if (confirm(`Remove category "${name}"?`)) {
-          await this.handleDeleteCategory(id, name);
-        }
-      });
-    });
-  }
-
   // --- MODALS & UTILS ---
 
   openModal(modalEl) {
     if (!modalEl) return;
     modalEl.classList.add('is-open');
-    if (modalEl === this.modalCategory) {
-      this.renderModalCategoriesList();
-    } else if (modalEl === this.modalData) {
+    if (modalEl === this.modalData) {
       this.updateBaseRateUI();
     }
     sound.playTick(1.0);
@@ -1657,24 +1590,10 @@ class ClassLoggerApp {
         return;
       }
 
-      // Ensure Aerosplash category exists in the database
-      let aerosplashCat = this.categories.find(c => c.name.toLowerCase() === 'aerosplash');
-      if (!aerosplashCat) {
-        aerosplashCat = await db.addCategory({
-          id: 'cat_aerosplash',
-          name: 'Aerosplash',
-          color: '#0a84ff',
-          icon: '🌊',
-          isDefault: true
-        });
-        await this.loadCategories();
-      }
-
-      // Add each class strictly under the Aerosplash category
+      // Add each class as an AeroSplash session
       let imported = 0;
       for (const cls of result.classes) {
-        cls.category = 'Aerosplash';
-        cls.categoryId = aerosplashCat ? aerosplashCat.id : 'cat_aerosplash';
+        cls.category = 'AeroSplash';
         await db.addClass(cls);
         imported++;
       }
@@ -1682,7 +1601,7 @@ class ClassLoggerApp {
       await this.loadClasses();
       this.closeModal(this.modalData);
       sound.playTick(1.5);
-      this.showToast(`Imported ${imported} class sessions strictly under Aerosplash!`, 'success');
+      this.showToast(`Imported ${imported} class sessions as AeroSplash!`, 'success');
     } catch (err) {
       console.error('Excel import error:', err);
       this.showToast(`Import error: ${err.message}`, 'danger');
@@ -1713,37 +1632,11 @@ class ClassLoggerApp {
   // --- FILTERED EXPORT FUNCTION ---
 
   openExportModal() {
-    this.populateExportCategorySelect();
     if (this.exportRatePerClass && !this.exportRatePerClass.dataset.userEdited) {
       this.exportRatePerClass.value = this.getBaseRate();
     }
     this.updateExportPreview();
     this.openModal(this.modalExport);
-  }
-
-  populateExportCategorySelect() {
-    if (!this.exportCategorySelect) return;
-    const currentVal = this.exportCategorySelect.value || 'all';
-    this.exportCategorySelect.innerHTML = '';
-
-    const allOpt = document.createElement('option');
-    allOpt.value = 'all';
-    allOpt.textContent = `🌟 All Categories (${this.classes.length} sessions)`;
-    this.exportCategorySelect.appendChild(allOpt);
-
-    this.categories.forEach(cat => {
-      const count = this.classes.filter(c => c.category && c.category.toLowerCase() === cat.name.toLowerCase()).length;
-      const opt = document.createElement('option');
-      opt.value = cat.name;
-      opt.textContent = `${cat.icon || '📌'} ${cat.name} (${count} session${count === 1 ? '' : 's'})`;
-      this.exportCategorySelect.appendChild(opt);
-    });
-
-    if ([...this.exportCategorySelect.options].some(o => o.value.toLowerCase() === currentVal.toLowerCase())) {
-      this.exportCategorySelect.value = currentVal;
-    } else {
-      this.exportCategorySelect.value = 'all';
-    }
   }
 
   applyExportDatePreset(preset) {
@@ -1796,14 +1689,10 @@ class ClassLoggerApp {
   }
 
   getFilteredExportData() {
-    const category = this.exportCategorySelect ? this.exportCategorySelect.value : 'all';
     const dateFrom = this.exportDateFrom ? this.exportDateFrom.value.trim() : '';
     const dateTo = this.exportDateTo ? this.exportDateTo.value.trim() : '';
 
     const filtered = this.classes.filter(c => {
-      if (category && category !== 'all') {
-        if (!c.category || c.category.toLowerCase() !== category.toLowerCase()) return false;
-      }
       if (dateFrom && c.date < dateFrom) return false;
       if (dateTo && c.date > dateTo) return false;
       return true;
@@ -1811,14 +1700,13 @@ class ClassLoggerApp {
 
     return {
       classes: filtered,
-      category,
       dateFrom,
       dateTo
     };
   }
 
   updateExportPreview() {
-    const { classes, category, dateFrom, dateTo } = this.getFilteredExportData();
+    const { classes, dateFrom, dateTo } = this.getFilteredExportData();
     const count = classes.length;
 
     if (this.exportPreviewCount) {
@@ -1834,7 +1722,6 @@ class ClassLoggerApp {
     }
 
     if (this.exportPreviewRange) {
-      const catLabel = category === 'all' ? 'All categories' : category;
       let dateLabel = 'All recorded dates';
       if (dateFrom && dateTo) {
         dateLabel = `${dateFrom} to ${dateTo}`;
@@ -1843,7 +1730,7 @@ class ClassLoggerApp {
       } else if (dateTo) {
         dateLabel = `Up to ${dateTo}`;
       }
-      this.exportPreviewRange.textContent = `${catLabel} • ${dateLabel}`;
+      this.exportPreviewRange.textContent = dateLabel;
     }
 
     // Live Billing & Fee Calculations with Units and Manager Bonus
@@ -1887,8 +1774,7 @@ class ClassLoggerApp {
     if (this.btnExportFilteredJson) this.btnExportFilteredJson.disabled = isDisabled;
   }
 
-  generateExportFilename(ext, category, dateFrom, dateTo) {
-    let catPart = (category && category !== 'all') ? category.replace(/[^a-zA-Z0-9_-]/g, '_') : 'AllCategories';
+  generateExportFilename(ext, dateFrom, dateTo) {
     let datePart = '';
     if (dateFrom && dateTo) {
       datePart = `_${dateFrom}_to_${dateTo}`;
@@ -1899,13 +1785,13 @@ class ClassLoggerApp {
     } else {
       datePart = `_${new Date().toISOString().split('T')[0]}`;
     }
-    return `ClassLogger_${catPart}${datePart}.${ext}`;
+    return `AeroSplash_Classes${datePart}.${ext}`;
   }
 
   handleExportXlsx() {
-    const { classes, category, dateFrom, dateTo } = this.getFilteredExportData();
+    const { classes, dateFrom, dateTo } = this.getFilteredExportData();
     if (!classes.length) {
-      this.showToast('No sessions found for this category/date filter', 'danger');
+      this.showToast('No sessions found for this date filter', 'danger');
       return;
     }
 
@@ -1918,20 +1804,20 @@ class ClassLoggerApp {
       ratePerClass,
       feesLabel
     });
-    const fileName = this.generateExportFilename('xlsx', category, dateFrom, dateTo);
+    const fileName = this.generateExportFilename('xlsx', dateFrom, dateTo);
     this.downloadBlob(blob, fileName);
     sound.playSuccess();
     this.showToast(`Exported ${classes.length} sessions to authentic timesheet Excel (.xlsx)!`, 'success');
   }
 
   handleExportCsv() {
-    const { classes, category, dateFrom, dateTo } = this.getFilteredExportData();
+    const { classes, dateFrom, dateTo } = this.getFilteredExportData();
     if (!classes.length) {
-      this.showToast('No sessions found for this category/date filter', 'danger');
+      this.showToast('No sessions found for this date filter', 'danger');
       return;
     }
 
-    const headers = ['Date', 'Day', 'Time', 'Category', 'Duration (mins)', 'Duration (hrs)', 'Credit Units', 'Fee (RM)', 'Notes / Remarks', 'Session ID'];
+    const headers = ['Date', 'Day', 'Time', 'Duration (mins)', 'Duration (hrs)', 'Credit Units', 'Fee (RM)', 'Notes / Remarks', 'Session ID'];
     const rateVal = this.exportRatePerClass ? (parseFloat(this.exportRatePerClass.value) || this.getBaseRate()) : this.getBaseRate();
     const rows = classes.map(c => {
       const d = new Date(c.date + 'T00:00:00');
@@ -1943,7 +1829,6 @@ class ClassLoggerApp {
         `"${c.date}"`,
         `"${dayOfWeek}"`,
         `"${c.displayTime || c.time}"`,
-        `"${(c.category || '').replace(/"/g, '""')}"`,
         c.duration || 60,
         hours,
         units.toFixed(1),
@@ -1954,29 +1839,29 @@ class ClassLoggerApp {
     });
 
     const csvContent = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
-    const fileName = this.generateExportFilename('csv', category, dateFrom, dateTo);
+    const fileName = this.generateExportFilename('csv', dateFrom, dateTo);
     this.downloadFile(csvContent, fileName, 'text/csv');
     sound.playSuccess();
     this.showToast(`Exported ${classes.length} sessions to CSV!`, 'success');
   }
 
   handleExportJson() {
-    const { classes, category, dateFrom, dateTo } = this.getFilteredExportData();
+    const { classes, dateFrom, dateTo } = this.getFilteredExportData();
     if (!classes.length) {
-      this.showToast('No sessions found for this category/date filter', 'danger');
+      this.showToast('No sessions found for this date filter', 'danger');
       return;
     }
 
     const payload = {
-      appName: 'ClassLogger',
+      appName: 'AeroSplash Class Logger',
       version: 1,
       exportedAt: new Date().toISOString(),
-      filter: { category, dateFrom: dateFrom || null, dateTo: dateTo || null },
+      filter: { dateFrom: dateFrom || null, dateTo: dateTo || null },
       totalCount: classes.length,
       classes
     };
 
-    const fileName = this.generateExportFilename('json', category, dateFrom, dateTo);
+    const fileName = this.generateExportFilename('json', dateFrom, dateTo);
     this.downloadFile(JSON.stringify(payload, null, 2), fileName, 'application/json');
     sound.playSuccess();
     this.showToast(`Exported ${classes.length} sessions to JSON!`, 'success');
@@ -2001,23 +1886,14 @@ class ClassLoggerApp {
         const oldCat = c.category;
         const newNote = c.note ? `${oldCat} - ${c.note}` : oldCat;
         await db.updateClass(c.id, {
-          category: 'Aerosplash',
-          categoryId: 'cat_aerosplash',
+          category: 'AeroSplash',
           note: newNote
         });
         changed = true;
       }
     }
 
-    for (const cat of this.categories) {
-      if (legacyNames.includes(cat.name.toLowerCase())) {
-        await db.deleteCategory(cat.id);
-        changed = true;
-      }
-    }
-
     if (changed) {
-      await this.loadCategories();
       await this.loadClasses();
     }
   }
