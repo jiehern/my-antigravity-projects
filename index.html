@@ -15,7 +15,7 @@
   <meta name="apple-mobile-web-app-title" content="AeroSplash">
   <link rel="apple-touch-icon" href="assets/app-icon.png">
   <link rel="icon" type="image/png" href="assets/app-icon.png">
-  <link rel="stylesheet" href="styles.css?v=3.8">
+  <link rel="stylesheet" href="styles.css?v=4.0">
   <script type="importmap">
   {
     "imports": {
@@ -140,20 +140,54 @@
             </div>
           </div>
 
-          <!-- 2. Class Duration -->
+          <!-- 2. Class Type -->
+          <div class="form-section">
+            <div class="section-label-row">
+              <label class="section-label">
+                <span>🏷️</span> Class Type
+              </label>
+              <span id="selected-classtype-label" style="font-size: 0.75rem; color: var(--accent-color); font-weight: 600;">LTS (1.0 unit)</span>
+            </div>
+
+            <div class="class-type-pills" id="class-type-pills-container" role="radiogroup" aria-label="Class Type">
+              <button type="button" class="class-type-pill is-active" data-type="LTS" role="radio" aria-checked="true">
+                <span class="type-pill-icon">🏊</span>
+                <span class="type-pill-text">
+                  <span class="type-pill-title">LTS</span>
+                  <span class="type-pill-badge">50m • 1.0 unit</span>
+                </span>
+              </button>
+              <button type="button" class="class-type-pill" data-type="Squad (Pre Comp)" role="radio" aria-checked="false">
+                <span class="type-pill-icon">⚡</span>
+                <span class="type-pill-text">
+                  <span class="type-pill-title">Squad (Pre Comp)</span>
+                  <span class="type-pill-badge">90m • 1.5 units</span>
+                </span>
+              </button>
+              <button type="button" class="class-type-pill" data-type="Baby Class" role="radio" aria-checked="false">
+                <span class="type-pill-icon">👶</span>
+                <span class="type-pill-text">
+                  <span class="type-pill-title">Baby Class</span>
+                  <span class="type-pill-badge">30m • 1.0 unit</span>
+                </span>
+              </button>
+            </div>
+          </div>
+
+          <!-- 3. Class Duration -->
           <div class="form-section">
             <div class="section-label-row">
               <label class="section-label">
                 <span>⏳</span> Duration
               </label>
-              <span id="selected-duration-label" style="font-size: 0.75rem; color: var(--text-secondary); font-weight: 600;">60 mins</span>
+              <span id="selected-duration-label" style="font-size: 0.75rem; color: var(--text-secondary); font-weight: 600;">50 mins</span>
             </div>
 
             <div class="duration-pills" id="duration-pills-container">
               <button type="button" class="duration-pill" data-mins="30">30m</button>
               <button type="button" class="duration-pill" data-mins="45">45m</button>
-              <button type="button" class="duration-pill" data-mins="50">50m</button>
-              <button type="button" class="duration-pill is-active" data-mins="60">60m</button>
+              <button type="button" class="duration-pill is-active" data-mins="50">50m</button>
+              <button type="button" class="duration-pill" data-mins="60">60m</button>
               <button type="button" class="duration-pill" data-mins="75">75m</button>
               <button type="button" class="duration-pill" data-mins="90">90m</button>
               <button type="button" class="duration-pill" data-mins="120">2h</button>
@@ -185,19 +219,17 @@
               <label class="section-label" for="class-notes-input">
                 <span>📝</span> Session Note
               </label>
-              <span style="font-size: 0.72rem; color: var(--text-tertiary);">Extra information & highlights</span>
+              <span style="font-size: 0.72rem; color: var(--text-tertiary);">Extra remarks & highlights</span>
             </div>
 
             <div class="note-container">
               <textarea 
                 id="class-notes-input" 
                 class="note-textarea" 
-                placeholder="e.g. LTS, Pre Comp, Assist Coach Allen..."
+                placeholder="e.g. Assist Coach Allen, stroke drills..."
               ></textarea>
 
               <div class="quick-note-tags" id="quick-note-tags">
-                <button type="button" class="note-tag-chip" data-note-val="LTS">LTS</button>
-                <button type="button" class="note-tag-chip" data-note-val="Pre Comp">Pre Comp</button>
                 <div class="assist-dropdown-container" id="assist-dropdown-container">
                   <button type="button" class="note-tag-chip assist-chip-btn" id="btn-assist-dropdown-toggle" aria-haspopup="true" aria-expanded="false">
                     <span>Assist</span>
@@ -531,6 +563,6 @@
   <div class="toast-container" id="toast-container" aria-live="polite"></div>
 
   <!-- Main JavaScript App -->
-  <script type="module" src="js/app.js?v=3.8"></script>
+  <script type="module" src="js/app.js?v=4.0"></script>
 </body>
 </html>

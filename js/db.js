@@ -401,16 +401,22 @@ class LocalDatabase {
 
   async exportCSV(filter = {}) {
     const classes = await this.getFilteredClasses(filter);
-    const headers = ['Date', 'Day', 'Time', 'Category', 'Duration (mins)', 'Duration (hrs)', 'Notes / Remarks', 'Session ID'];
+    const headers = ['Date', 'Day', 'Time', 'Class Type', 'Category', 'Duration (mins)', 'Duration (hrs)', 'Notes / Remarks', 'Session ID'];
     const rows = classes.map(c => {
       const d = new Date(c.date + 'T00:00:00');
       const dayOfWeek = isNaN(d.getTime()) ? '' : d.toLocaleDateString('en-US', { weekday: 'short' });
       const hours = c.duration ? (c.duration / 60).toFixed(2) : '1.00';
+      const classType = c.classType || (
+        (c.note && c.note.toLowerCase().includes('baby')) || c.duration === 30 ? 'Baby Class' :
+        (c.note && (c.note.toLowerCase().includes('pre comp') || c.note.toLowerCase().includes('squad'))) || c.duration === 90 ? 'Squad (Pre Comp)' :
+        'LTS'
+      );
       return [
         `"${c.date}"`,
         `"${dayOfWeek}"`,
         `"${c.displayTime || c.time}"`,
-        `"${(c.category || '').replace(/"/g, '""')}"`,
+        `"${classType}"`,
+        `"${(c.category || 'AeroSplash').replace(/"/g, '""')}"`,
         c.duration || 60,
         hours,
         `"${(c.note || '').replace(/"/g, '""')}"`,
@@ -473,6 +479,19 @@ class LocalDatabase {
         const category = 'AeroSplash';
         const duration = Number(raw.duration) || 60;
         const note = String(raw.note || '').trim();
+        const noteLower = note.toLowerCase();
+        const rawType = String(raw.classType || '').trim();
+        let classType = 'LTS';
+        if (rawType) {
+          if (rawType.toLowerCase().includes('baby')) classType = 'Baby Class';
+          else if (rawType.toLowerCase().includes('squad') || rawType.toLowerCase().includes('pre comp') || rawType.toLowerCase().includes('precomp')) classType = 'Squad (Pre Comp)';
+          else if (rawType.toLowerCase().includes('lts')) classType = 'LTS';
+          else classType = rawType;
+        } else {
+          if (noteLower.includes('baby') || duration === 30) classType = 'Baby Class';
+          else if (noteLower.includes('squad') || noteLower.includes('pre comp') || noteLower.includes('precomp') || duration === 90) classType = 'Squad (Pre Comp)';
+          else classType = 'LTS';
+        }
 
         const normalizedItem = {
           ...raw,
@@ -482,6 +501,7 @@ class LocalDatabase {
           displayTime,
           timestamp,
           category,
+          classType,
           duration,
           note,
           createdAt: raw.createdAt || new Date().toISOString(),
@@ -510,27 +530,30 @@ class LocalDatabase {
         time: '09:00',
         displayTime: '09:00 AM',
         timestamp: now.getTime() - 2 * 3600 * 1000,
-        category: 'Coach Allen',
-        duration: 60,
-        note: 'High-intensity swim interval drills. Completed 24 laps, improved sprint pacing by 1.4s.'
+        category: 'AeroSplash',
+        classType: 'LTS',
+        duration: 50,
+        note: 'Swim interval drills and stroke mechanics.'
       },
       {
         date: new Date(now.getTime() - 26 * 3600 * 1000).toISOString().split('T')[0],
-        time: '17:30',
-        displayTime: '05:30 PM',
+        time: '16:00',
+        displayTime: '04:00 PM',
         timestamp: now.getTime() - 26 * 3600 * 1000,
-        category: 'Aerosplash',
-        duration: 45,
-        note: 'Aerobic water resistance & core stability workout. Great energy in group session.'
+        category: 'AeroSplash',
+        classType: 'Baby Class',
+        duration: 30,
+        note: 'Water familiarity and bubble blowing exercises.'
       },
       {
         date: new Date(now.getTime() - 50 * 3600 * 1000).toISOString().split('T')[0],
-        time: '18:00',
-        displayTime: '06:00 PM',
+        time: '17:30',
+        displayTime: '05:30 PM',
         timestamp: now.getTime() - 50 * 3600 * 1000,
-        category: 'Charles',
-        duration: 75,
-        note: 'Boxing footwork combinations, heavy bag rounds, and defensive duck-and-weave drills.'
+        category: 'AeroSplash',
+        classType: 'Squad (Pre Comp)',
+        duration: 90,
+        note: 'Endurance sets, flip turns, and timed 100m pacing.'
       }
     ];
 

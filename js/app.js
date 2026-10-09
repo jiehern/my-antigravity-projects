@@ -6,12 +6,13 @@
 import { db } from './db.js';
 import { RotaryDialPicker } from './rotary-picker.js';
 import { sound } from './audio.js';
-import { ExcelTimesheetImporter, ExcelTimesheetExporter, getClassCreditUnits, calculateManagerBonus } from './excel-importer.js';
+import { ExcelTimesheetImporter, ExcelTimesheetExporter, getClassCreditUnits, calculateManagerBonus, resolveClassType } from './excel-importer.js';
 
 class ClassLoggerApp {
   constructor() {
     this.classes = [];
-    this.selectedDuration = 60;
+    this.selectedClassType = 'LTS';
+    this.selectedDuration = 50;
     this.editingClassId = null;
     this.searchQuery = '';
 
@@ -69,6 +70,8 @@ class ClassLoggerApp {
 
     // Form elements
     this.classForm = document.getElementById('class-form');
+    this.classTypeContainer = document.getElementById('class-type-pills-container');
+    this.classTypeLabel = document.getElementById('selected-classtype-label');
     this.durationContainer = document.getElementById('duration-pills-container');
     this.durationLabel = document.getElementById('selected-duration-label');
     this.customDurationWrapper = document.getElementById('custom-duration-wrapper');
@@ -356,6 +359,7 @@ class ClassLoggerApp {
     if (this.searchQuery.trim()) {
       const q = this.searchQuery.toLowerCase();
       filtered = filtered.filter(c => 
+        (c.classType && c.classType.toLowerCase().includes(q)) ||
         (c.note && c.note.toLowerCase().includes(q)) ||
         (c.category && c.category.toLowerCase().includes(q)) ||
         (c.date && c.date.includes(q)) ||
@@ -410,14 +414,20 @@ class ClassLoggerApp {
       today.setHours(0,0,0,0);
       const isToday = (today.getTime() === itemDate.getTime());
 
-      // Calculate units and display fee (LTS 50m = 1.0 unit; Pre Comp 90m = 1.5 units)
+      // Resolve class type and credit units (Baby Class 30m = 1.0 unit, LTS 50m = 1.0 unit, Squad 90m = 1.5 units)
+      const classType = item.classType || resolveClassType(item);
       const units = getClassCreditUnits(item);
-      const isPreComp = (units === 1.5);
-      const isLts = (units === 1.0 && (item.duration === 50 || (item.note && item.note.toLowerCase().includes('lts'))));
+      const isPreComp = (classType === 'Squad (Pre Comp)' || units === 1.5);
+      const isBaby = (classType === 'Baby Class');
+      const isLts = (classType === 'LTS');
       const currentBaseRate = this.getBaseRate();
       const feeCalculated = (units * currentBaseRate).toFixed(0);
-      const unitBadgeLabel = isPreComp ? `1.5 class • RM${feeCalculated}` : isLts ? `1.0 class • RM${feeCalculated}` : `${units.toFixed(1)} class • RM${feeCalculated}`;
-      const unitBadgeClass = isPreComp ? 'is-precomp' : isLts ? 'is-lts' : '';
+      const unitBadgeLabel = `${units.toFixed(1)} class • RM${feeCalculated}`;
+      const unitBadgeClass = isPreComp ? 'is-precomp' : isBaby ? 'is-baby' : isLts ? 'is-lts' : '';
+
+      const typeIcon = isBaby ? '👶' : isPreComp ? '⚡' : '🏊';
+      const typeSlug = isBaby ? 'baby' : isPreComp ? 'squad' : 'lts';
+      const typeBadgeClass = `is-type-${typeSlug}`;
 
       const card = document.createElement('article');
       card.className = 'class-log-card';
@@ -425,9 +435,9 @@ class ClassLoggerApp {
 
       card.innerHTML = `
         <div class="card-top-row">
-          <div class="card-category-badge">
-            <span class="category-badge-icon">🌊</span>
-            <span class="category-badge-text">AeroSplash</span>
+          <div class="card-type-pill-badge ${typeBadgeClass}">
+            <span class="type-badge-icon">${typeIcon}</span>
+            <span class="type-badge-text">${classType}</span>
           </div>
           <span class="card-units-badge ${unitBadgeClass}">
             ${unitBadgeLabel}
@@ -614,13 +624,42 @@ class ClassLoggerApp {
 
         <div class="bonus-footer-row">
           <span class="bonus-next-goal">${nextGoalText}</span>
-          <span class="bonus-unit-formula">LTS (50m) = 1.0 unit (RM${ratePerClass.toFixed(0)}) • Pre Comp (90m) = 1.5 units (RM${(ratePerClass * 1.5).toFixed(0)})</span>
+          <span class="bonus-unit-formula">LTS (50m) = 1.0 unit • Squad (90m) = 1.5 units • Baby (30m) = 1.0 unit</span>
         </div>
       </div>
     `;
   }
 
-  // --- DURATION HELPER ---
+  // --- CLASS TYPE & DURATION HELPERS ---
+
+  selectClassType(type, autoUpdateDuration = true) {
+    this.selectedClassType = type || 'LTS';
+
+    if (this.classTypeContainer) {
+      this.classTypeContainer.querySelectorAll('.class-type-pill').forEach(pill => {
+        const isActive = pill.dataset.type === this.selectedClassType;
+        pill.classList.toggle('is-active', isActive);
+        pill.setAttribute('aria-checked', isActive ? 'true' : 'false');
+      });
+    }
+
+    if (this.classTypeLabel) {
+      let unitText = '1.0 unit';
+      if (this.selectedClassType === 'Squad (Pre Comp)') unitText = '1.5 units';
+      else if (this.selectedClassType === 'Baby Class') unitText = '1.0 unit';
+      this.classTypeLabel.textContent = `${this.selectedClassType} (${unitText})`;
+    }
+
+    if (autoUpdateDuration) {
+      if (this.selectedClassType === 'Baby Class') {
+        this.setDuration(30);
+      } else if (this.selectedClassType === 'Squad (Pre Comp)') {
+        this.setDuration(90);
+      } else if (this.selectedClassType === 'LTS') {
+        this.setDuration(50);
+      }
+    }
+  }
 
   setDuration(mins) {
     const parsed = parseInt(mins, 10);
@@ -654,6 +693,17 @@ class ClassLoggerApp {
   // --- ATTACH EVENT LISTENERS ---
 
   attachEventListeners() {
+    // 0. Class Type Pills
+    if (this.classTypeContainer) {
+      this.classTypeContainer.querySelectorAll('.class-type-pill').forEach(pill => {
+        pill.addEventListener('click', () => {
+          const type = pill.dataset.type;
+          this.selectClassType(type, true);
+          sound.playTick(1.1);
+        });
+      });
+    }
+
     // 1. Duration Pills
     if (this.durationContainer) {
       this.durationContainer.querySelectorAll('.duration-pill').forEach(pill => {
@@ -720,17 +770,7 @@ class ClassLoggerApp {
       });
     }
 
-    // 2. Note Options (LTS, Pre Comp, Assist dropdown)
-    if (this.quickTagsContainer) {
-      // Direct buttons for LTS and Pre Comp
-      this.quickTagsContainer.querySelectorAll('.note-tag-chip[data-note-val]').forEach(chip => {
-        chip.addEventListener('click', () => {
-          const val = chip.dataset.noteVal;
-          this.setSessionNote(val);
-          sound.playTick(1.2);
-        });
-      });
-    }
+    // 2. Note Options (Assist dropdown)
 
     // Assist dropdown toggle
     if (this.btnAssistDropdownToggle) {
@@ -1220,6 +1260,7 @@ class ClassLoggerApp {
 
     const rotaryVal = this.rotaryPicker.getValue();
     const note = this.notesInput ? this.notesInput.value.trim() : '';
+    const classType = this.selectedClassType || 'LTS';
 
     const recordData = {
       date: rotaryVal.date,
@@ -1227,6 +1268,7 @@ class ClassLoggerApp {
       displayTime: rotaryVal.displayTime,
       timestamp: rotaryVal.timestamp,
       category: 'AeroSplash',
+      classType: classType,
       duration: this.selectedDuration,
       note: note
     };
@@ -1234,13 +1276,13 @@ class ClassLoggerApp {
     if (this.editingClassId) {
       // Update existing record
       await db.updateClass(this.editingClassId, recordData);
-      this.showToast('Updated AeroSplash session', 'success');
+      this.showToast(`Updated ${classType} session`, 'success');
       sound.playSuccess();
       this.cancelEdit();
     } else {
       // Create new record
       await db.addClass(recordData);
-      this.showToast(`Logged AeroSplash session at ${rotaryVal.displayTime}`, 'success');
+      this.showToast(`Logged ${classType} session at ${rotaryVal.displayTime}`, 'success');
       sound.playSuccess();
 
       // Reset note field
@@ -1256,6 +1298,10 @@ class ClassLoggerApp {
   startEditClass(item) {
     this.editingClassId = item.id;
     this.switchMobileTab('log');
+
+    // Load class type
+    const type = item.classType || resolveClassType(item);
+    this.selectClassType(type, false);
 
     // Load date into rotary picker
     if (this.rotaryPicker) {
@@ -1311,6 +1357,7 @@ class ClassLoggerApp {
 
   cancelEdit() {
     this.editingClassId = null;
+    this.selectClassType('LTS', true);
     if (this.btnSubmit) this.btnSubmit.classList.remove('is-editing');
     if (this.btnSubmitText) this.btnSubmitText.textContent = 'Enter Class Into Database';
     if (this.btnCancelEdit) this.btnCancelEdit.style.display = 'none';
@@ -1328,12 +1375,13 @@ class ClassLoggerApp {
       ...item,
       id: undefined,
       category: 'AeroSplash',
+      classType: item.classType || resolveClassType(item),
       note: item.note ? `${item.note} (Copy)` : ''
     };
     await db.addClass(clone);
     await this.loadClasses();
     sound.playSuccess();
-    this.showToast('Duplicated AeroSplash session', 'success');
+    this.showToast(`Duplicated ${clone.classType} session`, 'success');
   }
 
   async deleteClass(id) {
@@ -1490,36 +1538,9 @@ class ClassLoggerApp {
     }
   }
 
-  setSessionNote(newType) {
+  setSessionNote(noteText) {
     if (!this.notesInput) return;
-    const current = this.notesInput.value.trim();
-
-    if (!current) {
-      this.notesInput.value = newType;
-    } else {
-      const isKnownType = current === 'LTS' || current.startsWith('LTS ') || current.startsWith('LTS -') ||
-                          current === 'Pre Comp' || current.startsWith('Pre Comp ') || current.startsWith('Pre Comp -') ||
-                          current === 'Assist' || current.startsWith('Assist ') || current.startsWith('Assist -');
-
-      if (isKnownType) {
-        if (current.includes(' - ')) {
-          const remarks = current.split(' - ').slice(1).join(' - ').trim();
-          this.notesInput.value = remarks ? `${newType} - ${remarks}` : newType;
-        } else {
-          this.notesInput.value = newType;
-        }
-      } else {
-        this.notesInput.value = `${newType} - ${current}`;
-      }
-    }
-
-    // Auto-align duration based on class note: LTS -> 50m; Pre Comp -> 90m (1h30m)
-    if (newType === 'LTS' || newType.startsWith('LTS ') || newType.startsWith('LTS -')) {
-      this.setDuration(50);
-    } else if (newType === 'Pre Comp' || newType.startsWith('Pre Comp ') || newType.startsWith('Pre Comp -')) {
-      this.setDuration(90);
-    }
-
+    this.notesInput.value = noteText;
     this.updateNoteChipsActiveState();
     this.renderAssistNamesList();
     this.notesInput.focus();
@@ -1528,23 +1549,10 @@ class ClassLoggerApp {
   updateNoteChipsActiveState() {
     if (!this.notesInput) return;
     const val = (this.notesInput.value || '').trim();
-
-    const ltsBtn = document.querySelector('.note-tag-chip[data-note-val="LTS"]');
-    const preCompBtn = document.querySelector('.note-tag-chip[data-note-val="Pre Comp"]');
     const assistBtn = document.getElementById('btn-assist-dropdown-toggle');
 
-    if (ltsBtn) {
-      const isLTS = val === 'LTS' || val.startsWith('LTS ') || val.startsWith('LTS -');
-      ltsBtn.classList.toggle('is-active', isLTS);
-    }
-
-    if (preCompBtn) {
-      const isPreComp = val === 'Pre Comp' || val.startsWith('Pre Comp ') || val.startsWith('Pre Comp -');
-      preCompBtn.classList.toggle('is-active', isPreComp);
-    }
-
     if (assistBtn) {
-      const isAssist = val === 'Assist' || val.startsWith('Assist ') || val.startsWith('Assist -');
+      const isAssist = val.toLowerCase().includes('assist');
       assistBtn.classList.toggle('is-active', isAssist);
     }
   }
@@ -1941,13 +1949,15 @@ class ClassLoggerApp {
     const legacyNames = ['lts', 'precomp', 'swim clinic'];
     let changed = false;
     for (const c of this.classes) {
+      const updates = {};
       if (c.category && legacyNames.includes(c.category.toLowerCase())) {
-        const oldCat = c.category;
-        const newNote = c.note ? `${oldCat} - ${c.note}` : oldCat;
-        await db.updateClass(c.id, {
-          category: 'AeroSplash',
-          note: newNote
-        });
+        updates.category = 'AeroSplash';
+      }
+      if (!c.classType) {
+        updates.classType = resolveClassType(c);
+      }
+      if (Object.keys(updates).length > 0) {
+        await db.updateClass(c.id, updates);
         changed = true;
       }
     }

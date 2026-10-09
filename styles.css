@@ -778,6 +778,101 @@ body::after {
 }
 
 /* ==========================================================================
+   CLASS TYPE SELECTOR
+   ========================================================================== */
+.class-type-pills {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.class-type-pill {
+  background: var(--bg-surface-2);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 10px 8px;
+  cursor: pointer;
+  text-align: center;
+  transition: all var(--transition-fast);
+  user-select: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  position: relative;
+}
+
+.class-type-pill:hover {
+  background: var(--bg-surface-3);
+  border-color: var(--border-medium);
+  transform: translateY(-1px);
+}
+
+.class-type-pill:active {
+  transform: translateY(0);
+}
+
+.class-type-pill .type-pill-icon {
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+.class-type-pill .type-pill-text {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  width: 100%;
+}
+
+.class-type-pill .type-pill-title {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+
+.class-type-pill .type-pill-badge {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  line-height: 1.2;
+}
+
+/* Active State */
+.class-type-pill.is-active {
+  background: rgba(var(--accent-color-rgb), 0.14);
+  border-color: var(--accent-color);
+  box-shadow: 0 0 14px var(--accent-glow);
+}
+
+.class-type-pill.is-active .type-pill-title {
+  color: var(--accent-color);
+}
+
+.class-type-pill.is-active .type-pill-badge {
+  color: var(--accent-color);
+  opacity: 0.9;
+}
+
+@media (max-width: 380px) {
+  .class-type-pills {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+  .class-type-pill {
+    flex-direction: row;
+    justify-content: flex-start;
+    padding: 8px 12px;
+    gap: 10px;
+  }
+  .class-type-pill .type-pill-text {
+    align-items: flex-start;
+  }
+}
+
+/* ==========================================================================
    CLASS DURATION SELECTOR
    ========================================================================== */
 .duration-pills {
@@ -2200,6 +2295,50 @@ body::after {
   border-color: rgba(10, 132, 255, 0.3);
 }
 
+.card-units-badge.is-baby {
+  background: rgba(255, 159, 10, 0.14);
+  color: #ffb340;
+  border-color: rgba(255, 159, 10, 0.3);
+}
+
+/* Card Type Pill Badge in Class Card Top Row */
+.card-type-pill-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+.card-type-pill-badge .type-badge-icon {
+  font-size: 0.88rem;
+  line-height: 1;
+}
+
+.card-type-pill-badge.is-type-lts {
+  background: rgba(10, 132, 255, 0.12);
+  border-color: rgba(10, 132, 255, 0.28);
+  color: #7ce0ff;
+}
+
+.card-type-pill-badge.is-type-squad {
+  background: rgba(var(--accent-color-rgb), 0.14);
+  border-color: rgba(var(--accent-color-rgb), 0.35);
+  color: var(--accent-color);
+}
+
+.card-type-pill-badge.is-type-baby {
+  background: rgba(255, 159, 10, 0.14);
+  border-color: rgba(255, 159, 10, 0.3);
+  color: #ffb340;
+}
+
 .monthly-bonus-card {
   background: linear-gradient(145deg, rgba(28, 28, 34, 0.95) 0%, rgba(18, 18, 22, 0.98) 100%);
   border: 1px solid rgba(255, 255, 255, 0.12);
@@ -3256,6 +3395,58 @@ body::after {
   background: rgba(var(--accent-color-rgb), 0.12);
   color: var(--accent-color);
   border-color: rgba(var(--accent-color-rgb), 0.3);
+}
+
+[data-theme="light"] .card-units-badge.is-baby {
+  background: rgba(255, 149, 0, 0.12);
+  color: #d97706;
+  border-color: rgba(255, 149, 0, 0.25);
+}
+
+[data-theme="light"] .class-type-pill {
+  background: #f8fafc;
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] .class-type-pill:hover {
+  background: #f1f5f9;
+}
+
+[data-theme="light"] .class-type-pill.is-active {
+  background: rgba(var(--accent-color-rgb), 0.12);
+  border-color: var(--accent-color);
+}
+
+[data-theme="light"] .class-type-pill.is-active .type-pill-title {
+  color: var(--accent-color);
+}
+
+[data-theme="light"] .class-type-pill.is-active .type-pill-badge {
+  color: var(--accent-color);
+}
+
+[data-theme="light"] .card-type-pill-badge {
+  background: rgba(0, 0, 0, 0.05);
+  border-color: rgba(0, 0, 0, 0.1);
+  color: #1c1c1e;
+}
+
+[data-theme="light"] .card-type-pill-badge.is-type-lts {
+  background: rgba(10, 132, 255, 0.1);
+  border-color: rgba(10, 132, 255, 0.25);
+  color: #0066cc;
+}
+
+[data-theme="light"] .card-type-pill-badge.is-type-squad {
+  background: rgba(var(--accent-color-rgb), 0.12);
+  border-color: rgba(var(--accent-color-rgb), 0.3);
+  color: var(--accent-color);
+}
+
+[data-theme="light"] .card-type-pill-badge.is-type-baby {
+  background: rgba(255, 149, 0, 0.12);
+  border-color: rgba(255, 149, 0, 0.25);
+  color: #d97706;
 }
 
 [data-theme="light"] .card-time-large {

@@ -155,33 +155,69 @@ export function createZipBlob(filesMap) {
 }
 
 /**
+ * Resolves or normalizes the class type for a session:
+ * - 'LTS'
+ * - 'Squad (Pre Comp)'
+ * - 'Baby Class'
+ */
+export function resolveClassType(c) {
+  if (!c) return 'LTS';
+  if (c.classType) {
+    const raw = String(c.classType).trim();
+    const low = raw.toLowerCase();
+    if (low.includes('baby')) return 'Baby Class';
+    if (low.includes('squad') || low.includes('pre comp') || low.includes('precomp')) return 'Squad (Pre Comp)';
+    if (low.includes('lts')) return 'LTS';
+    return raw;
+  }
+  const note = (c.note || '').toLowerCase();
+  const cat = (c.category || '').toLowerCase();
+  const dur = Number(c.duration) || 60;
+
+  if (note.includes('baby') || cat.includes('baby') || dur === 30) {
+    return 'Baby Class';
+  }
+  if (note.includes('squad') || note.includes('pre comp') || note.includes('precomp') ||
+      cat.includes('squad') || cat.includes('pre comp') || cat.includes('precomp') || dur === 90) {
+    return 'Squad (Pre Comp)';
+  }
+  return 'LTS';
+}
+
+/**
  * Calculate the class credit units / hours for a session:
- * - Pre Comp classes (or 90m / 1.5h): 1.5 units (= RM60 at RM40 rate)
+ * - Baby Class (30m): 1.0 unit (= RM40 at RM40 rate)
+ * - Squad / Pre Comp classes (90m / 1.5h): 1.5 units (= RM60 at RM40 rate)
  * - LTS classes (50m): 1.0 unit (= RM40 at RM40 rate)
  * - 60m: 1.0 unit
  * - 120m: 2.0 units
- * - 30m: 0.5 units
  * - 45m: 0.75 units
  * - 75m: 1.25 units
  * - General: duration / 60
  */
 export function getClassCreditUnits(c) {
   if (!c) return 1.0;
-  const note = (c.note || '').toLowerCase();
-  const cat = (c.category || '').toLowerCase();
+  const type = resolveClassType(c).toLowerCase();
   const dur = Number(c.duration) || 60;
 
-  if (note.includes('pre comp') || note.includes('precomp') || cat.includes('pre comp') || cat.includes('precomp') || dur === 90) {
-    return 1.5;
-  }
-  if (note.includes('lts') || dur === 50) {
+  // Baby Class (30 mins = 1.0 unit)
+  if (type.includes('baby') || dur === 30) {
     return 1.0;
   }
+
+  // Squad / Pre Comp (90 mins = 1.5 units)
+  if (type.includes('squad') || type.includes('pre comp') || type.includes('precomp') || dur === 90) {
+    return 1.5;
+  }
+
+  // LTS (50m / 60m = 1.0 unit)
+  if (type.includes('lts') || dur === 50 || dur === 60) {
+    return 1.0;
+  }
+
   if (dur === 120) return 2.0;
-  if (dur === 30) return 0.5;
   if (dur === 45) return 0.75;
   if (dur === 75) return 1.25;
-  if (dur === 60) return 1.0;
   return Math.round((dur / 60) * 10) / 10;
 }
 
@@ -347,17 +383,22 @@ export function exportCoachTimesheetXLSX(classes, options = {}) {
     const durIdx = getStrIdx(durStr);
 
     // 4. Description & Remarks parsing
-    let desc = 'LTS';
-    let remarks = '';
-    const note = (c.note || '').trim();
-    if (note.includes(' - ')) {
-      const parts = note.split(' - ');
-      desc = parts[0].trim() || 'LTS';
-      remarks = parts.slice(1).join(' - ').trim();
-    } else if (note) {
-      desc = note;
-    } else if (c.category && c.category.toLowerCase() !== 'aerosplash') {
-      desc = c.category;
+    let desc = c.classType || '';
+    let remarks = (c.note || '').trim();
+    if (c.classType) {
+      desc = c.classType;
+      remarks = (c.note || '').trim();
+    } else {
+      if (remarks.includes(' - ')) {
+        const parts = remarks.split(' - ');
+        desc = parts[0].trim() || 'LTS';
+        remarks = parts.slice(1).join(' - ').trim();
+      } else if (remarks && (remarks.toLowerCase().includes('lts') || remarks.toLowerCase().includes('pre comp') || remarks.toLowerCase().includes('precomp') || remarks.toLowerCase().includes('baby'))) {
+        desc = remarks;
+        remarks = '';
+      } else {
+        desc = resolveClassType(c);
+      }
     }
     const descIdx = getStrIdx(desc);
 

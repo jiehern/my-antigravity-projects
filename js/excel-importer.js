@@ -162,23 +162,24 @@ export class ExcelTimesheetImporter {
       const rawDuration = colMap.duration !== -1 ? row[colMap.duration] : '60';
       const durationMins = this.parseDuration(rawDuration);
 
-      const rawCategory = colMap.description !== -1 ? String(row[colMap.description] || '').trim() : '';
+      const rawDescription = colMap.description !== -1 ? String(row[colMap.description] || '').trim() : '';
       const rawRemarks = colMap.remarks !== -1 ? String(row[colMap.remarks] || '').trim() : '';
 
-      // For this project, any .xlsx file imported is strictly under the Aerosplash category
-      const category = 'Aerosplash';
+      // For this project, any .xlsx file imported is strictly under the AeroSplash category
+      const category = 'AeroSplash';
       detectedCategories.add(category);
 
-      // Preserve description (e.g. LTS, PreComp, Swim Clinic) and remarks in session note
-      let combinedNote = '';
-      if (rawCategory && rawCategory.toLowerCase() !== 'aerosplash') {
-        if (rawRemarks) {
-          combinedNote = `${rawCategory} - ${rawRemarks}`;
-        } else {
-          combinedNote = rawCategory;
-        }
-      } else {
-        combinedNote = rawRemarks;
+      // Determine class type
+      let classType = 'LTS';
+      const descLower = rawDescription.toLowerCase();
+      if (descLower.includes('baby')) {
+        classType = 'Baby Class';
+      } else if (descLower.includes('squad') || descLower.includes('pre comp') || descLower.includes('precomp')) {
+        classType = 'Squad (Pre Comp)';
+      } else if (descLower.includes('lts')) {
+        classType = 'LTS';
+      } else if (rawDescription && rawDescription.toLowerCase() !== 'aerosplash') {
+        classType = rawDescription;
       }
 
       // Create timestamp
@@ -192,8 +193,9 @@ export class ExcelTimesheetImporter {
         displayTime: timeObj.displayTime,
         timestamp,
         duration: durationMins,
-        category: 'Aerosplash',
-        note: combinedNote,
+        category: 'AeroSplash',
+        classType: classType,
+        note: rawRemarks,
         importedFrom: firstSheetName,
         createdAt: new Date().toISOString()
       });
@@ -202,15 +204,15 @@ export class ExcelTimesheetImporter {
     return {
       sheetName: firstSheetName,
       classes: parsedClasses,
-      categories: ['Aerosplash'],
+      categories: ['AeroSplash'],
       totalCount: parsedClasses.length
     };
   }
 }
 
-import { exportCoachTimesheetXLSX, getClassCreditUnits, calculateManagerBonus } from './timesheet-template.js';
+import { exportCoachTimesheetXLSX, getClassCreditUnits, calculateManagerBonus, resolveClassType } from './timesheet-template.js';
 
-export { getClassCreditUnits, calculateManagerBonus, exportCoachTimesheetXLSX };
+export { getClassCreditUnits, calculateManagerBonus, exportCoachTimesheetXLSX, resolveClassType };
 
 /**
  * ExcelTimesheetExporter - Generates authentic Coach Timesheet Excel (.xlsx) files
