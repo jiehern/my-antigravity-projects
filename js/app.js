@@ -991,6 +991,12 @@ class ClassLoggerApp {
         });
       });
     }
+    if (this.exportCoachName) {
+      this.exportCoachName.value = this.getSavedCoachName();
+      this.exportCoachName.addEventListener('input', () => {
+        this.saveCoachName(this.exportCoachName.value);
+      });
+    }
     if (this.exportRatePerClass) {
       this.exportRatePerClass.addEventListener('input', () => {
         this.exportRatePerClass.dataset.userEdited = 'true';
@@ -1178,6 +1184,30 @@ class ClassLoggerApp {
     }
     if (this.exportRatePerClass && !this.exportRatePerClass.dataset.userEdited) {
       this.exportRatePerClass.value = rate;
+    }
+  }
+
+  // --- COACH NAME SETTINGS ---
+
+  getSavedCoachName() {
+    try {
+      return localStorage.getItem('class_logger_coach_name') || '';
+    } catch (e) {
+      console.warn('Error reading coach name from localStorage:', e);
+      return '';
+    }
+  }
+
+  saveCoachName(name) {
+    try {
+      const trimmed = (name || '').trim();
+      if (trimmed) {
+        localStorage.setItem('class_logger_coach_name', trimmed);
+      } else {
+        localStorage.removeItem('class_logger_coach_name');
+      }
+    } catch (e) {
+      console.warn('Error saving coach name to localStorage:', e);
     }
   }
 
@@ -1615,6 +1645,9 @@ class ClassLoggerApp {
   // --- FILTERED EXPORT FUNCTION ---
 
   openExportModal() {
+    if (this.exportCoachName) {
+      this.exportCoachName.value = this.getSavedCoachName();
+    }
     if (this.exportRatePerClass && !this.exportRatePerClass.dataset.userEdited) {
       this.exportRatePerClass.value = this.getBaseRate();
     }
@@ -1778,7 +1811,10 @@ class ClassLoggerApp {
       return;
     }
 
-    const coachName = (this.exportCoachName && this.exportCoachName.value.trim()) || 'Chew Jie Hern';
+    const coachName = (this.exportCoachName && this.exportCoachName.value.trim()) || '';
+    if (coachName) {
+      this.saveCoachName(coachName);
+    }
     const ratePerClass = this.exportRatePerClass ? (parseFloat(this.exportRatePerClass.value) || this.getBaseRate()) : this.getBaseRate();
     const feesLabel = (this.exportFeesLabel && this.exportFeesLabel.value.trim()) || undefined;
 

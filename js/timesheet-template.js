@@ -253,7 +253,7 @@ export function calculateManagerBonus(totalUnits) {
  * Generate 100% Authentic Coach Timesheet .xlsx
  */
 export function exportCoachTimesheetXLSX(classes, options = {}) {
-  const coachName = options.coachName || 'Chew Jie Hern';
+  const coachName = options.coachName !== undefined ? options.coachName : '';
   const ratePerClass = options.ratePerClass !== undefined ? Number(options.ratePerClass) : 40.0;
 
   // Sort chronologically
@@ -281,7 +281,11 @@ export function exportCoachTimesheetXLSX(classes, options = {}) {
   // Pre-register standard strings in identical order to template
   const idxName = getStrIdx('Name');
   const idxColon = getStrIdx(':');
-  const idxCoach = getStrIdx(coachName);
+  let c1CellXml = `<c r="C1" s="2"/>`;
+  if (coachName) {
+    const idxCoach = getStrIdx(coachName);
+    c1CellXml = `<c r="C1" s="2" t="s"><v>${idxCoach}</v></c>`;
+  }
   const idxDate = getStrIdx('Date');
   const idxDay = getStrIdx('Day');
   const idxTime = getStrIdx('Time');
@@ -293,7 +297,7 @@ export function exportCoachTimesheetXLSX(classes, options = {}) {
   const rowsXml = [];
 
   // Row 1: Coach Name
-  rowsXml.push(`<row r="1" ht="14.25" customHeight="1"><c r="A1" s="1" t="s"><v>${idxName}</v></c><c r="B1" s="1" t="s"><v>${idxColon}</v></c><c r="C1" s="2" t="s"><v>${idxCoach}</v></c><c r="D1" s="3"/><c r="F1" s="4"/></row>`);
+  rowsXml.push(`<row r="1" ht="14.25" customHeight="1"><c r="A1" s="1" t="s"><v>${idxName}</v></c><c r="B1" s="1" t="s"><v>${idxColon}</v></c>${c1CellXml}<c r="D1" s="3"/><c r="F1" s="4"/></row>`);
 
   // Rows 2 & 3: Empty spacer rows matching reference template
   rowsXml.push(`<row r="2" ht="14.25" customHeight="1"><c r="C2" s="4"/><c r="D2" s="3"/><c r="F2" s="4"/></row>`);
