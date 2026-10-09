@@ -994,11 +994,13 @@ class ClassLoggerApp {
     if (this.exportCoachName) {
       this.exportCoachName.value = this.getSavedCoachName();
       this.exportCoachName.addEventListener('input', () => {
+        this.exportCoachName.classList.remove('input-error');
         this.saveCoachName(this.exportCoachName.value);
       });
     }
     if (this.exportRatePerClass) {
       this.exportRatePerClass.addEventListener('input', () => {
+        this.exportRatePerClass.classList.remove('input-error');
         this.exportRatePerClass.dataset.userEdited = 'true';
         this.updateExportPreview();
       });
@@ -1804,6 +1806,33 @@ class ClassLoggerApp {
     return `AeroSplash_Classes${datePart}.${ext}`;
   }
 
+  validateExportRequirements() {
+    const coachName = this.exportCoachName ? this.exportCoachName.value.trim() : '';
+    if (!coachName) {
+      if (this.exportCoachName) {
+        this.exportCoachName.focus();
+        this.exportCoachName.classList.add('input-error');
+      }
+      sound.playError();
+      this.showToast('Coach Name is required to export', 'danger');
+      return null;
+    }
+
+    const rateStr = this.exportRatePerClass ? this.exportRatePerClass.value.trim() : '';
+    const rateVal = parseFloat(rateStr);
+    if (!rateStr || isNaN(rateVal) || rateVal <= 0) {
+      if (this.exportRatePerClass) {
+        this.exportRatePerClass.focus();
+        this.exportRatePerClass.classList.add('input-error');
+      }
+      sound.playError();
+      this.showToast('Rate per Class (RM > 0) is required to export', 'danger');
+      return null;
+    }
+
+    return { coachName, ratePerClass: rateVal };
+  }
+
   handleExportXlsx() {
     const { classes, dateFrom, dateTo } = this.getFilteredExportData();
     if (!classes.length) {
@@ -1811,11 +1840,11 @@ class ClassLoggerApp {
       return;
     }
 
-    const coachName = (this.exportCoachName && this.exportCoachName.value.trim()) || '';
-    if (coachName) {
-      this.saveCoachName(coachName);
-    }
-    const ratePerClass = this.exportRatePerClass ? (parseFloat(this.exportRatePerClass.value) || this.getBaseRate()) : this.getBaseRate();
+    const validated = this.validateExportRequirements();
+    if (!validated) return;
+    const { coachName, ratePerClass } = validated;
+    this.saveCoachName(coachName);
+
     const feesLabel = (this.exportFeesLabel && this.exportFeesLabel.value.trim()) || undefined;
 
     const blob = ExcelTimesheetExporter.toBlob(classes, {
@@ -1836,14 +1865,18 @@ class ClassLoggerApp {
       return;
     }
 
+    const validated = this.validateExportRequirements();
+    if (!validated) return;
+    const { coachName, ratePerClass } = validated;
+    this.saveCoachName(coachName);
+
     const headers = ['Date', 'Day', 'Time', 'Duration (mins)', 'Duration (hrs)', 'Credit Units', 'Fee (RM)', 'Notes / Remarks', 'Session ID'];
-    const rateVal = this.exportRatePerClass ? (parseFloat(this.exportRatePerClass.value) || this.getBaseRate()) : this.getBaseRate();
     const rows = classes.map(c => {
       const d = new Date(c.date + 'T00:00:00');
       const dayOfWeek = isNaN(d.getTime()) ? '' : d.toLocaleDateString('en-US', { weekday: 'short' });
       const hours = c.duration ? (c.duration / 60).toFixed(2) : '1.00';
       const units = getClassCreditUnits(c);
-      const fee = (units * rateVal).toFixed(2);
+      const fee = (units * ratePerClass).toFixed(2);
       return [
         `"${c.date}"`,
         `"${dayOfWeek}"`,
@@ -1871,10 +1904,17 @@ class ClassLoggerApp {
       return;
     }
 
+    const validated = this.validateExportRequirements();
+    if (!validated) return;
+    const { coachName, ratePerClass } = validated;
+    this.saveCoachName(coachName);
+
     const payload = {
       appName: 'AeroSplash Class Logger',
       version: 1,
       exportedAt: new Date().toISOString(),
+      coachName,
+      ratePerClass,
       filter: { dateFrom: dateFrom || null, dateTo: dateTo || null },
       totalCount: classes.length,
       classes

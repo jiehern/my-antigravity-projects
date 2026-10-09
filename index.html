@@ -15,7 +15,7 @@
   <meta name="apple-mobile-web-app-title" content="AeroSplash">
   <link rel="apple-touch-icon" href="assets/app-icon.png">
   <link rel="icon" type="image/png" href="assets/app-icon.png">
-  <link rel="stylesheet" href="styles.css?v=3.7">
+  <link rel="stylesheet" href="styles.css?v=3.8">
   <script type="importmap">
   {
     "imports": {
@@ -446,12 +446,12 @@
           </div>
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
             <div>
-              <label for="export-coach-name" style="font-size: 0.74rem;">Coach Name</label>
-              <input type="text" id="export-coach-name" class="form-input" value="" placeholder="e.g. Coach Name" style="padding: 6px 10px; font-size: 0.82rem;">
+              <label for="export-coach-name" style="font-size: 0.74rem;">Coach Name <span style="color: var(--apple-red); font-weight: bold;">*</span></label>
+              <input type="text" id="export-coach-name" class="form-input" value="" placeholder="e.g. Coach Name (Required)" required style="padding: 6px 10px; font-size: 0.82rem;">
             </div>
             <div>
-              <label for="export-rate-per-class" style="font-size: 0.74rem;">Rate per Class (RM)</label>
-              <input type="number" id="export-rate-per-class" class="form-input" value="40" step="1" min="0" style="padding: 6px 10px; font-size: 0.82rem;">
+              <label for="export-rate-per-class" style="font-size: 0.74rem;">Rate per Class (RM) <span style="color: var(--apple-red); font-weight: bold;">*</span></label>
+              <input type="number" id="export-rate-per-class" class="form-input" value="40" step="1" min="1" required style="padding: 6px 10px; font-size: 0.82rem;">
             </div>
           </div>
           <div>
@@ -531,6 +531,6 @@
   <div class="toast-container" id="toast-container" aria-live="polite"></div>
 
   <!-- Main JavaScript App -->
-  <script type="module" src="js/app.js?v=3.7"></script>
+  <script type="module" src="js/app.js?v=3.8"></script>
 </body>
 </html>
