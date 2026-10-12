@@ -2226,6 +2226,19 @@ body::after {
     height: 32px;
     font-size: 0.85rem;
   }
+
+  .toast-container {
+    bottom: calc(20px + env(safe-area-inset-bottom));
+    right: 16px;
+    left: 16px;
+    align-items: center;
+  }
+
+  .toast {
+    width: 100%;
+    max-width: 420px;
+    justify-content: center;
+  }
 }
 
 /* Small Screen Phones (<= 420px, e.g. iPhone SE, iPhone 12/13 mini) */

@@ -464,9 +464,6 @@ class ClassLoggerApp {
             <button type="button" class="card-action-btn edit" title="Edit this entry" data-id="${item.id}" aria-label="Edit class">
               ✏️
             </button>
-            <button type="button" class="card-action-btn duplicate" title="Duplicate entry" data-id="${item.id}" aria-label="Duplicate class">
-              📋
-            </button>
             <button type="button" class="card-action-btn delete" title="Delete entry" data-id="${item.id}" aria-label="Delete class">
               🗑️
             </button>
@@ -483,7 +480,6 @@ class ClassLoggerApp {
 
       // Card action buttons
       card.querySelector('.edit').addEventListener('click', () => this.startEditClass(item));
-      card.querySelector('.duplicate').addEventListener('click', () => this.duplicateClass(item));
       card.querySelector('.delete').addEventListener('click', () => this.deleteClass(item.id));
 
       this.classesList.appendChild(card);
@@ -1266,6 +1262,16 @@ class ClassLoggerApp {
 
   // --- CRUD ACTIONS ---
 
+  normalizeTime(t) {
+    if (!t) return '';
+    const parts = String(t).trim().split(':');
+    if (parts.length < 2) return String(t).trim();
+    const h = parseInt(parts[0], 10);
+    const m = parseInt(parts[1], 10);
+    if (isNaN(h) || isNaN(m)) return String(t).trim();
+    return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+  }
+
   async handleSubmitClass() {
     if (!this.rotaryPicker) return;
 
@@ -1283,6 +1289,28 @@ class ClassLoggerApp {
       duration: this.selectedDuration,
       note: note
     };
+
+    // Ensure there cannot be a class logged at the same time
+    const existingClass = this.classes.find(c => {
+      if (this.editingClassId && String(c.id) === String(this.editingClassId)) {
+        return false;
+      }
+      return c.date === recordData.date && this.normalizeTime(c.time) === this.normalizeTime(recordData.time);
+    });
+
+    if (existingClass) {
+      sound.playError();
+      this.showToast('Class already exists.', 'danger');
+
+      const badge = document.querySelector('.rotary-display-badge');
+      if (badge) {
+        badge.classList.remove('input-error');
+        void badge.offsetWidth;
+        badge.classList.add('input-error');
+        setTimeout(() => badge.classList.remove('input-error'), 1200);
+      }
+      return;
+    }
 
     if (this.editingClassId) {
       // Update existing record
@@ -1379,20 +1407,6 @@ class ClassLoggerApp {
       this.updateNoteChipsActiveState();
     }
     if (this.customDurationWrapper) this.customDurationWrapper.style.display = 'none';
-  }
-
-  async duplicateClass(item) {
-    const clone = {
-      ...item,
-      id: undefined,
-      category: 'AeroSplash',
-      classType: item.classType || resolveClassType(item),
-      note: item.note ? `${item.note} (Copy)` : ''
-    };
-    await db.addClass(clone);
-    await this.loadClasses();
-    sound.playSuccess();
-    this.showToast(`Duplicated ${clone.classType} session`, 'success');
   }
 
   async deleteClass(id) {
