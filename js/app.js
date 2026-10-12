@@ -429,6 +429,9 @@ class ClassLoggerApp {
       const typeSlug = isBaby ? 'baby' : isPreComp ? 'squad' : 'lts';
       const typeBadgeClass = `is-type-${typeSlug}`;
 
+      const durMins = Number(item.duration) || 50;
+      const durBadge = (durMins === 90) ? '1hr30m' : `${durMins}m`;
+
       const card = document.createElement('article');
       card.className = 'class-log-card';
       card.style.setProperty('--card-accent', 'var(--accent-color)');
@@ -448,7 +451,7 @@ class ClassLoggerApp {
           <div class="card-time-block">
             <div class="card-time-display">
               <span class="card-time-large">${item.displayTime || item.time}</span>
-              <span class="card-duration-badge">${item.duration || 60}m</span>
+              <span class="card-duration-badge">${durBadge}</span>
             </div>
             <div class="card-date-line">
               ${isToday ? '<span class="card-relative-badge is-today">Today</span>' : ''}
@@ -624,13 +627,20 @@ class ClassLoggerApp {
 
         <div class="bonus-footer-row">
           <span class="bonus-next-goal">${nextGoalText}</span>
-          <span class="bonus-unit-formula">LTS (50m) = 1.0 unit • Squad (90m) = 1.5 units • Baby (30m) = 1.0 unit</span>
+          <span class="bonus-unit-formula">LTS (50m) = 1.0 unit • Squad (1hr30m) = 1.5 units • Baby (30m) = 1.0 unit</span>
         </div>
       </div>
     `;
   }
 
   // --- CLASS TYPE & DURATION HELPERS ---
+
+  formatDurationLabel(mins) {
+    const parsed = parseInt(mins, 10);
+    if (parsed === 90) return '1hr 30m';
+    if (!parsed || parsed <= 0) return '0 mins';
+    return `${parsed} mins`;
+  }
 
   selectClassType(type, autoUpdateDuration = true) {
     this.selectedClassType = type || 'LTS';
@@ -667,7 +677,7 @@ class ClassLoggerApp {
     this.selectedDuration = parsed;
 
     if (this.durationLabel) {
-      this.durationLabel.textContent = `${parsed} mins`;
+      this.durationLabel.textContent = this.formatDurationLabel(parsed);
     }
 
     if (this.durationContainer) {
@@ -718,14 +728,14 @@ class ClassLoggerApp {
               const existingVal = parseInt(this.customDurationInput.value, 10);
               if (existingVal && existingVal > 0) {
                 this.selectedDuration = existingVal;
-                if (this.durationLabel) this.durationLabel.textContent = `${this.selectedDuration} mins`;
+                if (this.durationLabel) this.durationLabel.textContent = this.formatDurationLabel(this.selectedDuration);
               }
             }
           } else {
             if (this.customDurationWrapper) this.customDurationWrapper.style.display = 'none';
             this.selectedDuration = parseInt(pill.dataset.mins, 10);
             if (this.durationLabel) {
-              this.durationLabel.textContent = `${this.selectedDuration} mins`;
+              this.durationLabel.textContent = this.formatDurationLabel(this.selectedDuration);
             }
           }
           sound.playTick(1.1);
@@ -739,7 +749,7 @@ class ClassLoggerApp {
         if (val && val > 0) {
           this.selectedDuration = val;
           if (this.durationLabel) {
-            this.durationLabel.textContent = `${this.selectedDuration} mins`;
+            this.durationLabel.textContent = this.formatDurationLabel(this.selectedDuration);
           }
         }
       };
@@ -760,7 +770,7 @@ class ClassLoggerApp {
         if (val && val > 0) {
           this.selectedDuration = val;
           if (this.durationLabel) {
-            this.durationLabel.textContent = `${this.selectedDuration} mins`;
+            this.durationLabel.textContent = this.formatDurationLabel(this.selectedDuration);
           }
           sound.playTick(1.2);
           this.showToast(`Custom duration set to ${val} mins`, 'info');
@@ -1312,9 +1322,9 @@ class ClassLoggerApp {
     }
 
     // Set duration
-    this.selectedDuration = item.duration || 60;
+    this.selectedDuration = item.duration || 50;
     if (this.durationLabel) {
-      this.durationLabel.textContent = `${this.selectedDuration} mins`;
+      this.durationLabel.textContent = this.formatDurationLabel(this.selectedDuration);
     }
     if (this.durationContainer) {
       let matched = false;

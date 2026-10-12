@@ -883,7 +883,7 @@ body::after {
 
 .duration-pill {
   flex: 1;
-  min-width: 54px;
+  min-width: 62px;
   background: var(--bg-surface-2);
   border: 1px solid var(--border-subtle);
   border-radius: 10px;
@@ -895,6 +895,7 @@ body::after {
   text-align: center;
   transition: all var(--transition-fast);
   user-select: none;
+  white-space: nowrap;
 }
 
 .duration-pill:hover {
