@@ -191,9 +191,9 @@ class ClassLoggerApp {
   // --- THEME & ACCENT COLOR SYSTEM ---
 
   initTheme() {
-    let savedTheme = 'dark';
+    let savedTheme = 'light';
     try {
-      savedTheme = localStorage.getItem('aerosplash_theme') || 'dark';
+      savedTheme = localStorage.getItem('aerosplash_theme') || 'light';
     } catch (e) {
       console.warn('Could not read theme from localStorage:', e);
     }
@@ -202,9 +202,9 @@ class ClassLoggerApp {
     // Watch for OS preference changes if system theme is selected
     if (window.matchMedia) {
       window.matchMedia('(prefers-color-scheme: light)').addEventListener('change', () => {
-        let currentTheme = 'dark';
+        let currentTheme = 'light';
         try {
-          currentTheme = localStorage.getItem('aerosplash_theme') || 'dark';
+          currentTheme = localStorage.getItem('aerosplash_theme') || 'light';
         } catch (e) {}
         if (currentTheme === 'system') {
           this.setTheme('system', false);
@@ -259,9 +259,9 @@ class ClassLoggerApp {
   }
 
   toggleTheme() {
-    let currentTheme = 'dark';
+    let currentTheme = 'light';
     try {
-      currentTheme = localStorage.getItem('aerosplash_theme') || 'dark';
+      currentTheme = localStorage.getItem('aerosplash_theme') || 'light';
     } catch (e) {}
     const effectiveTheme = this.getEffectiveTheme(currentTheme);
     const newTheme = effectiveTheme === 'dark' ? 'light' : 'dark';
@@ -271,9 +271,9 @@ class ClassLoggerApp {
   }
 
   initAccentColor() {
-    let savedAccent = '#ff9f0a';
+    let savedAccent = '#64d2ff';
     try {
-      savedAccent = localStorage.getItem('aerosplash_accent_color') || '#ff9f0a';
+      savedAccent = localStorage.getItem('aerosplash_accent_color') || '#64d2ff';
     } catch (e) {
       console.warn('Could not read accent color from localStorage:', e);
     }
@@ -286,7 +286,7 @@ class ClassLoggerApp {
       cleanHex = cleanHex.split('').map(c => c + c).join('');
     }
     if (cleanHex.length !== 6) {
-      return { r: 255, g: 159, b: 10 }; // Fallback orange
+      return { r: 100, g: 210, b: 255 }; // Fallback light blue
     }
     const num = parseInt(cleanHex, 16);
     return {

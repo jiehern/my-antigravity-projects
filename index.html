@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
@@ -8,14 +8,14 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
-  <meta name="theme-color" content="#0a0a0c" id="meta-theme-color">
-  <meta name="color-scheme" content="dark" id="meta-color-scheme">
+  <meta name="theme-color" content="#f2f2f7" id="meta-theme-color">
+  <meta name="color-scheme" content="light" id="meta-color-scheme">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="AeroSplash">
   <link rel="apple-touch-icon" href="assets/app-icon.png">
   <link rel="icon" type="image/png" href="assets/app-icon.png">
-  <link rel="stylesheet" href="styles.css?v=4.3">
+  <link rel="stylesheet" href="styles.css?v=4.4">
   <script type="importmap">
   {
     "imports": {
@@ -69,8 +69,8 @@
           <span id="sound-icon">🔊</span>
         </button>
 
-        <button type="button" class="icon-btn" id="theme-toggle-btn" title="Toggle Light / Dark Mode" aria-label="Toggle Theme">
-          <span id="theme-icon">☀️</span>
+        <button type="button" class="icon-btn" id="theme-toggle-btn" title="Switch to Dark Mode" aria-label="Toggle Theme">
+          <span id="theme-icon">🌙</span>
         </button>
 
         <button type="button" class="icon-btn" id="data-menu-btn" title="Settings & Appearance" aria-label="Settings and Appearance">
@@ -327,10 +327,10 @@
         <div class="settings-appearance-row">
           <label class="settings-field-label">Display Mode</label>
           <div class="theme-switch-pills" id="theme-switch-pills">
-            <button type="button" class="theme-pill is-active" data-theme-val="dark">
+            <button type="button" class="theme-pill" data-theme-val="dark">
               <span>🌙 Dark</span>
             </button>
-            <button type="button" class="theme-pill" data-theme-val="light">
+            <button type="button" class="theme-pill is-active" data-theme-val="light">
               <span>☀️ Light</span>
             </button>
             <button type="button" class="theme-pill" data-theme-val="system">
@@ -343,20 +343,20 @@
         <div class="settings-appearance-row" style="margin-top: 12px;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
             <label class="settings-field-label" style="margin-bottom: 0;">Accent Color</label>
-            <span class="accent-current-preview" id="accent-current-preview">#ff9f0a</span>
+            <span class="accent-current-preview" id="accent-current-preview">#64D2FF</span>
           </div>
           <div class="accent-palette-grid" id="accent-palette-grid">
-            <button type="button" class="accent-color-btn is-active" data-accent="#ff9f0a" title="Apple Orange (Default)" style="--btn-color: #ff9f0a;"></button>
+            <button type="button" class="accent-color-btn" data-accent="#ff9f0a" title="Apple Orange" style="--btn-color: #ff9f0a;"></button>
             <button type="button" class="accent-color-btn" data-accent="#0a84ff" title="AeroSplash Blue" style="--btn-color: #0a84ff;"></button>
             <button type="button" class="accent-color-btn" data-accent="#30d158" title="Emerald Green" style="--btn-color: #30d158;"></button>
             <button type="button" class="accent-color-btn" data-accent="#bf5af2" title="Vivid Purple" style="--btn-color: #bf5af2;"></button>
             <button type="button" class="accent-color-btn" data-accent="#ff453a" title="Apple Red" style="--btn-color: #ff453a;"></button>
             <button type="button" class="accent-color-btn" data-accent="#ffd60a" title="Sun Gold" style="--btn-color: #ffd60a;"></button>
-            <button type="button" class="accent-color-btn" data-accent="#64d2ff" title="Aqua Cyan" style="--btn-color: #64d2ff;"></button>
+            <button type="button" class="accent-color-btn is-active" data-accent="#64d2ff" title="Light Blue (Aqua Cyan)" style="--btn-color: #64d2ff;"></button>
             <button type="button" class="accent-color-btn" data-accent="#ff375f" title="Hot Pink" style="--btn-color: #ff375f;"></button>
             <label class="accent-color-custom-label" title="Custom Accent Color Picker">
               <span>🎨</span>
-              <input type="color" id="input-custom-accent-color" value="#ff9f0a" class="accent-custom-picker-input">
+              <input type="color" id="input-custom-accent-color" value="#64d2ff" class="accent-custom-picker-input">
             </label>
           </div>
         </div>
@@ -568,6 +568,6 @@
   <div class="toast-container" id="toast-container" aria-live="polite"></div>
 
   <!-- Main JavaScript App -->
-  <script type="module" src="js/app.js?v=4.3"></script>
+  <script type="module" src="js/app.js?v=4.4"></script>
 </body>
 </html>

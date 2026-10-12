@@ -7,8 +7,8 @@
 
 :root {
   /* Dynamic Accent Color System */
-  --accent-color: #ff9f0a;
-  --accent-color-rgb: 255, 159, 10;
+  --accent-color: #64d2ff;
+  --accent-color-rgb: 100, 210, 255;
   --accent-glow: rgba(var(--accent-color-rgb), 0.35);
   --accent-contrast: #000000;
   --border-focus: var(--accent-color);
@@ -105,7 +105,7 @@
 html {
   -webkit-text-size-adjust: 100%;
   scroll-behavior: smooth;
-  color-scheme: dark;
+  color-scheme: light dark;
 }
 
 html, body {
