@@ -33,6 +33,7 @@ class ClassLoggerApp {
     this.renderAssistNamesList();
     this.updateNoteChipsActiveState();
     this.updateBaseRateUI();
+    this.initBottomSheetSwipeGestures();
 
     // 3. Initialize Rotary Dial Picker
     const mountEl = document.getElementById('rotary-picker-mount');
@@ -1407,6 +1408,14 @@ class ClassLoggerApp {
 
   openModal(modalEl) {
     if (!modalEl) return;
+    const windowEl = modalEl.querySelector('.modal-window');
+    if (windowEl) {
+      windowEl.style.transform = '';
+      windowEl.style.transition = '';
+      windowEl.classList.remove('is-dragging');
+    }
+    modalEl.style.backgroundColor = '';
+    modalEl.style.transition = '';
     modalEl.classList.add('is-open');
     if (modalEl === this.modalData) {
       this.updateBaseRateUI();
@@ -1417,6 +1426,161 @@ class ClassLoggerApp {
   closeModal(modalEl) {
     if (!modalEl) return;
     modalEl.classList.remove('is-open');
+    const windowEl = modalEl.querySelector('.modal-window');
+    if (windowEl) {
+      windowEl.style.transform = '';
+      windowEl.style.transition = '';
+      windowEl.classList.remove('is-dragging');
+    }
+    modalEl.style.backgroundColor = '';
+    modalEl.style.transition = '';
+  }
+
+  initBottomSheetSwipeGestures() {
+    const modals = [this.modalData, this.modalExport, this.modalDateJump];
+    modals.forEach(overlay => {
+      if (!overlay) return;
+      const windowEl = overlay.querySelector('.modal-window');
+      if (!windowEl) return;
+      this.attachSheetSwipeListener(overlay, windowEl);
+    });
+  }
+
+  attachSheetSwipeListener(overlay, windowEl) {
+    let startY = 0;
+    let startX = 0;
+    let startTime = 0;
+    let isHeaderTouch = false;
+    let isDragging = false;
+    let hasDeterminedDirection = false;
+    let lastDragEndTime = 0;
+
+    const dragHandle = windowEl.querySelector('.modal-drag-handle');
+    if (dragHandle) {
+      dragHandle.addEventListener('click', (e) => {
+        if (window.innerWidth <= 640 && Date.now() - lastDragEndTime > 300) {
+          e.preventDefault();
+          this.closeModal(overlay);
+          sound.playTick(0.9);
+        }
+      });
+    }
+
+    const onTouchStart = (e) => {
+      if (window.innerWidth > 640) return;
+      if (!overlay.classList.contains('is-open')) return;
+      if (!e.touches || e.touches.length !== 1) return;
+
+      const touch = e.touches[0];
+      startY = touch.clientY;
+      startX = touch.clientX;
+      startTime = Date.now();
+      isDragging = false;
+      hasDeterminedDirection = false;
+
+      isHeaderTouch = Boolean(touch.target.closest('.modal-drag-handle, .modal-header'));
+    };
+
+    const onTouchMove = (e) => {
+      if (window.innerWidth > 640) return;
+      if (!overlay.classList.contains('is-open')) return;
+      if (!e.touches || e.touches.length !== 1) return;
+
+      const touch = e.touches[0];
+      const deltaY = touch.clientY - startY;
+      const deltaX = touch.clientX - startX;
+
+      if (!hasDeterminedDirection) {
+        if (Math.abs(deltaY) > 5 || Math.abs(deltaX) > 5) {
+          hasDeterminedDirection = true;
+          if (Math.abs(deltaY) > Math.abs(deltaX)) {
+            if (isHeaderTouch && deltaY > 0) {
+              isDragging = true;
+            } else if (!isHeaderTouch && windowEl.scrollTop <= 0 && deltaY > 0) {
+              isDragging = true;
+            }
+          }
+        }
+      }
+
+      if (isDragging) {
+        if (e.cancelable) {
+          e.preventDefault();
+        }
+
+        if (document.activeElement && typeof document.activeElement.blur === 'function') {
+          document.activeElement.blur();
+        }
+
+        const translateY = deltaY > 0 ? deltaY : Math.max(deltaY * 0.15, -25);
+        windowEl.style.transition = 'none';
+        windowEl.style.transform = `translateY(${translateY}px)`;
+        windowEl.classList.add('is-dragging');
+
+        const progress = Math.min(Math.max(deltaY / 320, 0), 1);
+        const bgOpacity = 0.75 * (1 - progress * 0.65);
+        overlay.style.backgroundColor = `rgba(0, 0, 0, ${bgOpacity})`;
+      }
+    };
+
+    const onTouchEnd = (e) => {
+      if (!isDragging) return;
+      isDragging = false;
+      lastDragEndTime = Date.now();
+      windowEl.classList.remove('is-dragging');
+
+      const endTouch = (e.changedTouches && e.changedTouches[0]) ? e.changedTouches[0] : null;
+      const endY = endTouch ? endTouch.clientY : startY;
+      const deltaY = endY - startY;
+      const elapsed = Math.max(Date.now() - startTime, 1);
+      const velocityY = deltaY / elapsed;
+
+      const shouldDismiss = deltaY > 80 || (velocityY > 0.32 && deltaY > 25);
+
+      if (shouldDismiss) {
+        windowEl.style.transition = 'transform 0.24s cubic-bezier(0.32, 1, 0.23, 1)';
+        windowEl.style.transform = 'translateY(100%)';
+        overlay.style.transition = 'background-color 0.24s ease';
+        overlay.style.backgroundColor = 'rgba(0, 0, 0, 0)';
+
+        setTimeout(() => {
+          this.closeModal(overlay);
+          windowEl.style.transform = '';
+          windowEl.style.transition = '';
+          overlay.style.backgroundColor = '';
+          overlay.style.transition = '';
+        }, 240);
+      } else {
+        windowEl.style.transition = 'transform 0.26s cubic-bezier(0.18, 0.89, 0.32, 1.1)';
+        windowEl.style.transform = 'translateY(0)';
+        overlay.style.transition = 'background-color 0.2s ease';
+        overlay.style.backgroundColor = '';
+
+        setTimeout(() => {
+          windowEl.style.transform = '';
+          windowEl.style.transition = '';
+          overlay.style.backgroundColor = '';
+          overlay.style.transition = '';
+        }, 260);
+      }
+    };
+
+    const onTouchCancel = () => {
+      if (isDragging) {
+        isDragging = false;
+        lastDragEndTime = Date.now();
+        windowEl.classList.remove('is-dragging');
+        windowEl.style.transform = '';
+        windowEl.style.transition = '';
+        overlay.style.backgroundColor = '';
+        overlay.style.transition = '';
+      }
+    };
+
+    windowEl.addEventListener('touchstart', onTouchStart, { passive: true });
+    windowEl.addEventListener('touchmove', onTouchMove, { passive: false });
+    windowEl.addEventListener('touchend', onTouchEnd, { passive: true });
+    windowEl.addEventListener('touchcancel', onTouchCancel, { passive: true });
   }
 
   showToast(message, type = 'info') {

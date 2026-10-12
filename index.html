@@ -15,7 +15,7 @@
   <meta name="apple-mobile-web-app-title" content="AeroSplash">
   <link rel="apple-touch-icon" href="assets/app-icon.png">
   <link rel="icon" type="image/png" href="assets/app-icon.png">
-  <link rel="stylesheet" href="styles.css?v=4.1">
+  <link rel="stylesheet" href="styles.css?v=4.2">
   <script type="importmap">
   {
     "imports": {
@@ -306,6 +306,9 @@
   <!-- Modal: Data Management & Backups -->
   <div class="modal-overlay" id="modal-data">
     <div class="modal-window">
+      <div class="modal-drag-handle" aria-label="Swipe down to dismiss" role="button" tabindex="0">
+        <span class="modal-drag-bar"></span>
+      </div>
       <div class="modal-header">
         <h3 class="modal-title">⚙️ Settings & Database</h3>
         <button type="button" class="modal-close-btn" id="btn-close-data-modal">✕</button>
@@ -430,6 +433,9 @@
   <!-- Modal: Filtered Export by Category & Dates -->
   <div class="modal-overlay" id="modal-export">
     <div class="modal-window" style="max-width: 520px;">
+      <div class="modal-drag-handle" aria-label="Swipe down to dismiss" role="button" tabindex="0">
+        <span class="modal-drag-bar"></span>
+      </div>
       <div class="modal-header">
         <div>
           <h3 class="modal-title"><span>📤</span> Export Classes</h3>
@@ -541,6 +547,9 @@
   <!-- Modal: Native Date Picker Jump -->
   <div class="modal-overlay" id="modal-date-jump">
     <div class="modal-window" style="max-width: 360px;">
+      <div class="modal-drag-handle" aria-label="Swipe down to dismiss" role="button" tabindex="0">
+        <span class="modal-drag-bar"></span>
+      </div>
       <div class="modal-header">
         <h3 class="modal-title">Jump to Specific Date</h3>
         <button type="button" class="modal-close-btn" id="btn-close-date-modal">✕</button>
@@ -559,6 +568,6 @@
   <div class="toast-container" id="toast-container" aria-live="polite"></div>
 
   <!-- Main JavaScript App -->
-  <script type="module" src="js/app.js?v=4.1"></script>
+  <script type="module" src="js/app.js?v=4.2"></script>
 </body>
 </html>
