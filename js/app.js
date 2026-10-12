@@ -1641,12 +1641,18 @@ class ClassLoggerApp {
       const saved = localStorage.getItem('class_logger_assist_names');
       if (saved !== null) {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed)) return parsed;
+        if (Array.isArray(parsed)) {
+          const filtered = parsed.filter(n => n && n !== 'Coach Allen' && n !== 'Charles');
+          if (filtered.length !== parsed.length) {
+            this.saveAssistNames(filtered);
+          }
+          return filtered;
+        }
       }
     } catch (e) {
       console.warn('Failed to parse assist names', e);
     }
-    return ['Coach Allen', 'Charles'];
+    return [];
   }
 
   saveAssistNames(names) {
