@@ -1736,20 +1736,65 @@ class ClassLoggerApp {
 
   showToast(message, type = 'info') {
     if (!this.toastContainer) return;
-    const toast = document.createElement('div');
-    toast.className = `toast toast-${type}`;
 
     let icon = 'ℹ️';
     if (type === 'success') icon = '✓';
     if (type === 'danger') icon = '⚠️';
 
+    const dismissToast = (toastEl) => {
+      if (!toastEl || toastEl._isDismissing) return;
+      toastEl._isDismissing = true;
+      if (toastEl._dismissTimer) {
+        clearTimeout(toastEl._dismissTimer);
+        toastEl._dismissTimer = null;
+      }
+      toastEl.classList.remove('toast-pop');
+      toastEl.classList.add('toast-fade-out');
+      setTimeout(() => {
+        if (toastEl.parentElement) {
+          toastEl.remove();
+        }
+      }, 350);
+    };
+
+    // If a toast is currently active in that single place, update it in-place and give feedback
+    const currentToast = this.toastContainer.querySelector('.toast:not(.toast-fade-out)');
+    if (currentToast) {
+      if (currentToast._dismissTimer) {
+        clearTimeout(currentToast._dismissTimer);
+      }
+      currentToast.className = `toast toast-${type}`;
+      currentToast.innerHTML = `<span>${icon}</span> <span>${this.escapeHTML(message)}</span>`;
+
+      // Trigger lively pop animation on repeated clicks so spamming gives immediate feedback in one spot
+      currentToast.classList.remove('toast-pop');
+      void currentToast.offsetWidth; // Force CSS reflow to replay pop
+      currentToast.classList.add('toast-pop');
+
+      currentToast._dismissTimer = setTimeout(() => {
+        dismissToast(currentToast);
+      }, 2800);
+      return;
+    }
+
+    // Clean up any lingering fade-out toasts immediately before mounting the new one
+    const lingering = this.toastContainer.querySelectorAll('.toast');
+    lingering.forEach(t => t.remove());
+
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
     toast.innerHTML = `<span>${icon}</span> <span>${this.escapeHTML(message)}</span>`;
+
+    // Click to dismiss early with smooth fade away
+    toast.addEventListener('click', () => {
+      dismissToast(toast);
+    });
+
     this.toastContainer.appendChild(toast);
 
-    setTimeout(() => {
-      toast.style.animation = 'toast-in 0.3s ease reverse forwards';
-      setTimeout(() => toast.remove(), 300);
-    }, 3200);
+    toast._dismissTimer = setTimeout(() => {
+      dismissToast(toast);
+    }, 2800);
   }
 
   downloadFile(content, fileName, mimeType) {

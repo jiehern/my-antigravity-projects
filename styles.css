@@ -1902,7 +1902,7 @@ body.modal-open {
   right: 24px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  align-items: flex-end;
   z-index: 1200;
   pointer-events: none;
 }
@@ -1920,15 +1920,55 @@ body.modal-open {
   font-weight: 600;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
   pointer-events: auto;
-  transform: translateY(20px);
+  cursor: pointer;
   opacity: 0;
   animation: toast-in 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: transform, opacity;
+  transition: border-color 0.2s ease, background 0.2s ease;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.toast.toast-pop {
+  animation: toast-pop 0.22s cubic-bezier(0.18, 1.25, 0.4, 1) forwards;
+}
+
+.toast.toast-fade-out {
+  animation: toast-fade-out 0.35s cubic-bezier(0.25, 1, 0.5, 1) forwards !important;
+  pointer-events: none;
 }
 
 @keyframes toast-in {
+  from {
+    transform: translateY(16px) scale(0.96);
+    opacity: 0;
+  }
   to {
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
     opacity: 1;
+  }
+}
+
+@keyframes toast-pop {
+  0% {
+    transform: translateY(0) scale(1);
+  }
+  40% {
+    transform: translateY(-3px) scale(1.03);
+  }
+  100% {
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes toast-fade-out {
+  from {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(12px) scale(0.94);
+    opacity: 0;
   }
 }
 
