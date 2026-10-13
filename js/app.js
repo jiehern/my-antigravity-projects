@@ -1547,7 +1547,7 @@ class ClassLoggerApp {
 
       if (shouldDismiss) {
         windowEl.style.transition = 'transform 0.18s cubic-bezier(0.32, 1, 0.23, 1)';
-        windowEl.style.transform = 'translateY(100%)';
+        windowEl.style.transform = 'translateY(calc(100% + 80px))';
         overlay.style.transition = 'background-color 0.16s ease, backdrop-filter 0.16s ease, -webkit-backdrop-filter 0.16s ease, opacity 0.16s ease';
         overlay.style.backgroundColor = 'rgba(0, 0, 0, 0)';
         overlay.style.backdropFilter = 'blur(0px)';
