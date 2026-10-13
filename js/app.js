@@ -393,6 +393,7 @@ class ClassLoggerApp {
     }
 
     this.classesList.innerHTML = '';
+    const fragment = document.createDocumentFragment();
 
     filtered.forEach(item => {
       // Actual formatted calendar date
@@ -469,8 +470,10 @@ class ClassLoggerApp {
       card.querySelector('.edit').addEventListener('click', () => this.startEditClass(item));
       card.querySelector('.delete').addEventListener('click', () => this.deleteClass(item.id));
 
-      this.classesList.appendChild(card);
+      fragment.appendChild(card);
     });
+
+    this.classesList.appendChild(fragment);
   }
 
   // --- MONTHLY MANAGER BONUS CARD ---
@@ -908,9 +911,13 @@ class ClassLoggerApp {
 
     // 5. Search filtering
     if (this.searchInput) {
+      let searchDebounceTimer = null;
       this.searchInput.addEventListener('input', (e) => {
         this.searchQuery = e.target.value;
-        this.renderClassesList();
+        clearTimeout(searchDebounceTimer);
+        searchDebounceTimer = setTimeout(() => {
+          this.renderClassesList();
+        }, 80);
       });
     }
 
@@ -1928,7 +1935,7 @@ class ClassLoggerApp {
   updateNoteChipsActiveState() {
     if (!this.notesInput) return;
     const val = (this.notesInput.value || '').trim();
-    const assistBtn = document.getElementById('btn-assist-dropdown-toggle');
+    const assistBtn = this.btnAssistDropdownToggle || document.getElementById('btn-assist-dropdown-toggle');
 
     if (assistBtn) {
       const isAssist = val.toLowerCase().includes('assist');

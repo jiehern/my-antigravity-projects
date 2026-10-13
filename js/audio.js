@@ -98,11 +98,6 @@ class SoundEngine {
 
       osc2.start(t);
       osc2.stop(t + 0.02);
-
-      // Light haptic vibration on supporting mobile devices
-      if (typeof navigator !== 'undefined' && navigator.vibrate) {
-        navigator.vibrate(6);
-      }
     } catch (e) {
       // Audio autoplay policy or silent fail
     }

@@ -311,7 +311,7 @@ export class RotaryDialPicker {
 
       // Only calculate 3D transform for items near the active window
       if (Math.abs(offset) <= halfVisible + 1.5) {
-        el.style.display = 'flex';
+        if (el.style.display !== 'flex') el.style.display = 'flex';
         // 3D Cylinder geometry
         const angle = offset * 21; // degrees curved around cylinder
         const rad = (angle * Math.PI) / 180;
@@ -334,8 +334,10 @@ export class RotaryDialPicker {
           el.classList.remove('is-active');
         }
       } else {
-        el.style.display = 'none';
-        el.classList.remove('is-active');
+        if (el.style.display !== 'none') {
+          el.style.display = 'none';
+          el.classList.remove('is-active');
+        }
       }
     });
   }
