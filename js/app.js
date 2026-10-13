@@ -1404,11 +1404,28 @@ class ClassLoggerApp {
   }
 
   async deleteClass(id) {
+    const classToDelete = this.classes.find(c => c.id === id);
+    if (!classToDelete) return;
+
     if (confirm('Delete this class session?')) {
+      const classCopy = { ...classToDelete };
+      if (this.editingClassId === id) {
+        this.cancelEdit();
+      }
       await db.deleteClass(id);
       sound.playTrash();
       await this.loadClasses();
-      this.showToast('Class entry deleted', 'info');
+
+      this.showToast('Class entry deleted', 'info', {
+        actionText: 'Undo',
+        duration: 5000,
+        onAction: async () => {
+          await db.upsertClass(classCopy);
+          sound.playSuccess();
+          await this.loadClasses();
+          this.showToast('Class entry restored', 'success');
+        }
+      });
     }
   }
 
@@ -1737,7 +1754,7 @@ class ClassLoggerApp {
     windowEl.addEventListener('touchcancel', onTouchCancel, { passive: true });
   }
 
-  showToast(message, type = 'info') {
+  showToast(message, type = 'info', options = null) {
     if (!this.toastContainer) return;
 
     let icon = 'ℹ️';
@@ -1760,6 +1777,31 @@ class ClassLoggerApp {
       }, 350);
     };
 
+    const attachActionHandler = (toastEl) => {
+      if (!options || !options.actionText || typeof options.onAction !== 'function') return;
+      const actionBtn = toastEl.querySelector('.toast-action-btn');
+      if (actionBtn) {
+        actionBtn.addEventListener('click', async (e) => {
+          e.stopPropagation();
+          if (toastEl._dismissTimer) clearTimeout(toastEl._dismissTimer);
+          toastEl.remove();
+          try {
+            await options.onAction();
+          } catch (err) {
+            console.error('Error executing toast action:', err);
+          }
+        });
+      }
+    };
+
+    const toastInnerHtml = `
+      <span>${icon}</span>
+      <span>${this.escapeHTML(message)}</span>
+      ${options && options.actionText ? `<button type="button" class="toast-action-btn">${this.escapeHTML(options.actionText)}</button>` : ''}
+    `;
+
+    const duration = (options && options.duration) ? options.duration : (options && options.actionText ? 5000 : 2800);
+
     // If a toast is currently active in that single place, update it in-place and give feedback
     const currentToast = this.toastContainer.querySelector('.toast:not(.toast-fade-out)');
     if (currentToast) {
@@ -1767,7 +1809,8 @@ class ClassLoggerApp {
         clearTimeout(currentToast._dismissTimer);
       }
       currentToast.className = `toast toast-${type}`;
-      currentToast.innerHTML = `<span>${icon}</span> <span>${this.escapeHTML(message)}</span>`;
+      currentToast.innerHTML = toastInnerHtml;
+      attachActionHandler(currentToast);
 
       // Trigger lively pop animation on repeated clicks so spamming gives immediate feedback in one spot
       currentToast.classList.remove('toast-pop');
@@ -1776,7 +1819,7 @@ class ClassLoggerApp {
 
       currentToast._dismissTimer = setTimeout(() => {
         dismissToast(currentToast);
-      }, 2800);
+      }, duration);
       return;
     }
 
@@ -1789,10 +1832,12 @@ class ClassLoggerApp {
 
     const toast = document.createElement('div');
     toast.className = `toast toast-${type}`;
-    toast.innerHTML = `<span>${icon}</span> <span>${this.escapeHTML(message)}</span>`;
+    toast.innerHTML = toastInnerHtml;
+    attachActionHandler(toast);
 
-    // Click to dismiss early with smooth fade away
-    toast.addEventListener('click', () => {
+    // Click to dismiss early with smooth fade away (ignore clicks on action button)
+    toast.addEventListener('click', (e) => {
+      if (e.target.closest('.toast-action-btn')) return;
       dismissToast(toast);
     });
 
@@ -1800,7 +1845,7 @@ class ClassLoggerApp {
 
     toast._dismissTimer = setTimeout(() => {
       dismissToast(toast);
-    }, 2800);
+    }, duration);
   }
 
   downloadFile(content, fileName, mimeType) {

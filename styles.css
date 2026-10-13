@@ -1989,6 +1989,36 @@ body.modal-open {
   border-left: 4px solid var(--apple-red);
 }
 
+.toast-action-btn {
+  background: var(--accent-color, #0a84ff);
+  color: var(--accent-contrast, #ffffff);
+  border: none;
+  border-radius: 9999px;
+  padding: 5px 14px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  transition: transform 0.15s ease, filter 0.15s ease, opacity 0.15s ease;
+  touch-action: manipulation;
+  flex-shrink: 0;
+}
+
+.toast-action-btn:hover {
+  filter: brightness(1.12);
+  transform: scale(1.05);
+}
+
+.toast-action-btn:active {
+  transform: scale(0.95);
+  opacity: 0.85;
+}
+
 /* ==========================================================================
    Export Modal Styles
    ========================================================================== */
@@ -2469,6 +2499,10 @@ body.modal-open {
     width: 100%;
     max-width: 420px;
     justify-content: center;
+  }
+
+  .toast:has(.toast-action-btn) {
+    justify-content: space-between;
   }
 }
 
