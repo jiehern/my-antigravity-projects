@@ -1921,8 +1921,9 @@ body.modal-open {
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
   pointer-events: auto;
   cursor: pointer;
-  opacity: 0;
-  animation: toast-in 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  animation: toast-in 0.28s cubic-bezier(0.16, 1, 0.3, 1) both;
   will-change: transform, opacity;
   transition: border-color 0.2s ease, background 0.2s ease;
   user-select: none;
@@ -1930,7 +1931,8 @@ body.modal-open {
 }
 
 .toast.toast-pop {
-  animation: toast-pop 0.22s cubic-bezier(0.18, 1.25, 0.4, 1) forwards;
+  animation: toast-pop 0.2s cubic-bezier(0.18, 1.25, 0.4, 1) both;
+  opacity: 1 !important;
 }
 
 .toast.toast-fade-out {
@@ -1952,12 +1954,15 @@ body.modal-open {
 @keyframes toast-pop {
   0% {
     transform: translateY(0) scale(1);
+    opacity: 1;
   }
-  40% {
-    transform: translateY(-3px) scale(1.03);
+  35% {
+    transform: translateY(-4px) scale(1.04);
+    opacity: 1;
   }
   100% {
     transform: translateY(0) scale(1);
+    opacity: 1;
   }
 }
 

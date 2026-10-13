@@ -1779,7 +1779,10 @@ class ClassLoggerApp {
 
     // Clean up any lingering fade-out toasts immediately before mounting the new one
     const lingering = this.toastContainer.querySelectorAll('.toast');
-    lingering.forEach(t => t.remove());
+    lingering.forEach(t => {
+      if (t._dismissTimer) clearTimeout(t._dismissTimer);
+      t.remove();
+    });
 
     const toast = document.createElement('div');
     toast.className = `toast toast-${type}`;
