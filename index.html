@@ -15,7 +15,7 @@
   <meta name="apple-mobile-web-app-title" content="AeroSplash">
   <link rel="apple-touch-icon" href="assets/app-icon.png">
   <link rel="icon" type="image/png" href="assets/app-icon.png">
-  <link rel="stylesheet" href="styles.css?v=7.0">
+  <link rel="stylesheet" href="styles.css?v=8.0">
   <script type="importmap">
   {
     "imports": {
@@ -44,32 +44,35 @@
       <div class="header-actions">
         <!-- Direct JSON File Import Button -->
         <label class="quick-pill-btn" title="Import classes from .json file">
-          <span class="desktop-only-text">💾 Import JSON</span>
-          <span class="mobile-only-text">💾 JSON</span>
+          <svg class="ui-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          <span class="desktop-only-text">Import JSON</span>
+          <span class="mobile-only-text">JSON</span>
           <input type="file" id="import-json-header-btn" accept=".json,application/json" style="display: none;">
         </label>
 
         <!-- Direct Excel File Import Button -->
         <label class="quick-pill-btn primary" title="Import coach timesheet Excel spreadsheet (.xlsx)">
-          <span class="desktop-only-text">📥 Import Excel (.xlsx)</span>
-          <span class="mobile-only-text">📥 Excel</span>
+          <svg class="ui-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/></svg>
+          <span class="desktop-only-text">Import Excel (.xlsx)</span>
+          <span class="mobile-only-text">Excel</span>
           <input type="file" id="import-excel-btn" accept=".xlsx, .xls" style="display: none;">
         </label>
 
         <button type="button" class="quick-pill-btn" id="btn-header-export" title="Export classes and timesheets">
-          <span>📤 Export</span>
+          <svg class="ui-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          <span>Export</span>
         </button>
 
-        <button type="button" class="icon-btn" id="sound-toggle-btn" title="Toggle Mechanical Tick Sound" aria-label="Toggle Sound">
-          <span id="sound-icon">🔊</span>
+        <button type="button" class="icon-btn" id="sound-toggle-btn" title="Toggle Sound Feedback" aria-label="Toggle Sound">
+          <span id="sound-icon"><svg class="ui-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg></span>
         </button>
 
-        <button type="button" class="icon-btn" id="theme-toggle-btn" title="Switch to Dark Mode" aria-label="Toggle Theme">
-          <span id="theme-icon">🌙</span>
+        <button type="button" class="icon-btn" id="theme-toggle-btn" title="Switch Theme" aria-label="Toggle Theme">
+          <span id="theme-icon"><svg class="ui-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></span>
         </button>
 
-        <button type="button" class="icon-btn" id="data-menu-btn" title="Settings & Appearance" aria-label="Settings and Appearance">
-          <span>⚙️</span>
+        <button type="button" class="icon-btn" id="data-menu-btn" title="Settings & Database" aria-label="Settings and Database">
+          <svg class="ui-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
         </button>
       </div>
     </header>
@@ -78,10 +81,12 @@
     <!-- Mobile Segmented View Switcher (Visible only on mobile screens) -->
     <nav class="mobile-segmented-nav" id="mobile-nav-tabs" aria-label="Mobile Navigation">
       <button type="button" class="mobile-nav-pill is-active" id="mobile-tab-log" data-tab="log">
-        <span>⏱️ Log Class</span>
+        <svg class="ui-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        <span>Log Class</span>
       </button>
       <button type="button" class="mobile-nav-pill" id="mobile-tab-history" data-tab="history">
-        <span>📋 Class History</span>
+        <svg class="ui-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+        <span>Class History</span>
         <span class="mobile-nav-badge" id="mobile-history-badge">0</span>
       </button>
     </nav>
@@ -92,7 +97,8 @@
       <section class="panel-card panel-log-section" id="panel-log" aria-label="Log Class Form">
         <div class="panel-header">
           <h2 class="panel-title" id="form-heading">
-            <span>⏱️</span> Log Class Session
+            <svg class="ui-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            Log Class Session
           </h2>
           <span class="panel-tag" id="mode-tag">New Entry</span>
         </div>
@@ -102,7 +108,8 @@
           <div class="form-section">
             <div class="section-label-row">
               <label class="section-label">
-                <span>🕒</span> Date & Time
+                <svg class="ui-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                <span>Date & Time</span>
               </label>
             </div>
 
@@ -119,7 +126,8 @@
               <!-- Quick Action Pills -->
               <div class="rotary-quick-actions">
                 <button type="button" class="quick-pill-btn primary" id="btn-set-now" title="Set to Current Time">
-                  <span>⚡</span> <span class="btn-text-full">Set to Current Time</span><span class="btn-text-compact">Current Time</span>
+                  <svg class="ui-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                  <span class="btn-text-full">Current Time</span><span class="btn-text-compact">Now</span>
                 </button>
                 <button type="button" class="quick-pill-btn" id="btn-minus-hour" title="Minus 1 Hour">
                   <span>-1h</span>
@@ -128,7 +136,8 @@
                   <span>+1h</span>
                 </button>
                 <button type="button" class="quick-pill-btn" id="btn-calendar-jump" title="Jump to Calendar Date">
-                  <span>📅</span> <span class="btn-text-full">Calendar Jump</span><span class="btn-text-compact">Calendar</span>
+                  <svg class="ui-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                  <span class="btn-text-full">Calendar</span><span class="btn-text-compact">Date</span>
                 </button>
               </div>
             </div>
@@ -138,28 +147,29 @@
           <div class="form-section">
             <div class="section-label-row">
               <label class="section-label">
-                <span>🏷️</span> Class Type
+                <svg class="ui-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+                <span>Class Type</span>
               </label>
               <span id="selected-classtype-label" style="font-size: 0.75rem; color: var(--accent-color); font-weight: 600;">LTS (1.0 unit)</span>
             </div>
 
             <div class="class-type-pills" id="class-type-pills-container" role="radiogroup" aria-label="Class Type">
               <button type="button" class="class-type-pill is-active" data-type="LTS" role="radio" aria-checked="true">
-                <span class="type-pill-icon">🏊</span>
+                <span class="type-pill-pip pip-lts"></span>
                 <span class="type-pill-text">
                   <span class="type-pill-title">LTS</span>
                   <span class="type-pill-badge">50m • 1.0 unit</span>
                 </span>
               </button>
               <button type="button" class="class-type-pill" data-type="Squad (Pre Comp)" role="radio" aria-checked="false">
-                <span class="type-pill-icon">⚡</span>
+                <span class="type-pill-pip pip-squad"></span>
                 <span class="type-pill-text">
                   <span class="type-pill-title">Squad (Pre Comp)</span>
-                  <span class="type-pill-badge">1hr30m • 1.5 units</span>
+                  <span class="type-pill-badge">1hr 30m • 1.5 units</span>
                 </span>
               </button>
               <button type="button" class="class-type-pill" data-type="Baby Class" role="radio" aria-checked="false">
-                <span class="type-pill-icon">👶</span>
+                <span class="type-pill-pip pip-baby"></span>
                 <span class="type-pill-text">
                   <span class="type-pill-title">Baby Class</span>
                   <span class="type-pill-badge">30m • 1.0 unit</span>
@@ -172,7 +182,8 @@
           <div class="form-section">
             <div class="section-label-row">
               <label class="section-label">
-                <span>⏳</span> Duration
+                <svg class="ui-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 14 14"/></svg>
+                <span>Duration</span>
               </label>
               <span id="selected-duration-label" style="font-size: 0.75rem; color: var(--text-secondary); font-weight: 600;">50 mins</span>
             </div>
@@ -180,7 +191,7 @@
             <div class="duration-pills" id="duration-pills-container">
               <button type="button" class="duration-pill" data-mins="30">30m</button>
               <button type="button" class="duration-pill is-active" data-mins="50">50m</button>
-              <button type="button" class="duration-pill" data-mins="90">1hr30m</button>
+              <button type="button" class="duration-pill" data-mins="90">1hr 30m</button>
               <button type="button" class="duration-pill" data-mins="custom" id="duration-pill-custom">Custom</button>
             </div>
 
@@ -207,9 +218,10 @@
           <div class="form-section">
             <div class="section-label-row">
               <label class="section-label" for="class-notes-input">
-                <span>📝</span> Session Note
+                <svg class="ui-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                <span>Session Note</span>
               </label>
-              <span style="font-size: 0.72rem; color: var(--text-tertiary);">Extra remarks & highlights</span>
+              <span style="font-size: 0.72rem; color: var(--text-tertiary);">Remarks & highlights</span>
             </div>
 
             <div class="note-container">
@@ -222,8 +234,9 @@
               <div class="quick-note-tags" id="quick-note-tags">
                 <div class="assist-dropdown-container" id="assist-dropdown-container">
                   <button type="button" class="note-tag-chip assist-chip-btn" id="btn-assist-dropdown-toggle" aria-haspopup="true" aria-expanded="false">
+                    <svg class="ui-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                     <span>Assist</span>
-                    <span class="assist-caret">▾</span>
+                    <svg class="ui-icon assist-caret" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
                   </button>
                   <div class="assist-dropdown-menu" id="assist-dropdown-menu" style="display: none;">
                     <div class="assist-dropdown-header">
@@ -251,8 +264,8 @@
 
           <!-- Submit Buttons -->
           <button type="submit" class="submit-btn" id="btn-submit-class">
-            <span id="btn-submit-icon">✓</span>
-            <span id="btn-submit-text">Enter Class Into Database</span>
+            <span id="btn-submit-icon"><svg class="ui-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+            <span id="btn-submit-text">Record Session</span>
           </button>
 
           <button type="button" class="cancel-edit-btn" id="btn-cancel-edit" style="display: none;">
@@ -265,7 +278,8 @@
       <section class="panel-card panel-history-section" id="panel-history" aria-label="Logged Classes History">
         <div class="panel-header">
           <h2 class="panel-title">
-            <span>📋</span> Class Log History
+            <svg class="ui-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+            Session History
           </h2>
           <span class="panel-tag" id="log-count-tag">0 sessions</span>
         </div>
@@ -278,12 +292,12 @@
         <div class="history-controls">
           <!-- Search box -->
           <div class="search-box">
-            <span class="search-icon">🔍</span>
+            <span class="search-icon"><svg class="ui-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
             <input 
               type="text" 
               class="search-input" 
               id="history-search-input" 
-              placeholder="Search notes, dates, or times..."
+              placeholder="Filter by note, date, or time..."
               autocomplete="off"
             >
           </div>
@@ -304,15 +318,23 @@
         <span class="modal-drag-bar"></span>
       </div>
       <div class="modal-header">
-        <h3 class="modal-title">⚙️ Settings & Database</h3>
-        <button type="button" class="modal-close-btn" id="btn-close-data-modal">✕</button>
+        <h3 class="modal-title">
+          <svg class="ui-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          Settings & Database
+        </h3>
+        <button type="button" class="modal-close-btn" id="btn-close-data-modal" aria-label="Close settings">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
       </div>
 
       <!-- Appearance & Theme Customization Box -->
       <div class="settings-appearance-box">
         <div class="settings-appearance-header">
           <div>
-            <div class="settings-appearance-title">🎨 Appearance & Theme</div>
+            <div class="settings-appearance-title">
+              <svg class="ui-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a7 7 0 0 0-7 7c0 2 2 3 2 4.5 0 1.5-1 2.5-1 2.5h12s-1-1-1-2.5c0-1.5 2-2.5 2-4.5a7 7 0 0 0-7-7z"/></svg>
+              Appearance & Theme
+            </div>
             <div class="settings-appearance-subtitle">Switch between dark/light mode and customize your accent colors</div>
           </div>
         </div>
@@ -322,13 +344,16 @@
           <label class="settings-field-label">Display Mode</label>
           <div class="theme-switch-pills" id="theme-switch-pills">
             <button type="button" class="theme-pill" data-theme-val="dark">
-              <span>🌙 Dark</span>
+              <svg class="ui-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+              <span>Dark</span>
             </button>
             <button type="button" class="theme-pill is-active" data-theme-val="light">
-              <span>☀️ Light</span>
+              <svg class="ui-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+              <span>Light</span>
             </button>
             <button type="button" class="theme-pill" data-theme-val="system">
-              <span>🖥️ System</span>
+              <svg class="ui-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+              <span>System</span>
             </button>
           </div>
         </div>
@@ -340,16 +365,16 @@
             <span class="accent-current-preview" id="accent-current-preview">#64D2FF</span>
           </div>
           <div class="accent-palette-grid" id="accent-palette-grid">
-            <button type="button" class="accent-color-btn" data-accent="#ff9f0a" title="Apple Orange" style="--btn-color: #ff9f0a;"></button>
-            <button type="button" class="accent-color-btn" data-accent="#0a84ff" title="AeroSplash Blue" style="--btn-color: #0a84ff;"></button>
+            <button type="button" class="accent-color-btn" data-accent="#ff9f0a" title="Amber Orange" style="--btn-color: #ff9f0a;"></button>
+            <button type="button" class="accent-color-btn" data-accent="#0a84ff" title="Electric Blue" style="--btn-color: #0a84ff;"></button>
             <button type="button" class="accent-color-btn" data-accent="#30d158" title="Emerald Green" style="--btn-color: #30d158;"></button>
             <button type="button" class="accent-color-btn" data-accent="#bf5af2" title="Vivid Purple" style="--btn-color: #bf5af2;"></button>
-            <button type="button" class="accent-color-btn" data-accent="#ff453a" title="Apple Red" style="--btn-color: #ff453a;"></button>
-            <button type="button" class="accent-color-btn" data-accent="#ffd60a" title="Sun Gold" style="--btn-color: #ffd60a;"></button>
-            <button type="button" class="accent-color-btn is-active" data-accent="#64d2ff" title="Light Blue (Aqua Cyan)" style="--btn-color: #64d2ff;"></button>
-            <button type="button" class="accent-color-btn" data-accent="#ff375f" title="Hot Pink" style="--btn-color: #ff375f;"></button>
+            <button type="button" class="accent-color-btn" data-accent="#ff453a" title="Coral Red" style="--btn-color: #ff453a;"></button>
+            <button type="button" class="accent-color-btn" data-accent="#ffd60a" title="Solar Gold" style="--btn-color: #ffd60a;"></button>
+            <button type="button" class="accent-color-btn is-active" data-accent="#64d2ff" title="Aqua Cyan" style="--btn-color: #64d2ff;"></button>
+            <button type="button" class="accent-color-btn" data-accent="#ff375f" title="Neon Pink" style="--btn-color: #ff375f;"></button>
             <label class="accent-color-custom-label" title="Custom Accent Color Picker">
-              <span>🎨</span>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m2 22 1-1h3l9-9"/><path d="M3 21v-3l9-9"/><path d="m15 6 3 3"/><path d="m18 3 3 3-2 2-3-3 2-2z"/></svg>
               <input type="color" id="input-custom-accent-color" value="#64d2ff" class="accent-custom-picker-input">
             </label>
           </div>
@@ -360,7 +385,10 @@
       <div class="settings-base-rate-box">
         <div class="settings-rate-title-row">
           <div>
-            <div class="settings-rate-title">💵 Coach Base Rate</div>
+            <div class="settings-rate-title">
+              <svg class="ui-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+              Coach Base Rate
+            </div>
             <div class="settings-rate-subtitle">Base hourly pay per standard class (1.0 unit)</div>
           </div>
           <span class="settings-rate-current-tag" id="settings-current-rate-badge">RM 40.0 / class</span>
@@ -393,28 +421,34 @@
       </div>
 
       <div style="display: flex; flex-direction: column; gap: 10px;">
-        <button type="button" class="submit-btn" id="btn-open-export-modal" style="background: rgba(10, 132, 255, 0.2); color: var(--apple-cyan); box-shadow: none; border: 1px solid rgba(10, 132, 255, 0.4); font-weight: 600;">
-          📤 Export Classes (Filter Dates & Timesheet)
+        <button type="button" class="submit-btn" id="btn-open-export-modal" style="background: rgba(10, 132, 255, 0.15); color: var(--apple-cyan); box-shadow: none; border: 1px solid rgba(10, 132, 255, 0.35); font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px;">
+          <svg class="ui-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          Export Classes (Filter Dates & Timesheet)
         </button>
-        <button type="button" class="submit-btn" id="btn-export-csv" style="background: var(--bg-surface-2); color: var(--text-primary); box-shadow: none; border: 1px solid var(--border-medium);">
-          📊 Export as CSV (Quick All Classes)
+        <button type="button" class="submit-btn" id="btn-export-csv" style="background: var(--bg-surface-2); color: var(--text-primary); box-shadow: none; border: 1px solid var(--border-medium); display: flex; align-items: center; justify-content: center; gap: 8px;">
+          <svg class="ui-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+          Export as CSV (Quick All Classes)
         </button>
-        <button type="button" class="submit-btn" id="btn-export-json" style="background: var(--bg-surface-2); color: var(--text-primary); box-shadow: none; border: 1px solid var(--border-medium);">
-          💾 Backup Full Database (JSON)
+        <button type="button" class="submit-btn" id="btn-export-json" style="background: var(--bg-surface-2); color: var(--text-primary); box-shadow: none; border: 1px solid var(--border-medium); display: flex; align-items: center; justify-content: center; gap: 8px;">
+          <svg class="ui-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+          Backup Full Database (JSON)
         </button>
         
-        <label class="submit-btn" style="background: rgba(10, 132, 255, 0.15); color: var(--apple-cyan); box-shadow: none; border: 1px solid rgba(10, 132, 255, 0.35); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;">
-          <span>💾</span> Import Classes (.json)
+        <label class="submit-btn" style="background: rgba(10, 132, 255, 0.12); color: var(--apple-cyan); box-shadow: none; border: 1px solid rgba(10, 132, 255, 0.3); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;">
+          <svg class="ui-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Import Classes (.json)
           <input type="file" id="import-json-input" accept=".json,application/json" style="display: none;">
         </label>
 
-        <label class="submit-btn" style="background: rgba(100, 210, 255, 0.15); color: var(--apple-cyan); box-shadow: none; border: 1px solid rgba(100, 210, 255, 0.35); cursor: pointer;">
-          📥 Import Coach Timesheet (.xlsx)
+        <label class="submit-btn" style="background: rgba(100, 210, 255, 0.12); color: var(--apple-cyan); box-shadow: none; border: 1px solid rgba(100, 210, 255, 0.3); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;">
+          <svg class="ui-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg>
+          Import Coach Timesheet (.xlsx)
           <input type="file" id="import-excel-modal-input" accept=".xlsx, .xls" style="display: none;">
         </label>
 
-        <button type="button" class="submit-btn" id="btn-clear-db" style="background: rgba(255, 69, 58, 0.15); color: var(--apple-red); box-shadow: none; border: 1px solid rgba(255, 69, 58, 0.35);">
-          🗑️ Clear All Local Records
+        <button type="button" class="submit-btn" id="btn-clear-db" style="background: rgba(255, 69, 58, 0.12); color: var(--apple-red); box-shadow: none; border: 1px solid rgba(255, 69, 58, 0.3); display: flex; align-items: center; justify-content: center; gap: 8px;">
+          <svg class="ui-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+          Clear All Local Records
         </button>
       </div>
     </div>
@@ -428,12 +462,17 @@
       </div>
       <div class="modal-header">
         <div>
-          <h3 class="modal-title"><span>📤</span> Export Classes</h3>
+          <h3 class="modal-title" style="display: flex; align-items: center; gap: 8px;">
+            <svg class="ui-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            Export Classes
+          </h3>
           <p style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 3px;">
             Filter by date range and generate coach timesheets
           </p>
         </div>
-        <button type="button" class="modal-close-btn" id="btn-close-export-modal">✕</button>
+        <button type="button" class="modal-close-btn" id="btn-close-export-modal" aria-label="Close export dialog">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
       </div>
 
       <div class="export-form-body">
@@ -465,7 +504,10 @@
 
         <div class="form-group" style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 12px 14px;">
           <div style="font-size: 0.8rem; font-weight: 600; color: var(--apple-cyan); margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between;">
-            <span>💵 Coach Billing & Timesheet Summary</span>
+            <span style="display: flex; align-items: center; gap: 6px;">
+              <svg class="ui-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+              Coach Billing & Timesheet Summary
+            </span>
             <span style="font-size: 0.72rem; color: var(--text-tertiary);">Matches reference sheet</span>
           </div>
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
@@ -518,15 +560,18 @@
 
         <!-- 5. Download Action Buttons -->
         <div class="export-actions-group">
-          <button type="button" class="submit-btn export-btn-excel" id="btn-export-filtered-xlsx">
-            <span>📊</span> Export as Excel (.xlsx)
+          <button type="button" class="submit-btn export-btn-excel" id="btn-export-filtered-xlsx" style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+            <svg class="ui-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg>
+            Export as Excel (.xlsx)
           </button>
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px;">
-            <button type="button" class="quick-pill-btn" id="btn-export-filtered-csv" style="justify-content: center; padding: 12px; font-weight: 600;">
-              <span>📄</span> Export as CSV
+            <button type="button" class="quick-pill-btn" id="btn-export-filtered-csv" style="justify-content: center; padding: 12px; font-weight: 600; display: flex; align-items: center; gap: 6px;">
+              <svg class="ui-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+              Export as CSV
             </button>
-            <button type="button" class="quick-pill-btn" id="btn-export-filtered-json" style="justify-content: center; padding: 12px; font-weight: 600;">
-              <span>💾</span> Export as JSON
+            <button type="button" class="quick-pill-btn" id="btn-export-filtered-json" style="justify-content: center; padding: 12px; font-weight: 600; display: flex; align-items: center; gap: 6px;">
+              <svg class="ui-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+              Export as JSON
             </button>
           </div>
         </div>
@@ -542,7 +587,9 @@
       </div>
       <div class="modal-header">
         <h3 class="modal-title">Jump to Specific Date</h3>
-        <button type="button" class="modal-close-btn" id="btn-close-date-modal">✕</button>
+        <button type="button" class="modal-close-btn" id="btn-close-date-modal" aria-label="Close date picker">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
       </div>
       <div class="form-group">
         <label for="date-jump-input">Choose Date</label>
@@ -558,6 +605,6 @@
   <div class="toast-container" id="toast-container" aria-live="polite"></div>
 
   <!-- Main JavaScript App -->
-  <script type="module" src="js/app.js?v=7.0"></script>
+  <script type="module" src="js/app.js?v=8.0"></script>
 </body>
 </html>

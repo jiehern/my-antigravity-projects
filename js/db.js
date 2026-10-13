@@ -9,9 +9,9 @@ const STORE_CLASSES = 'classes';
 const STORE_CATEGORIES = 'categories';
 
 export const DEFAULT_CATEGORIES = [
-  { id: 'cat_coach_allen', name: 'Coach Allen', color: '#ff9f0a', icon: '🏊‍♂️', isDefault: true },
-  { id: 'cat_aerosplash', name: 'Aerosplash', color: '#0a84ff', icon: '🌊', isDefault: true },
-  { id: 'cat_charles', name: 'Charles', color: '#30d158', icon: '🥊', isDefault: true }
+  { id: 'cat_coach_allen', name: 'Coach Allen', color: '#ff9f0a', icon: '', isDefault: true },
+  { id: 'cat_aerosplash', name: 'Aerosplash', color: '#0a84ff', icon: '', isDefault: true },
+  { id: 'cat_charles', name: 'Charles', color: '#30d158', icon: '', isDefault: true }
 ];
 
 class LocalDatabase {

@@ -8,6 +8,24 @@ import { RotaryDialPicker } from './rotary-picker.js';
 import { sound } from './audio.js';
 import { ExcelTimesheetImporter, ExcelTimesheetExporter, getClassCreditUnits, calculateManagerBonus, resolveClassType } from './excel-importer.js';
 
+export const SVG_ICONS = {
+  moon: `<svg class="ui-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>`,
+  sun: `<svg class="ui-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>`,
+  volumeOn: `<svg class="ui-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>`,
+  volumeMute: `<svg class="ui-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>`,
+  edit: `<svg class="ui-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>`,
+  trash: `<svg class="ui-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>`,
+  note: `<svg class="ui-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>`,
+  award: `<svg class="ui-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>`,
+  check: `<svg class="ui-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`,
+  checkCircle: `<svg class="ui-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`,
+  alertCircle: `<svg class="ui-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`,
+  infoCircle: `<svg class="ui-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>`,
+  user: `<svg class="ui-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`,
+  close: `<svg class="ui-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`,
+  target: `<svg class="ui-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>`
+};
+
 class ClassLoggerApp {
   constructor() {
     this.classes = [];
@@ -245,7 +263,7 @@ class ClassLoggerApp {
 
     // Update Header Theme Icon
     if (this.themeIcon) {
-      this.themeIcon.textContent = effectiveTheme === 'light' ? '🌙' : '☀️';
+      this.themeIcon.innerHTML = effectiveTheme === 'light' ? SVG_ICONS.moon : SVG_ICONS.sun;
     }
     if (this.themeToggleBtn) {
       this.themeToggleBtn.title = effectiveTheme === 'light' ? 'Switch to Dark Mode' : 'Switch to Light Mode';
@@ -382,7 +400,9 @@ class ClassLoggerApp {
     if (filtered.length === 0) {
       this.classesList.innerHTML = `
         <div class="empty-state">
-          <div class="empty-state-icon">⏱️</div>
+          <div class="empty-state-icon">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
           <h3 class="empty-state-title">${this.searchQuery ? 'No Classes Found' : 'No Classes Logged'}</h3>
           <p class="empty-state-desc">
             ${this.searchQuery ? 'No sessions matched your search query.' : 'Select the date and time to log your first class!'}
@@ -414,7 +434,6 @@ class ClassLoggerApp {
       const unitBadgeLabel = `${units.toFixed(1)} class • RM${feeCalculated}`;
       const unitBadgeClass = isPreComp ? 'is-precomp' : isBaby ? 'is-baby' : isLts ? 'is-lts' : '';
 
-      const typeIcon = isBaby ? '👶' : isPreComp ? '⚡' : '🏊';
       const typeSlug = isBaby ? 'baby' : isPreComp ? 'squad' : 'lts';
       const typeBadgeClass = `is-type-${typeSlug}`;
 
@@ -428,7 +447,7 @@ class ClassLoggerApp {
       card.innerHTML = `
         <div class="card-top-row">
           <div class="card-type-pill-badge ${typeBadgeClass}">
-            <span class="type-badge-icon">${typeIcon}</span>
+            <span class="type-pill-pip pip-${typeSlug}"></span>
             <span class="type-badge-text">${classType}</span>
           </div>
           <span class="card-units-badge ${unitBadgeClass}">
@@ -450,17 +469,17 @@ class ClassLoggerApp {
 
           <div class="card-actions">
             <button type="button" class="card-action-btn edit" title="Edit this entry" data-id="${item.id}" aria-label="Edit class">
-              ✏️
+              ${SVG_ICONS.edit}
             </button>
             <button type="button" class="card-action-btn delete" title="Delete entry" data-id="${item.id}" aria-label="Delete class">
-              🗑️
+              ${SVG_ICONS.trash}
             </button>
           </div>
         </div>
 
         ${item.note ? `
           <div class="card-note-box">
-            <span class="card-note-icon">📝</span>
+            <span class="card-note-icon">${SVG_ICONS.note}</span>
             <span class="card-note-text">${this.escapeHTML(item.note)}</span>
           </div>
         ` : ''}
@@ -505,20 +524,20 @@ class ClassLoggerApp {
     // Next goal description
     let nextGoalText = '';
     if (totalUnits >= 50) {
-      nextGoalText = '🎉 Maximum Tier 4 Reached! (RM350 Bonus)';
+      nextGoalText = 'Maximum Tier 4 Reached (+RM350 Bonus)';
     } else if (totalUnits >= 40) {
-      nextGoalText = `🎯 ${bonusInfo.needed} more hrs/units to reach Tier 4 (RM350 Bonus)`;
+      nextGoalText = `${bonusInfo.needed} hrs to Tier 4 (+RM350 Bonus)`;
     } else if (totalUnits >= 30) {
-      nextGoalText = `🎯 ${bonusInfo.needed} more hrs/units to reach Tier 3 (RM250 Bonus)`;
+      nextGoalText = `${bonusInfo.needed} hrs to Tier 3 (+RM250 Bonus)`;
     } else if (totalUnits >= 24) {
-      nextGoalText = `🎯 ${bonusInfo.needed} more hrs/units to reach Tier 2 (RM150 Bonus)`;
+      nextGoalText = `${bonusInfo.needed} hrs to Tier 2 (+RM150 Bonus)`;
     } else {
-      nextGoalText = `🎯 ${bonusInfo.needed} more hrs/units to unlock Tier 1 (RM100 Bonus)`;
+      nextGoalText = `${bonusInfo.needed} hrs to unlock Tier 1 (+RM100 Bonus)`;
     }
 
     let tierBadgeHtml = '';
     if (bonusInfo.tier > 0) {
-      tierBadgeHtml = `<span class="bonus-tier-badge tier-${bonusInfo.tier}">⭐ ${bonusInfo.tierName}: +RM${bonusInfo.bonus}</span>`;
+      tierBadgeHtml = `<span class="bonus-tier-badge tier-${bonusInfo.tier}">${bonusInfo.tierName}: +RM${bonusInfo.bonus}</span>`;
     } else {
       tierBadgeHtml = `<span class="bonus-tier-badge no-tier">Below 24 hrs</span>`;
     }
@@ -526,7 +545,7 @@ class ClassLoggerApp {
     this.monthlyBonusCard.innerHTML = `
       <div class="bonus-card-top">
         <div class="bonus-card-title-group">
-          <span class="bonus-trophy-icon">🏆</span>
+          <span class="bonus-trophy-icon">${SVG_ICONS.award}</span>
           <div>
             <div class="bonus-card-title">Monthly Earnings & Manager Bonus</div>
             <div class="bonus-card-period">${this.escapeHTML(periodLabel)} • ${totalSessions} class${totalSessions === 1 ? '' : 'es'}</div>
@@ -581,35 +600,35 @@ class ClassLoggerApp {
           <div class="bonus-tier-pill ${totalUnits >= 24 ? 'is-achieved' : (totalUnits < 24 ? 'is-next' : '')}">
             <div class="tier-pill-hours-row">
               <span class="tier-pill-hours">24h</span>
-              ${totalUnits >= 24 ? '<span class="tier-pill-check">✓</span>' : ''}
+              ${totalUnits >= 24 ? `<span class="tier-pill-check">${SVG_ICONS.check}</span>` : ''}
             </div>
             <span class="tier-pill-reward">+RM100</span>
           </div>
           <div class="bonus-tier-pill ${totalUnits >= 30 ? 'is-achieved' : (totalUnits >= 24 && totalUnits < 30 ? 'is-next' : '')}">
             <div class="tier-pill-hours-row">
               <span class="tier-pill-hours">30h</span>
-              ${totalUnits >= 30 ? '<span class="tier-pill-check">✓</span>' : ''}
+              ${totalUnits >= 30 ? `<span class="tier-pill-check">${SVG_ICONS.check}</span>` : ''}
             </div>
             <span class="tier-pill-reward">+RM150</span>
           </div>
           <div class="bonus-tier-pill ${totalUnits >= 40 ? 'is-achieved' : (totalUnits >= 30 && totalUnits < 40 ? 'is-next' : '')}">
             <div class="tier-pill-hours-row">
               <span class="tier-pill-hours">40h</span>
-              ${totalUnits >= 40 ? '<span class="tier-pill-check">✓</span>' : ''}
+              ${totalUnits >= 40 ? `<span class="tier-pill-check">${SVG_ICONS.check}</span>` : ''}
             </div>
             <span class="tier-pill-reward">+RM250</span>
           </div>
           <div class="bonus-tier-pill ${totalUnits >= 50 ? 'is-achieved' : (totalUnits >= 40 && totalUnits < 50 ? 'is-next' : '')}">
             <div class="tier-pill-hours-row">
               <span class="tier-pill-hours">50h</span>
-              ${totalUnits >= 50 ? '<span class="tier-pill-check">✓</span>' : ''}
+              ${totalUnits >= 50 ? `<span class="tier-pill-check">${SVG_ICONS.check}</span>` : ''}
             </div>
             <span class="tier-pill-reward">+RM350</span>
           </div>
         </div>
 
         <div class="bonus-footer-row">
-          <span class="bonus-next-goal">${nextGoalText}</span>
+          <span class="bonus-next-goal">${SVG_ICONS.target} ${nextGoalText}</span>
           <span class="bonus-unit-formula">LTS (50m) = 1.0 unit • Squad (1hr30m) = 1.5 units • Baby (30m) = 1.0 unit</span>
         </div>
       </div>
@@ -1219,7 +1238,7 @@ class ClassLoggerApp {
   updateSoundButtonUI() {
     if (!this.soundIcon || !this.soundToggleBtn) return;
     const muted = sound.isMuted();
-    this.soundIcon.textContent = muted ? '🔇' : '🔊';
+    this.soundIcon.innerHTML = muted ? SVG_ICONS.volumeMute : SVG_ICONS.volumeOn;
     this.soundToggleBtn.title = muted ? 'Unmute Sound' : 'Mute Sound';
   }
 
@@ -1423,7 +1442,7 @@ class ClassLoggerApp {
     if (this.btnSubmit) this.btnSubmit.classList.add('is-editing');
     if (this.btnSubmitText) this.btnSubmitText.textContent = 'Save Changes to Database';
     if (this.btnCancelEdit) this.btnCancelEdit.style.display = 'block';
-    if (this.formHeading) this.formHeading.innerHTML = `<span>✏️</span> Edit Class Session`;
+    if (this.formHeading) this.formHeading.innerHTML = `${SVG_ICONS.edit} Edit Class Session`;
     if (this.modeTag) this.modeTag.textContent = 'Editing';
 
     // Scroll smoothly to form
@@ -1439,7 +1458,7 @@ class ClassLoggerApp {
     if (this.btnSubmit) this.btnSubmit.classList.remove('is-editing');
     if (this.btnSubmitText) this.btnSubmitText.textContent = 'Enter Class Into Database';
     if (this.btnCancelEdit) this.btnCancelEdit.style.display = 'none';
-    if (this.formHeading) this.formHeading.innerHTML = `<span>⏱️</span> Log Class Session`;
+    if (this.formHeading) this.formHeading.innerHTML = `<svg class="ui-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Log Class Session`;
     if (this.modeTag) this.modeTag.textContent = 'New Entry';
     if (this.notesInput) {
       this.notesInput.value = '';
@@ -1802,9 +1821,9 @@ class ClassLoggerApp {
   showToast(message, type = 'info', options = null) {
     if (!this.toastContainer) return;
 
-    let icon = 'ℹ️';
-    if (type === 'success') icon = '✓';
-    if (type === 'danger') icon = '⚠️';
+    let icon = SVG_ICONS.infoCircle;
+    if (type === 'success') icon = SVG_ICONS.checkCircle;
+    if (type === 'danger') icon = SVG_ICONS.alertCircle;
 
     const dismissToast = (toastEl) => {
       if (!toastEl || toastEl._isDismissing) return;
@@ -1840,8 +1859,8 @@ class ClassLoggerApp {
     };
 
     const toastInnerHtml = `
-      <span>${icon}</span>
-      <span>${this.escapeHTML(message)}</span>
+      <span class="toast-icon-wrap">${icon}</span>
+      <span class="toast-message-text">${this.escapeHTML(message)}</span>
       ${options && options.actionText ? `<button type="button" class="toast-action-btn">${this.escapeHTML(options.actionText)}</button>` : ''}
     `;
 
@@ -1951,9 +1970,9 @@ class ClassLoggerApp {
     let html = `
       <div class="assist-name-row generic-assist-row ${isGenericActive ? 'is-selected' : ''}">
         <button type="button" class="assist-name-select-btn" data-assist-val="Assist">
-          <span class="assist-name-icon">👤</span>
+          <span class="assist-name-icon">${SVG_ICONS.user}</span>
           <span class="assist-name-label">Assist (No Name)</span>
-          ${isGenericActive ? '<span class="assist-name-check">✓</span>' : ''}
+          ${isGenericActive ? `<span class="assist-name-check">${SVG_ICONS.check}</span>` : ''}
         </button>
       </div>
     `;
@@ -1966,12 +1985,12 @@ class ClassLoggerApp {
         html += `
           <div class="assist-name-row ${isNameActive ? 'is-selected' : ''}">
             <button type="button" class="assist-name-select-btn" data-assist-val="Assist ${this.escapeHTML(name)}">
-              <span class="assist-name-icon">🏊</span>
+              <span class="assist-name-icon">${SVG_ICONS.user}</span>
               <span class="assist-name-label">${this.escapeHTML(name)}</span>
-              ${isNameActive ? '<span class="assist-name-check">✓</span>' : ''}
+              ${isNameActive ? `<span class="assist-name-check">${SVG_ICONS.check}</span>` : ''}
             </button>
             <button type="button" class="assist-name-delete-btn" data-delete-idx="${idx}" title="Delete ${this.escapeHTML(name)}" aria-label="Delete ${this.escapeHTML(name)}">
-              ✕
+              ${SVG_ICONS.close}
             </button>
           </div>
         `;
