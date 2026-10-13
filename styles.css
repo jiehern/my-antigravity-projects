@@ -1702,21 +1702,12 @@ body::after {
 
 /* ==========================================================================
    MODALS & OVERLAYS
-   ========================================================================== */
-html.modal-open {
-  overflow: hidden !important;
-  overscroll-behavior: none !important;
-}
-
-body.modal-open {
-  overflow: hidden !important;
-  overscroll-behavior: none !important;
-}
-
-/* Desktop-only scroll locking via position: fixed (preserves mobile viewport & eliminates bottom white bar glitch) */
+/* Desktop-only scroll locking via position: fixed and overflow: hidden (preserves mobile sticky header & eliminates viewport glitch) */
 @media (min-width: 641px) {
   html.modal-open {
     height: 100% !important;
+    overflow: hidden !important;
+    overscroll-behavior: none !important;
   }
 
   body.modal-open {
@@ -1725,6 +1716,8 @@ body.modal-open {
     left: 0 !important;
     right: 0 !important;
     width: 100% !important;
+    overflow: hidden !important;
+    overscroll-behavior: none !important;
   }
 }
 
@@ -2375,6 +2368,17 @@ body.modal-open {
     left: auto !important;
     right: auto !important;
     width: auto !important;
+    overflow: visible !important;
+    overscroll-behavior: none !important;
+  }
+
+  /* Keep header banner visibly pinned at top of viewport when modal is open on mobile */
+  body.modal-open .app-header {
+    position: sticky !important;
+    top: calc(env(safe-area-inset-top) + 8px) !important;
+    z-index: 60 !important;
+    visibility: visible !important;
+    opacity: 1 !important;
   }
 
   .modal-overlay {

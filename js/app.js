@@ -1155,6 +1155,51 @@ class ClassLoggerApp {
     // 11. Global scroll containment & keyboard navigation when modals are open
     window.addEventListener('wheel', (e) => this.handleGlobalWheel(e), { passive: false });
     window.addEventListener('keydown', (e) => this.handleGlobalKeyDown(e), { passive: false });
+
+    let touchStartY = 0;
+    window.addEventListener('touchstart', (e) => {
+      if (e.touches && e.touches.length === 1) {
+        touchStartY = e.touches[0].clientY;
+      }
+    }, { passive: true });
+
+    window.addEventListener('touchmove', (e) => {
+      if (!this.isScrollLocked) return;
+      if (!e.touches || e.touches.length !== 1) return;
+
+      const openOverlay = document.querySelector('.modal-overlay.is-open');
+      if (!openOverlay) return;
+
+      const modalWindow = openOverlay.querySelector('.modal-window');
+      if (!modalWindow) {
+        if (e.cancelable) e.preventDefault();
+        return;
+      }
+
+      // If touch is on overlay backdrop outside modal window -> block background scroll
+      if (!modalWindow.contains(e.target)) {
+        if (e.cancelable) e.preventDefault();
+        return;
+      }
+
+      // If touch is on header or drag handle -> let sheet swipe listener handle it
+      if (e.target.closest('.modal-drag-handle, .modal-header')) {
+        return;
+      }
+
+      // Inside modal content: prevent chaining when at scroll boundaries
+      const currentY = e.touches[0].clientY;
+      const deltaY = currentY - touchStartY;
+      const isPullingDown = deltaY > 0;
+      const isPullingUp = deltaY < 0;
+
+      const atTop = modalWindow.scrollTop <= 0;
+      const atBottom = Math.ceil(modalWindow.scrollTop + modalWindow.clientHeight) >= modalWindow.scrollHeight - 1;
+
+      if ((isPullingDown && atTop) || (isPullingUp && atBottom)) {
+        if (e.cancelable) e.preventDefault();
+      }
+    }, { passive: false });
   }
 
   switchMobileTab(tab) {
