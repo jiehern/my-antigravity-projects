@@ -1003,12 +1003,18 @@ class ClassLoggerApp {
       this.btnCloseExportModal.addEventListener('click', () => this.closeModal(this.modalExport));
     }
 
-    // Close modals on clicking overlay background
+    // Close modals on clicking overlay background & prevent backdrop scroll leakage
     [this.modalData, this.modalDateJump, this.modalExport].forEach(modal => {
       if (modal) {
         modal.addEventListener('click', (e) => {
           if (e.target === modal) this.closeModal(modal);
         });
+        modal.addEventListener('touchmove', (e) => {
+          if (e.target === modal) e.preventDefault();
+        }, { passive: false });
+        modal.addEventListener('wheel', (e) => {
+          if (e.target === modal) e.preventDefault();
+        }, { passive: false });
       }
     });
 
@@ -1419,6 +1425,8 @@ class ClassLoggerApp {
     modalEl.style.opacity = '';
     modalEl.style.transition = '';
     modalEl.classList.add('is-open');
+    document.body.classList.add('modal-open');
+    document.documentElement.classList.add('modal-open');
     if (modalEl === this.modalData) {
       this.updateBaseRateUI();
     }
@@ -1439,6 +1447,10 @@ class ClassLoggerApp {
     modalEl.style.webkitBackdropFilter = '';
     modalEl.style.opacity = '';
     modalEl.style.transition = '';
+    if (!document.querySelector('.modal-overlay.is-open')) {
+      document.body.classList.remove('modal-open');
+      document.documentElement.classList.remove('modal-open');
+    }
   }
 
   initBottomSheetSwipeGestures() {
