@@ -383,26 +383,12 @@ class ClassLoggerApp {
       this.classesList.innerHTML = `
         <div class="empty-state">
           <div class="empty-state-icon">⏱️</div>
-          <h3 class="empty-state-title">No Classes Found</h3>
+          <h3 class="empty-state-title">${this.searchQuery ? 'No Classes Found' : 'No Classes Logged'}</h3>
           <p class="empty-state-desc">
-            ${this.searchQuery ? 'No sessions matched your search query.' : 'Select the date and time using the rotary dials and log your first class!'}
+            ${this.searchQuery ? 'No sessions matched your search query.' : 'Select the date and time to log your first class!'}
           </p>
-          ${!this.searchQuery ? `
-            <button type="button" class="quick-pill-btn primary" id="btn-empty-seed" style="margin: 0 auto;">
-              🧪 Insert Demo Classes
-            </button>
-          ` : ''}
         </div>
       `;
-
-      const emptySeedBtn = document.getElementById('btn-empty-seed');
-      if (emptySeedBtn) {
-        emptySeedBtn.addEventListener('click', async () => {
-          await db.seedSampleData();
-          await this.loadClasses();
-          this.showToast('Sample class sessions inserted!', 'success');
-        });
-      }
       return;
     }
 

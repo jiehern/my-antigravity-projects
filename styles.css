@@ -1696,7 +1696,7 @@ body::after {
   font-size: 0.85rem;
   color: var(--text-secondary);
   max-width: 340px;
-  margin: 0 auto 18px;
+  margin: 0 auto;
 }
 
 /* ==========================================================================
