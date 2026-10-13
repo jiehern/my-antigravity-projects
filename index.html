@@ -15,7 +15,7 @@
   <meta name="apple-mobile-web-app-title" content="AeroSplash">
   <link rel="apple-touch-icon" href="assets/app-icon.png">
   <link rel="icon" type="image/png" href="assets/app-icon.png">
-  <link rel="stylesheet" href="styles.css?v=8.0">
+  <link rel="stylesheet" href="styles.css?v=8.1">
   <script type="importmap">
   {
     "imports": {
@@ -581,21 +581,20 @@
 
   <!-- Modal: Native Date Picker Jump -->
   <div class="modal-overlay" id="modal-date-jump">
-    <div class="modal-window" style="max-width: 360px;">
-      <div class="modal-drag-handle" aria-label="Swipe down to dismiss" role="button" tabindex="0">
-        <span class="modal-drag-bar"></span>
-      </div>
+    <div class="modal-window modal-window-date-jump" style="max-width: 360px;">
       <div class="modal-header">
         <h3 class="modal-title">Jump to Specific Date</h3>
         <button type="button" class="modal-close-btn" id="btn-close-date-modal" aria-label="Close date picker">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
       </div>
-      <div class="form-group">
+      <div class="form-group date-jump-form-group">
         <label for="date-jump-input">Choose Date</label>
-        <input type="date" id="date-jump-input" class="form-input">
+        <div class="date-jump-input-wrap">
+          <input type="date" id="date-jump-input" class="form-input date-jump-input">
+        </div>
       </div>
-      <button type="button" class="submit-btn" id="btn-confirm-date-jump" style="margin-top: 14px;">
+      <button type="button" class="submit-btn btn-confirm-date-jump" id="btn-confirm-date-jump">
         Apply to Rotary Dial
       </button>
     </div>
@@ -605,6 +604,6 @@
   <div class="toast-container" id="toast-container" aria-live="polite"></div>
 
   <!-- Main JavaScript App -->
-  <script type="module" src="js/app.js?v=8.0"></script>
+  <script type="module" src="js/app.js?v=8.1"></script>
 </body>
 </html>

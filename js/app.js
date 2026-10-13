@@ -1674,7 +1674,7 @@ class ClassLoggerApp {
   }
 
   initBottomSheetSwipeGestures() {
-    const modals = [this.modalData, this.modalExport, this.modalDateJump];
+    const modals = [this.modalData, this.modalExport];
     modals.forEach(overlay => {
       if (!overlay) return;
       const windowEl = overlay.querySelector('.modal-window');

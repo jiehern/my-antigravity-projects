@@ -1951,6 +1951,119 @@ body::after {
   color: var(--text-primary);
 }
 
+/* ==========================================================================
+   Date Jump Modal (Calendar Menu Dialog)
+   ========================================================================== */
+#modal-date-jump .modal-window-date-jump {
+  max-width: 350px;
+  padding: 24px 22px;
+  border-radius: var(--radius-lg);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
+  text-align: center;
+}
+
+#modal-date-jump .modal-header {
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+#modal-date-jump .modal-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+#modal-date-jump .date-jump-form-group {
+  margin: 16px 0 20px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+#modal-date-jump .date-jump-form-group label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-tertiary);
+  margin-bottom: 8px;
+  display: block;
+  text-align: center;
+  width: 100%;
+}
+
+#modal-date-jump .date-jump-input-wrap {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+#modal-date-jump .date-jump-input {
+  width: 100%;
+  max-width: 250px;
+  margin: 0 auto;
+  height: 48px;
+  padding: 0 16px;
+  text-align: center;
+  font-size: 1.05rem !important;
+  font-weight: 600;
+  font-family: var(--font-sans);
+  font-variant-numeric: tabular-nums;
+  border-radius: 12px;
+  background: var(--bg-surface-2);
+  border: 1px solid var(--border-medium);
+  color: var(--text-primary);
+  box-sizing: border-box;
+  -webkit-appearance: none;
+  appearance: none;
+  display: block;
+  cursor: pointer;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+#modal-date-jump .date-jump-input::-webkit-date-and-time-value {
+  text-align: center;
+}
+
+#modal-date-jump .date-jump-input::-webkit-datetime-edit {
+  text-align: center;
+  display: inline-flex;
+  justify-content: center;
+  margin: 0 auto;
+}
+
+#modal-date-jump .date-jump-input::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  filter: invert(0.8);
+  margin-left: 8px;
+}
+
+[data-theme="light"] #modal-date-jump .date-jump-input::-webkit-calendar-picker-indicator {
+  filter: invert(0.2);
+}
+
+#modal-date-jump .date-jump-input:focus {
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 3px rgba(var(--accent-color-rgb), 0.25);
+}
+
+#modal-date-jump .btn-confirm-date-jump {
+  width: 100%;
+  max-width: 250px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 44px;
+  border-radius: 12px;
+  font-size: 0.92rem;
+  font-weight: 600;
+}
+
 .form-group {
   margin-bottom: 16px;
 }
@@ -2583,6 +2696,42 @@ body::after {
   .modal-overlay.is-open .modal-window {
     transform: translateY(0);
     transition: transform 0.38s cubic-bezier(0.22, 1.28, 0.36, 1);
+  }
+
+  /* Modal Date Jump on Mobile - Centered Dialog (Never over-extended or hugging bottom) */
+  #modal-date-jump {
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 16px !important;
+  }
+
+  #modal-date-jump .modal-window-date-jump {
+    width: 100% !important;
+    max-width: 320px !important;
+    margin: auto !important;
+    border-radius: 20px !important;
+    border-bottom: 1px solid var(--border-medium) !important;
+    margin-bottom: 0 !important;
+    padding: 22px 18px !important;
+    transform: scale(0.95) !important;
+    transition: transform 0.24s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.24s ease !important;
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.75) !important;
+  }
+
+  #modal-date-jump.is-open .modal-window-date-jump {
+    transform: scale(1) !important;
+  }
+
+  #modal-date-jump .modal-drag-handle {
+    display: none !important;
+  }
+
+  #modal-date-jump .date-jump-input {
+    max-width: 240px !important;
+  }
+
+  #modal-date-jump .btn-confirm-date-jump {
+    max-width: 240px !important;
   }
 
   .category-filter-tabs {
@@ -4104,6 +4253,24 @@ body::after {
 
 [data-theme="light"] ::-webkit-scrollbar-thumb:hover {
   background: rgba(0, 0, 0, 0.35);
+}
+
+/* Light Mode Date Jump Modal */
+[data-theme="light"] #modal-date-jump .modal-window-date-jump {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.12);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.12);
+}
+
+[data-theme="light"] #modal-date-jump .date-jump-input {
+  background: #f2f2f7 !important;
+  border-color: rgba(0, 0, 0, 0.12) !important;
+  color: #1c1c1e !important;
+}
+
+[data-theme="light"] #modal-date-jump .date-jump-input:focus {
+  border-color: var(--accent-color) !important;
+  box-shadow: 0 0 0 3px rgba(var(--accent-color-rgb), 0.2) !important;
 }
 
 
