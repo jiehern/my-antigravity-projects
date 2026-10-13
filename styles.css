@@ -596,7 +596,8 @@ body::after {
 .rotary-column-date .rotary-item {
   font-size: 0.92rem;
   justify-content: flex-start;
-  padding-left: 8px;
+  padding-left: 18px;
+  padding-right: 6px;
 }
 
 .rotary-item.is-today {
@@ -2453,9 +2454,10 @@ body.modal-open {
   }
 
   .rotary-column-date .rotary-item {
-    font-size: 0.78rem;
-    letter-spacing: -0.02em;
-    padding-left: 4px;
+    font-size: 0.8rem;
+    letter-spacing: -0.01em;
+    padding-left: 15px;
+    padding-right: 4px;
   }
 
   .rotary-live-date,
