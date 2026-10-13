@@ -376,8 +376,8 @@ class ClassLoggerApp {
       this.mobileHistoryBadge.textContent = this.classes.length;
     }
 
-    // Update the live Monthly Manager Bonus tracker card
-    this.renderMonthlyBonusCard(filtered);
+    // Update the live Monthly Manager Bonus tracker card (always reflects all logged classes)
+    this.renderMonthlyBonusCard(this.classes);
 
     if (filtered.length === 0) {
       this.classesList.innerHTML = `
@@ -490,17 +490,13 @@ class ClassLoggerApp {
     const totalPayout = baseEarnings + bonusInfo.bonus;
 
     let periodLabel = 'This Month';
-    if (this.activeFilter === 'all' && !this.searchQuery) {
-      if (list.length > 0 && list[0].date) {
-        const [y, m] = list[0].date.split('-').map(Number);
-        const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-        periodLabel = `${monthNames[m - 1] || 'Current Month'} ${y || 2026}`;
-      } else {
-        const now = new Date();
-        periodLabel = now.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-      }
-    } else if (this.searchQuery) {
-      periodLabel = 'Search Results';
+    if (list.length > 0 && list[0].date) {
+      const [y, m] = list[0].date.split('-').map(Number);
+      const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+      periodLabel = `${monthNames[m - 1] || 'Current Month'} ${y || 2026}`;
+    } else {
+      const now = new Date();
+      periodLabel = now.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
     }
 
     // Milestones progress calculation (scale 0 to 50 max)
