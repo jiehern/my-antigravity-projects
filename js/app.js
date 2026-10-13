@@ -1414,6 +1414,9 @@ class ClassLoggerApp {
       windowEl.classList.remove('is-dragging');
     }
     modalEl.style.backgroundColor = '';
+    modalEl.style.backdropFilter = '';
+    modalEl.style.webkitBackdropFilter = '';
+    modalEl.style.opacity = '';
     modalEl.style.transition = '';
     modalEl.classList.add('is-open');
     if (modalEl === this.modalData) {
@@ -1432,6 +1435,9 @@ class ClassLoggerApp {
       windowEl.classList.remove('is-dragging');
     }
     modalEl.style.backgroundColor = '';
+    modalEl.style.backdropFilter = '';
+    modalEl.style.webkitBackdropFilter = '';
+    modalEl.style.opacity = '';
     modalEl.style.transition = '';
   }
 
@@ -1516,9 +1522,12 @@ class ClassLoggerApp {
         windowEl.style.transform = `translateY(${translateY}px)`;
         windowEl.classList.add('is-dragging');
 
-        const progress = Math.min(Math.max(deltaY / 320, 0), 1);
-        const bgOpacity = 0.75 * (1 - progress * 0.65);
+        const progress = Math.min(Math.max(deltaY / 240, 0), 1);
+        const bgOpacity = (0.75 * (1 - progress * 0.8)).toFixed(2);
         overlay.style.backgroundColor = `rgba(0, 0, 0, ${bgOpacity})`;
+        const currentBlur = (8 * (1 - progress)).toFixed(1);
+        overlay.style.backdropFilter = `blur(${currentBlur}px)`;
+        overlay.style.webkitBackdropFilter = `blur(${currentBlur}px)`;
       }
     };
 
@@ -1537,30 +1546,35 @@ class ClassLoggerApp {
       const shouldDismiss = deltaY > 80 || (velocityY > 0.32 && deltaY > 25);
 
       if (shouldDismiss) {
-        windowEl.style.transition = 'transform 0.24s cubic-bezier(0.32, 1, 0.23, 1)';
+        windowEl.style.transition = 'transform 0.18s cubic-bezier(0.32, 1, 0.23, 1)';
         windowEl.style.transform = 'translateY(100%)';
-        overlay.style.transition = 'background-color 0.24s ease';
+        overlay.style.transition = 'background-color 0.16s ease, backdrop-filter 0.16s ease, -webkit-backdrop-filter 0.16s ease, opacity 0.16s ease';
         overlay.style.backgroundColor = 'rgba(0, 0, 0, 0)';
+        overlay.style.backdropFilter = 'blur(0px)';
+        overlay.style.webkitBackdropFilter = 'blur(0px)';
+        overlay.style.opacity = '0';
 
         setTimeout(() => {
           this.closeModal(overlay);
-          windowEl.style.transform = '';
-          windowEl.style.transition = '';
-          overlay.style.backgroundColor = '';
-          overlay.style.transition = '';
-        }, 240);
+        }, 180);
       } else {
-        windowEl.style.transition = 'transform 0.26s cubic-bezier(0.18, 0.89, 0.32, 1.1)';
+        windowEl.style.transition = 'transform 0.22s cubic-bezier(0.18, 0.89, 0.32, 1.1)';
         windowEl.style.transform = 'translateY(0)';
-        overlay.style.transition = 'background-color 0.2s ease';
+        overlay.style.transition = 'background-color 0.2s ease, backdrop-filter 0.2s ease, -webkit-backdrop-filter 0.2s ease, opacity 0.2s ease';
         overlay.style.backgroundColor = '';
+        overlay.style.backdropFilter = '';
+        overlay.style.webkitBackdropFilter = '';
+        overlay.style.opacity = '';
 
         setTimeout(() => {
           windowEl.style.transform = '';
           windowEl.style.transition = '';
           overlay.style.backgroundColor = '';
+          overlay.style.backdropFilter = '';
+          overlay.style.webkitBackdropFilter = '';
+          overlay.style.opacity = '';
           overlay.style.transition = '';
-        }, 260);
+        }, 220);
       }
     };
 
@@ -1572,6 +1586,9 @@ class ClassLoggerApp {
         windowEl.style.transform = '';
         windowEl.style.transition = '';
         overlay.style.backgroundColor = '';
+        overlay.style.backdropFilter = '';
+        overlay.style.webkitBackdropFilter = '';
+        overlay.style.opacity = '';
         overlay.style.transition = '';
       }
     };

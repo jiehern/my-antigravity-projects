@@ -1716,7 +1716,7 @@ body::after {
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
-  transition: all var(--transition-fast);
+  transition: opacity 0.18s ease, visibility 0.18s ease, backdrop-filter 0.18s ease, -webkit-backdrop-filter 0.18s ease;
   overflow-y: auto;
 }
 
