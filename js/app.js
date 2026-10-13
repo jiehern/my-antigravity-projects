@@ -1416,15 +1416,18 @@ class ClassLoggerApp {
     this.savedScrollY = window.scrollY || window.pageYOffset || document.documentElement.scrollTop || 0;
     this.isScrollLocked = true;
 
-    // Compensate scrollbar width on desktop to prevent horizontal layout shift
-    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
-    if (scrollbarWidth > 0) {
-      document.body.style.paddingRight = `${scrollbarWidth}px`;
+    const isDesktop = window.innerWidth > 640;
+    if (isDesktop) {
+      // Compensate scrollbar width on desktop to prevent horizontal layout shift
+      const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+      if (scrollbarWidth > 0) {
+        document.body.style.paddingRight = `${scrollbarWidth}px`;
+      }
+      document.body.style.top = `-${this.savedScrollY}px`;
     }
 
     document.documentElement.classList.add('modal-open');
     document.body.classList.add('modal-open');
-    document.body.style.top = `-${this.savedScrollY}px`;
   }
 
   unlockBodyScroll() {
@@ -1432,17 +1435,20 @@ class ClassLoggerApp {
     this.isScrollLocked = false;
 
     const restoreY = this.savedScrollY || 0;
+    const isDesktop = window.innerWidth > 640;
 
     document.documentElement.classList.remove('modal-open');
     document.body.classList.remove('modal-open');
     document.body.style.top = '';
     document.body.style.paddingRight = '';
 
-    window.scrollTo({
-      top: restoreY,
-      left: 0,
-      behavior: 'instant'
-    });
+    if (isDesktop && restoreY > 0) {
+      window.scrollTo({
+        top: restoreY,
+        left: 0,
+        behavior: 'instant'
+      });
+    }
   }
 
   handleGlobalWheel(e) {
@@ -1559,6 +1565,7 @@ class ClassLoggerApp {
 
   closeModal(modalEl) {
     if (!modalEl) return;
+    const wasSwipeDismiss = this.isDismissing;
     modalEl.classList.remove('is-open');
     const windowEl = modalEl.querySelector('.modal-window');
     if (windowEl) {
@@ -1569,8 +1576,16 @@ class ClassLoggerApp {
     modalEl.style.opacity = '';
     modalEl.style.transition = '';
 
-    if (!document.querySelector('.modal-overlay.is-open')) {
-      this.unlockBodyScroll();
+    const finalizeUnlock = () => {
+      if (!document.querySelector('.modal-overlay.is-open')) {
+        this.unlockBodyScroll();
+      }
+    };
+
+    if (wasSwipeDismiss) {
+      finalizeUnlock();
+    } else {
+      setTimeout(finalizeUnlock, 320);
     }
   }
 

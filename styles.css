@@ -1705,17 +1705,26 @@ body::after {
 html.modal-open {
   overflow: hidden !important;
   overscroll-behavior: none !important;
-  height: 100% !important;
 }
 
 body.modal-open {
   overflow: hidden !important;
   overscroll-behavior: none !important;
-  height: 100% !important;
-  position: fixed !important;
-  left: 0 !important;
-  right: 0 !important;
-  width: 100% !important;
+}
+
+/* Desktop-only scroll locking via position: fixed (preserves mobile viewport & eliminates bottom white bar glitch) */
+@media (min-width: 641px) {
+  html.modal-open {
+    height: 100% !important;
+  }
+
+  body.modal-open {
+    height: 100% !important;
+    position: fixed !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+  }
 }
 
 .modal-overlay {
@@ -2283,12 +2292,22 @@ body.modal-open {
 
 /* Mobile Bottom Sheets & Modal Drawers (<= 640px) */
 @media (max-width: 640px) {
+  html.modal-open,
+  body.modal-open {
+    height: auto !important;
+    position: static !important;
+    left: auto !important;
+    right: auto !important;
+    width: auto !important;
+  }
+
   .modal-overlay {
     align-items: flex-end;
     padding: 0;
     overflow: hidden !important;
     overscroll-behavior: none !important;
     touch-action: none !important;
+    will-change: opacity;
   }
 
   .modal-window {
@@ -2306,6 +2325,9 @@ body.modal-open {
     box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.8);
     border-bottom: none;
     -webkit-overflow-scrolling: touch;
+    will-change: transform;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
   }
 
   /* Handle grab indicator & swipe gesture area */
