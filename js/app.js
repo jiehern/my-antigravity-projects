@@ -48,11 +48,6 @@ class ClassLoggerApp {
     // 4. Connect to database and load records
     try {
       await db.init();
-      const statusText = document.getElementById('db-status-text');
-      if (statusText) {
-        statusText.textContent = db.isIndexedDBAvailable ? 'Local DB: IndexedDB' : 'Local DB: LocalStorage';
-      }
-
       await this.loadClasses();
 
       // Clean up / migrate any legacy sessions previously imported under subcategories
@@ -117,7 +112,6 @@ class ClassLoggerApp {
     this.btnExportJson = document.getElementById('btn-export-json');
     this.importJsonInput = document.getElementById('import-json-input');
     this.importJsonHeaderBtn = document.getElementById('import-json-header-btn');
-    this.btnSeedSample = document.getElementById('btn-seed-sample');
     this.btnClearDb = document.getElementById('btn-clear-db');
 
     // Appearance & Accent settings elements
@@ -1118,15 +1112,6 @@ class ClassLoggerApp {
         this.handleExcelImport(file);
       }
     });
-
-    if (this.btnSeedSample) {
-      this.btnSeedSample.addEventListener('click', async () => {
-        await db.seedSampleData();
-        await this.loadClasses();
-        this.closeModal(this.modalData);
-        this.showToast('Demo sessions added!', 'success');
-      });
-    }
 
     if (this.btnClearDb) {
       this.btnClearDb.addEventListener('click', async () => {

@@ -15,7 +15,7 @@
   <meta name="apple-mobile-web-app-title" content="AeroSplash">
   <link rel="apple-touch-icon" href="assets/app-icon.png">
   <link rel="icon" type="image/png" href="assets/app-icon.png">
-  <link rel="stylesheet" href="styles.css?v=4.6">
+  <link rel="stylesheet" href="styles.css?v=4.7">
   <script type="importmap">
   {
     "imports": {
@@ -42,11 +42,6 @@
       </div>
 
       <div class="header-actions">
-        <div class="db-status-pill" id="db-status" title="Your classes are saved directly on this computer in a local browser database">
-          <span class="status-dot"></span>
-          <span id="db-status-text">Local DB: IndexedDB</span>
-        </div>
-
         <!-- Direct JSON File Import Button -->
         <label class="quick-pill-btn" style="cursor: pointer; margin: 0; display: inline-flex; align-items: center; gap: 5px;" title="Import classes from .json file">
           <span class="desktop-only-text">💾 Import JSON</span>
@@ -419,10 +414,6 @@
           <input type="file" id="import-excel-modal-input" accept=".xlsx, .xls" style="display: none;">
         </label>
 
-        <button type="button" class="submit-btn" id="btn-seed-sample" style="background: rgba(10, 132, 255, 0.15); color: var(--apple-blue); box-shadow: none; border: 1px solid rgba(10, 132, 255, 0.35);">
-          🧪 Insert Demo Sample Classes
-        </button>
-
         <button type="button" class="submit-btn" id="btn-clear-db" style="background: rgba(255, 69, 58, 0.15); color: var(--apple-red); box-shadow: none; border: 1px solid rgba(255, 69, 58, 0.35);">
           🗑️ Clear All Local Records
         </button>
@@ -568,6 +559,6 @@
   <div class="toast-container" id="toast-container" aria-live="polite"></div>
 
   <!-- Main JavaScript App -->
-  <script type="module" src="js/app.js?v=4.6"></script>
+  <script type="module" src="js/app.js?v=4.7"></script>
 </body>
 </html>

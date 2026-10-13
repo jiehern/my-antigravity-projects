@@ -119,6 +119,7 @@ html, body {
   -moz-osx-font-smoothing: grayscale;
   line-height: 1.5;
   overflow-x: hidden;
+  overflow-x: clip;
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -190,15 +191,20 @@ body::after {
    Header & Navigation
    ========================================================================== */
 .app-header {
+  position: sticky;
+  top: 0;
+  z-index: 60;
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 16px 24px;
-  background: var(--bg-surface-1);
+  background: rgba(18, 18, 21, 0.88);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-xl);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.28);
+  transition: box-shadow var(--transition-normal);
 }
 
 .brand-wrapper {
@@ -1690,7 +1696,7 @@ body::after {
   align-items: center;
   justify-content: center;
   padding: 20px;
-  z-index: 100;
+  z-index: 1000;
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
@@ -1851,7 +1857,7 @@ body::after {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  z-index: 200;
+  z-index: 1200;
   pointer-events: none;
 }
 
@@ -2022,9 +2028,8 @@ body::after {
   /* Sticky iOS-style Segmented Nav Switcher */
   .mobile-segmented-nav {
     display: flex;
-    position: sticky;
-    top: max(8px, env(safe-area-inset-top));
-    z-index: 50;
+    position: relative;
+    z-index: 10;
     background: rgba(18, 18, 22, 0.92);
     backdrop-filter: blur(24px);
     -webkit-backdrop-filter: blur(24px);
@@ -3052,9 +3057,9 @@ body::after {
 }
 
 [data-theme="light"] .app-header {
-  background: rgba(255, 255, 255, 0.95);
+  background: rgba(255, 255, 255, 0.92);
   border-color: rgba(0, 0, 0, 0.08);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.06);
 }
 
 [data-theme="light"] .brand-title {
