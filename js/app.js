@@ -16,6 +16,13 @@ class ClassLoggerApp {
     this.editingClassId = null;
     this.searchQuery = '';
 
+    // Scroll lock & gesture state
+    this.isScrollLocked = false;
+    this.savedScrollY = 0;
+    this.lastSwipeDismissTime = 0;
+    this.lastDragEndTime = 0;
+    this.isDismissing = false;
+
     // Initialize DOM hooks
     this.initElements();
   }
@@ -1007,6 +1014,9 @@ class ClassLoggerApp {
     [this.modalData, this.modalDateJump, this.modalExport].forEach(modal => {
       if (modal) {
         modal.addEventListener('click', (e) => {
+          if (this.isDismissing) return;
+          if (Date.now() - this.lastSwipeDismissTime < 500) return;
+          if (Date.now() - this.lastDragEndTime < 500) return;
           if (e.target === modal) this.closeModal(modal);
         });
         modal.addEventListener('touchmove', (e) => {
@@ -1152,6 +1162,10 @@ class ClassLoggerApp {
     if (this.mobileTabHistory) {
       this.mobileTabHistory.addEventListener('click', () => this.switchMobileTab('history'));
     }
+
+    // 11. Global scroll containment & keyboard navigation when modals are open
+    window.addEventListener('wheel', (e) => this.handleGlobalWheel(e), { passive: false });
+    window.addEventListener('keydown', (e) => this.handleGlobalKeyDown(e), { passive: false });
   }
 
   switchMobileTab(tab) {
@@ -1411,6 +1425,132 @@ class ClassLoggerApp {
 
   // --- MODALS & UTILS ---
 
+  lockBodyScroll() {
+    if (this.isScrollLocked) return;
+    this.savedScrollY = window.scrollY || window.pageYOffset || document.documentElement.scrollTop || 0;
+    this.isScrollLocked = true;
+
+    // Compensate scrollbar width on desktop to prevent horizontal layout shift
+    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+    if (scrollbarWidth > 0) {
+      document.body.style.paddingRight = `${scrollbarWidth}px`;
+    }
+
+    document.documentElement.classList.add('modal-open');
+    document.body.classList.add('modal-open');
+    document.body.style.top = `-${this.savedScrollY}px`;
+  }
+
+  unlockBodyScroll() {
+    if (!this.isScrollLocked) return;
+    this.isScrollLocked = false;
+
+    const restoreY = this.savedScrollY || 0;
+
+    document.documentElement.classList.remove('modal-open');
+    document.body.classList.remove('modal-open');
+    document.body.style.top = '';
+    document.body.style.paddingRight = '';
+
+    window.scrollTo({
+      top: restoreY,
+      left: 0,
+      behavior: 'instant'
+    });
+  }
+
+  handleGlobalWheel(e) {
+    if (!this.isScrollLocked) return;
+
+    const openOverlay = document.querySelector('.modal-overlay.is-open');
+    if (!openOverlay) return;
+
+    const modalWindow = openOverlay.querySelector('.modal-window');
+    if (!modalWindow) {
+      e.preventDefault();
+      return;
+    }
+
+    // Outside the modal box (on dark backdrop) -> block scroll completely
+    if (!modalWindow.contains(e.target)) {
+      e.preventDefault();
+      return;
+    }
+
+    // Inside modal box: find which element has scrollable overflow
+    let current = e.target;
+    let scrollable = null;
+
+    while (current && current !== openOverlay) {
+      if (current.scrollHeight > current.clientHeight + 2) {
+        const style = window.getComputedStyle(current);
+        const overflowY = style.overflowY;
+        if (overflowY === 'auto' || overflowY === 'scroll') {
+          scrollable = current;
+          break;
+        }
+      }
+      if (current === modalWindow) break;
+      current = current.parentElement;
+    }
+
+    if (!scrollable && modalWindow.scrollHeight > modalWindow.clientHeight + 2) {
+      scrollable = modalWindow;
+    }
+
+    if (!scrollable) {
+      e.preventDefault();
+      return;
+    }
+
+    const deltaY = e.deltaY;
+    const isScrollingUp = deltaY < 0;
+    const isScrollingDown = deltaY > 0;
+
+    const atTop = scrollable.scrollTop <= 0;
+    const atBottom = Math.ceil(scrollable.scrollTop + scrollable.clientHeight) >= scrollable.scrollHeight - 1;
+
+    if ((isScrollingUp && atTop) || (isScrollingDown && atBottom)) {
+      e.preventDefault();
+    }
+  }
+
+  handleGlobalKeyDown(e) {
+    if (!this.isScrollLocked) return;
+    const scrollKeys = ['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End', ' '];
+    if (!scrollKeys.includes(e.key)) return;
+
+    const tag = (e.target.tagName || '').toLowerCase();
+    if (tag === 'input' || tag === 'textarea' || tag === 'select' || e.target.isContentEditable) {
+      return;
+    }
+
+    const openOverlay = document.querySelector('.modal-overlay.is-open');
+    if (!openOverlay) return;
+
+    const modalWindow = openOverlay.querySelector('.modal-window');
+    if (!modalWindow) {
+      e.preventDefault();
+      return;
+    }
+
+    if (e.key === 'ArrowDown') {
+      modalWindow.scrollTop += 40;
+      e.preventDefault();
+    } else if (e.key === 'ArrowUp') {
+      modalWindow.scrollTop -= 40;
+      e.preventDefault();
+    } else if (e.key === 'PageDown' || e.key === ' ') {
+      modalWindow.scrollTop += modalWindow.clientHeight * 0.8;
+      e.preventDefault();
+    } else if (e.key === 'PageUp') {
+      modalWindow.scrollTop -= modalWindow.clientHeight * 0.8;
+      e.preventDefault();
+    } else {
+      e.preventDefault();
+    }
+  }
+
   openModal(modalEl) {
     if (!modalEl) return;
     const windowEl = modalEl.querySelector('.modal-window');
@@ -1425,8 +1565,9 @@ class ClassLoggerApp {
     modalEl.style.opacity = '';
     modalEl.style.transition = '';
     modalEl.classList.add('is-open');
-    document.body.classList.add('modal-open');
-    document.documentElement.classList.add('modal-open');
+
+    this.lockBodyScroll();
+
     if (modalEl === this.modalData) {
       this.updateBaseRateUI();
     }
@@ -1447,9 +1588,9 @@ class ClassLoggerApp {
     modalEl.style.webkitBackdropFilter = '';
     modalEl.style.opacity = '';
     modalEl.style.transition = '';
+
     if (!document.querySelector('.modal-overlay.is-open')) {
-      document.body.classList.remove('modal-open');
-      document.documentElement.classList.remove('modal-open');
+      this.unlockBodyScroll();
     }
   }
 
@@ -1475,7 +1616,10 @@ class ClassLoggerApp {
     const dragHandle = windowEl.querySelector('.modal-drag-handle');
     if (dragHandle) {
       dragHandle.addEventListener('click', (e) => {
-        if (window.innerWidth <= 640 && Date.now() - lastDragEndTime > 300) {
+        if (this.isDismissing) return;
+        if (Date.now() - this.lastSwipeDismissTime < 500) return;
+        if (Date.now() - this.lastDragEndTime < 500) return;
+        if (window.innerWidth <= 640) {
           e.preventDefault();
           this.closeModal(overlay);
           sound.playTick(0.9);
@@ -1555,28 +1699,34 @@ class ClassLoggerApp {
       const elapsed = Math.max(Date.now() - startTime, 1);
       const velocityY = deltaY / elapsed;
 
-      const shouldDismiss = deltaY > 80 || (velocityY > 0.32 && deltaY > 25);
+      const shouldDismiss = deltaY > 70 || (velocityY > 0.25 && deltaY > 15);
 
       if (shouldDismiss) {
-        windowEl.style.transition = 'transform 0.18s cubic-bezier(0.32, 1, 0.23, 1)';
+        this.isDismissing = true;
+        this.lastSwipeDismissTime = Date.now();
+        this.lastDragEndTime = Date.now();
+
+        // Smooth natural Apple spring exit curve
+        windowEl.style.transition = 'transform 0.28s cubic-bezier(0.22, 1, 0.36, 1)';
         windowEl.style.transform = 'translateY(calc(100% + 80px))';
-        overlay.style.transition = 'background-color 0.16s ease, backdrop-filter 0.16s ease, -webkit-backdrop-filter 0.16s ease, opacity 0.16s ease';
+
+        // Concurrently fade out backdrop tint & blur
+        overlay.style.transition = 'background-color 0.26s ease-out, backdrop-filter 0.26s ease-out, -webkit-backdrop-filter 0.26s ease-out';
         overlay.style.backgroundColor = 'rgba(0, 0, 0, 0)';
         overlay.style.backdropFilter = 'blur(0px)';
         overlay.style.webkitBackdropFilter = 'blur(0px)';
-        overlay.style.opacity = '0';
 
         setTimeout(() => {
           this.closeModal(overlay);
-        }, 180);
+          this.isDismissing = false;
+        }, 280);
       } else {
-        windowEl.style.transition = 'transform 0.22s cubic-bezier(0.18, 0.89, 0.32, 1.1)';
+        windowEl.style.transition = 'transform 0.24s cubic-bezier(0.18, 0.89, 0.32, 1.1)';
         windowEl.style.transform = 'translateY(0)';
-        overlay.style.transition = 'background-color 0.2s ease, backdrop-filter 0.2s ease, -webkit-backdrop-filter 0.2s ease, opacity 0.2s ease';
+        overlay.style.transition = 'background-color 0.2s ease, backdrop-filter 0.2s ease, -webkit-backdrop-filter 0.2s ease';
         overlay.style.backgroundColor = '';
         overlay.style.backdropFilter = '';
         overlay.style.webkitBackdropFilter = '';
-        overlay.style.opacity = '';
 
         setTimeout(() => {
           windowEl.style.transform = '';
@@ -1586,14 +1736,14 @@ class ClassLoggerApp {
           overlay.style.webkitBackdropFilter = '';
           overlay.style.opacity = '';
           overlay.style.transition = '';
-        }, 220);
+        }, 240);
       }
     };
 
     const onTouchCancel = () => {
       if (isDragging) {
         isDragging = false;
-        lastDragEndTime = Date.now();
+        this.lastDragEndTime = Date.now();
         windowEl.classList.remove('is-dragging');
         windowEl.style.transform = '';
         windowEl.style.transition = '';

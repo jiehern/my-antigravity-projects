@@ -1702,10 +1702,20 @@ body::after {
 /* ==========================================================================
    MODALS & OVERLAYS
    ========================================================================== */
-html.modal-open,
+html.modal-open {
+  overflow: hidden !important;
+  overscroll-behavior: none !important;
+  height: 100% !important;
+}
+
 body.modal-open {
   overflow: hidden !important;
   overscroll-behavior: none !important;
+  height: 100% !important;
+  position: fixed !important;
+  left: 0 !important;
+  right: 0 !important;
+  width: 100% !important;
 }
 
 .modal-overlay {
