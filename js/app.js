@@ -590,26 +590,27 @@ class ClassLoggerApp {
       <div class="bonus-card-top">
         <div class="bonus-card-title-group">
           <span class="bonus-trophy-icon">${SVG_ICONS.award}</span>
-          <div>
-            <div class="bonus-card-title">Monthly Earnings & Manager Bonus</div>
-            <div class="bonus-card-nav-row">
-              <div class="bonus-month-stepper">
-                <button type="button" class="month-stepper-btn prev" id="btn-bonus-prev-month" title="Previous month" aria-label="Previous month">
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-                </button>
-                <span class="bonus-month-label">${this.escapeHTML(periodLabel)}</span>
-                <button type="button" class="month-stepper-btn next" id="btn-bonus-next-month" title="Next month" aria-label="Next month">
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-                </button>
-              </div>
-              <button type="button" class="bonus-month-today-btn ${isCurrentCalendarMonth ? 'is-current' : ''}" id="btn-bonus-today-month" title="${isCurrentCalendarMonth ? 'Currently viewing active month' : 'Jump back to current month'}">
-                Current
-              </button>
-              <span class="bonus-card-count">• ${totalSessions} class${totalSessions === 1 ? '' : 'es'}</span>
-            </div>
-          </div>
+          <div class="bonus-card-title">Monthly Earnings & Manager Bonus</div>
         </div>
         ${tierBadgeHtml}
+      </div>
+
+      <div class="bonus-card-nav-row">
+        <div class="bonus-month-stepper">
+          <button type="button" class="month-stepper-btn prev" id="btn-bonus-prev-month" title="Previous month" aria-label="Previous month">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+          </button>
+          <span class="bonus-month-label">${this.escapeHTML(periodLabel)}</span>
+          <button type="button" class="month-stepper-btn next" id="btn-bonus-next-month" title="Next month" aria-label="Next month">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+        </div>
+        <div class="bonus-nav-right-group">
+          <button type="button" class="bonus-month-today-btn ${isCurrentCalendarMonth ? 'is-current' : ''}" id="btn-bonus-today-month" title="${isCurrentCalendarMonth ? 'Currently viewing active month' : 'Jump back to current month'}">
+            Current
+          </button>
+          <span class="bonus-card-count">• ${totalSessions} class${totalSessions === 1 ? '' : 'es'}</span>
+        </div>
       </div>
 
       <div class="bonus-stats-grid">

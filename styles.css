@@ -2974,15 +2974,15 @@ body::after {
 
 .bonus-card-top {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
-  margin-bottom: 14px;
+  margin-bottom: 12px;
   gap: 10px;
 }
 
 .bonus-card-title-group {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 10px;
 }
 
@@ -2997,7 +2997,6 @@ body::after {
   border: 1px solid rgba(var(--accent-color-rgb), 0.25);
   color: var(--accent-color);
   flex-shrink: 0;
-  margin-top: 1px;
 }
 
 .bonus-card-title {
@@ -3017,18 +3016,30 @@ body::after {
 .bonus-card-nav-row {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 8px;
-  margin-top: 4px;
+  margin-bottom: 14px;
+  padding: 6px 10px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
   flex-wrap: nowrap;
+}
+
+.bonus-nav-right-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
 }
 
 .bonus-month-stepper {
   display: inline-flex;
   align-items: center;
   justify-content: space-between;
-  width: 172px;
-  min-width: 172px;
-  max-width: 172px;
+  width: 164px;
+  min-width: 164px;
+  max-width: 164px;
   height: 28px;
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid var(--border-subtle);
@@ -3066,9 +3077,9 @@ body::after {
   font-size: 0.74rem;
   font-weight: 700;
   color: var(--text-primary);
-  width: 114px;
-  min-width: 114px;
-  max-width: 114px;
+  width: 106px;
+  min-width: 106px;
+  max-width: 106px;
   text-align: center;
   letter-spacing: -0.01em;
   white-space: nowrap;
@@ -3984,6 +3995,11 @@ body::after {
 
 [data-theme="light"] .bonus-card-period {
   color: #636366;
+}
+
+[data-theme="light"] .bonus-card-nav-row {
+  background: #f7f8fa;
+  border-color: rgba(0, 0, 0, 0.06);
 }
 
 [data-theme="light"] .bonus-month-stepper {
