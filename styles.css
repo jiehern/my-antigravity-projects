@@ -2002,67 +2002,71 @@ body::after {
   justify-content: center;
 }
 
-#modal-date-jump .date-jump-field-container {
-  position: relative;
+#modal-date-jump .date-jump-input {
   width: 100%;
   max-width: 250px;
   margin: 0 auto;
   height: 48px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
+  line-height: 46px;
+  padding: 0 16px;
   background: var(--bg-surface-2);
   border: 1px solid var(--border-medium);
   border-radius: 12px;
-  padding: 0 14px;
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 1.05rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
   box-sizing: border-box;
+  display: block;
   cursor: pointer;
+  text-align: center;
   transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
 }
 
-#modal-date-jump .date-jump-field-container:hover,
-#modal-date-jump .date-jump-field-container:focus-within {
+#modal-date-jump .date-jump-input:focus {
   border-color: var(--accent-color);
   box-shadow: 0 0 0 3px rgba(var(--accent-color-rgb), 0.25);
+  outline: none;
 }
 
-#modal-date-jump .date-jump-cal-icon {
+/* iOS Safari: Vertically center and align the text */
+#modal-date-jump .date-jump-input::-webkit-date-and-time-value {
+  text-align: center;
+  height: 46px;
+  line-height: 46px;
+  margin: 0 auto;
+  padding: 0;
+}
+
+/* Chrome / WebKit alignment */
+#modal-date-jump .date-jump-input::-webkit-datetime-edit {
+  text-align: center;
+  padding: 0;
+}
+
+#modal-date-jump .date-jump-input::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  filter: invert(0.8);
+  margin-left: 8px;
+  padding: 4px;
+}
+
+.date-jump-selected-preview {
+  margin-top: 10px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: var(--accent-color);
-  flex-shrink: 0;
-  pointer-events: none;
-}
-
-#modal-date-jump .date-jump-pretty-text {
-  font-size: 0.95rem;
+  font-size: 0.82rem;
   font-weight: 700;
-  color: var(--text-primary);
+  color: var(--accent-color);
+  background: rgba(var(--accent-color-rgb), 0.12);
+  border: 1px solid rgba(var(--accent-color-rgb), 0.28);
+  border-radius: 999px;
+  padding: 4px 14px;
   letter-spacing: -0.01em;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  pointer-events: none;
-  text-align: center;
-}
-
-#modal-date-jump .date-jump-native-input {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  opacity: 0;
-  cursor: pointer;
-  border: none;
-  background: transparent;
-  z-index: 2;
-  margin: 0;
-  padding: 0;
-  -webkit-appearance: none;
-  appearance: none;
 }
 
 #modal-date-jump .btn-confirm-date-jump {
@@ -2740,7 +2744,7 @@ body::after {
     display: none !important;
   }
 
-  #modal-date-jump .date-jump-field-container {
+  #modal-date-jump .date-jump-input {
     max-width: 240px !important;
   }
 
@@ -4411,18 +4415,20 @@ body::after {
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.12);
 }
 
-[data-theme="light"] #modal-date-jump .date-jump-field-container {
+[data-theme="light"] #modal-date-jump .date-jump-input {
   background: #f2f2f7 !important;
   border-color: rgba(0, 0, 0, 0.12) !important;
-}
-
-[data-theme="light"] #modal-date-jump .date-jump-pretty-text {
   color: #1c1c1e !important;
 }
 
-[data-theme="light"] #modal-date-jump .date-jump-field-container:focus-within {
-  border-color: var(--accent-color) !important;
-  box-shadow: 0 0 0 3px rgba(var(--accent-color-rgb), 0.2) !important;
+[data-theme="light"] #modal-date-jump .date-jump-input::-webkit-calendar-picker-indicator {
+  filter: invert(0.2);
+}
+
+[data-theme="light"] .date-jump-selected-preview {
+  background: rgba(var(--accent-color-rgb), 0.1);
+  border-color: rgba(var(--accent-color-rgb), 0.3);
+  color: var(--accent-color);
 }
 
 

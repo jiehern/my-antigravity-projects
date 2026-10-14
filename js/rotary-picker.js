@@ -88,6 +88,58 @@ export class RotaryDialPicker {
     this.columns.date = this.createDrumColumn('date', dates, false);
   }
 
+  rebuildDateColumnAround(centerDate) {
+    if (!this.columns || !this.columns.date) return;
+    const dates = [];
+    const center = new Date(centerDate);
+    center.setHours(0, 0, 0, 0);
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const todayIso = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+
+    for (let i = -60; i <= 30; i++) {
+      const d = new Date(center);
+      d.setDate(center.getDate() + i);
+
+      const yyyy = d.getFullYear();
+      const mm = String(d.getMonth() + 1).padStart(2, '0');
+      const dd = String(d.getDate()).padStart(2, '0');
+      const iso = `${yyyy}-${mm}-${dd}`;
+
+      const weekday = d.toLocaleDateString('en-US', { weekday: 'short' });
+      const month = d.toLocaleDateString('en-US', { month: 'short' });
+      const dayNum = d.getDate();
+      const formattedDate = `${weekday}, ${month} ${dayNum}`;
+
+      const isToday = (iso === todayIso);
+      let label = formattedDate;
+      if (isToday) {
+        label = `Today, ${month} ${dayNum}`;
+      }
+
+      dates.push({
+        value: iso,
+        label: label,
+        dateObj: d,
+        isToday: isToday
+      });
+    }
+
+    const state = this.columns.date;
+    state.items = dates;
+    state.wheelEl.innerHTML = '';
+    dates.forEach((item, index) => {
+      const itemEl = document.createElement('div');
+      itemEl.className = 'rotary-item';
+      itemEl.dataset.index = index;
+      itemEl.textContent = item.label;
+      if (item.isToday) itemEl.classList.add('is-today');
+      state.wheelEl.appendChild(itemEl);
+    });
+    state.itemElements = Array.from(state.wheelEl.children);
+  }
+
   setupHourColumn() {
     // 1 to 12 repeated for smooth circular feeling
     const rawHours = [];
@@ -463,9 +515,12 @@ export class RotaryDialPicker {
 
     let dateIdx = this.columns.date.items.findIndex(item => item.value === iso);
     if (dateIdx === -1) {
-      // Find closest or default to today
-      dateIdx = this.columns.date.items.findIndex(item => item.isToday);
-      if (dateIdx === -1) dateIdx = 0;
+      this.rebuildDateColumnAround(d);
+      dateIdx = this.columns.date.items.findIndex(item => item.value === iso);
+      if (dateIdx === -1) {
+        dateIdx = this.columns.date.items.findIndex(item => item.isToday);
+        if (dateIdx === -1) dateIdx = 0;
+      }
     }
 
     // 2. Hour (1-12) & Period (AM/PM)

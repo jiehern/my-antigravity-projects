@@ -955,11 +955,7 @@ class ClassLoggerApp {
       };
       this.dateJumpInput.addEventListener('input', handleDateInput);
       this.dateJumpInput.addEventListener('change', handleDateInput);
-    }
-
-    const dateFieldContainer = document.getElementById('date-jump-field-container');
-    if (dateFieldContainer && this.dateJumpInput) {
-      dateFieldContainer.addEventListener('click', () => {
+      this.dateJumpInput.addEventListener('click', () => {
         if (typeof this.dateJumpInput.showPicker === 'function') {
           try {
             this.dateJumpInput.showPicker();
@@ -974,8 +970,8 @@ class ClassLoggerApp {
         if (selected && this.rotaryPicker) {
           const [y, m, d] = selected.split('-').map(Number);
           const cur = this.rotaryPicker.getValue().fullDate;
-          cur.setFullYear(y, m - 1, d);
-          this.rotaryPicker.setValue(cur, true);
+          const targetDate = new Date(y, m - 1, d, cur.getHours(), cur.getMinutes(), 0, 0);
+          this.rotaryPicker.setValue(targetDate, true);
           this.closeModal(this.modalDateJump);
           sound.playTick(1.2);
           this.showToast(`Jumped to ${selected}`, 'info');
