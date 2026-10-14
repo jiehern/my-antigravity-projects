@@ -2002,53 +2002,67 @@ body::after {
   justify-content: center;
 }
 
-#modal-date-jump .date-jump-input {
+#modal-date-jump .date-jump-field-container {
+  position: relative;
   width: 100%;
   max-width: 250px;
   margin: 0 auto;
   height: 48px;
-  padding: 0 16px;
-  text-align: center;
-  font-size: 1.05rem !important;
-  font-weight: 600;
-  font-family: var(--font-sans);
-  font-variant-numeric: tabular-nums;
-  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   background: var(--bg-surface-2);
   border: 1px solid var(--border-medium);
-  color: var(--text-primary);
+  border-radius: 12px;
+  padding: 0 14px;
   box-sizing: border-box;
-  -webkit-appearance: none;
-  appearance: none;
-  display: block;
   cursor: pointer;
   transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
 }
 
-#modal-date-jump .date-jump-input::-webkit-date-and-time-value {
-  text-align: center;
-}
-
-#modal-date-jump .date-jump-input::-webkit-datetime-edit {
-  text-align: center;
-  display: inline-flex;
-  justify-content: center;
-  margin: 0 auto;
-}
-
-#modal-date-jump .date-jump-input::-webkit-calendar-picker-indicator {
-  cursor: pointer;
-  filter: invert(0.8);
-  margin-left: 8px;
-}
-
-[data-theme="light"] #modal-date-jump .date-jump-input::-webkit-calendar-picker-indicator {
-  filter: invert(0.2);
-}
-
-#modal-date-jump .date-jump-input:focus {
+#modal-date-jump .date-jump-field-container:hover,
+#modal-date-jump .date-jump-field-container:focus-within {
   border-color: var(--accent-color);
   box-shadow: 0 0 0 3px rgba(var(--accent-color-rgb), 0.25);
+}
+
+#modal-date-jump .date-jump-cal-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent-color);
+  flex-shrink: 0;
+  pointer-events: none;
+}
+
+#modal-date-jump .date-jump-pretty-text {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  pointer-events: none;
+  text-align: center;
+}
+
+#modal-date-jump .date-jump-native-input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  z-index: 2;
+  margin: 0;
+  padding: 0;
+  -webkit-appearance: none;
+  appearance: none;
 }
 
 #modal-date-jump .btn-confirm-date-jump {
@@ -2726,7 +2740,7 @@ body::after {
     display: none !important;
   }
 
-  #modal-date-jump .date-jump-input {
+  #modal-date-jump .date-jump-field-container {
     max-width: 240px !important;
   }
 
@@ -2956,7 +2970,7 @@ body::after {
 
 .bonus-card-top {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   margin-bottom: 14px;
   gap: 10px;
@@ -2964,7 +2978,7 @@ body::after {
 
 .bonus-card-title-group {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 10px;
 }
 
@@ -2979,6 +2993,7 @@ body::after {
   border: 1px solid rgba(var(--accent-color-rgb), 0.25);
   color: var(--accent-color);
   flex-shrink: 0;
+  margin-top: 1px;
 }
 
 .bonus-card-title {
@@ -2986,6 +3001,7 @@ body::after {
   font-weight: 700;
   color: var(--text-primary);
   letter-spacing: -0.01em;
+  line-height: 1.25;
 }
 
 .bonus-card-period {
@@ -2998,18 +3014,24 @@ body::after {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-top: 3px;
-  flex-wrap: wrap;
+  margin-top: 4px;
+  flex-wrap: nowrap;
 }
 
 .bonus-month-stepper {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  justify-content: space-between;
+  width: 172px;
+  min-width: 172px;
+  max-width: 172px;
+  height: 28px;
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid var(--border-subtle);
   border-radius: 6px;
-  padding: 2px 4px;
+  padding: 0 4px;
+  box-sizing: border-box;
+  flex-shrink: 0;
 }
 
 .month-stepper-btn {
@@ -3019,10 +3041,11 @@ body::after {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 20px;
-  height: 20px;
+  width: 22px;
+  height: 22px;
   border-radius: 4px;
   cursor: pointer;
+  flex-shrink: 0;
   transition: all var(--transition-fast);
 }
 
@@ -3039,20 +3062,16 @@ body::after {
   font-size: 0.74rem;
   font-weight: 700;
   color: var(--text-primary);
-  padding: 0 4px;
+  width: 114px;
+  min-width: 114px;
+  max-width: 114px;
+  text-align: center;
   letter-spacing: -0.01em;
-}
-
-.bonus-current-pip {
-  font-size: 0.65rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  padding: 2px 6px;
-  border-radius: 999px;
-  background: rgba(var(--accent-color-rgb), 0.14);
-  color: var(--accent-color);
-  border: 1px solid rgba(var(--accent-color-rgb), 0.3);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
 }
 
 .bonus-month-today-btn {
@@ -3060,10 +3079,19 @@ body::after {
   border: 1px solid rgba(var(--accent-color-rgb), 0.35);
   color: var(--accent-color);
   border-radius: 999px;
-  padding: 2px 8px;
+  width: 58px;
+  min-width: 58px;
+  max-width: 58px;
+  height: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
   font-size: 0.68rem;
   font-weight: 700;
   cursor: pointer;
+  flex-shrink: 0;
+  box-sizing: border-box;
   transition: all var(--transition-fast);
 }
 
@@ -3071,10 +3099,20 @@ body::after {
   background: rgba(var(--accent-color-rgb), 0.25);
 }
 
+.bonus-month-today-btn.is-current {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: var(--border-subtle);
+  color: var(--text-tertiary);
+  cursor: default;
+  pointer-events: none;
+}
+
 .bonus-card-count {
   font-size: 0.72rem;
   color: var(--text-tertiary);
   font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .bonus-tier-badge {
@@ -3966,6 +4004,12 @@ body::after {
   color: #8e8e93;
 }
 
+[data-theme="light"] .bonus-month-today-btn.is-current {
+  background: rgba(0, 0, 0, 0.04);
+  border-color: rgba(0, 0, 0, 0.08);
+  color: #8e8e93;
+}
+
 [data-theme="light"] .bonus-tier-badge.no-tier {
   background: rgba(0, 0, 0, 0.06);
   color: #48484a;
@@ -4367,13 +4411,16 @@ body::after {
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.12);
 }
 
-[data-theme="light"] #modal-date-jump .date-jump-input {
+[data-theme="light"] #modal-date-jump .date-jump-field-container {
   background: #f2f2f7 !important;
   border-color: rgba(0, 0, 0, 0.12) !important;
+}
+
+[data-theme="light"] #modal-date-jump .date-jump-pretty-text {
   color: #1c1c1e !important;
 }
 
-[data-theme="light"] #modal-date-jump .date-jump-input:focus {
+[data-theme="light"] #modal-date-jump .date-jump-field-container:focus-within {
   border-color: var(--accent-color) !important;
   box-shadow: 0 0 0 3px rgba(var(--accent-color-rgb), 0.2) !important;
 }

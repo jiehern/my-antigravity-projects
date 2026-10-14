@@ -208,6 +208,24 @@ class ClassLoggerApp {
     }
   }
 
+  updateDateJumpDisplay(dateStr) {
+    const textElem = document.getElementById('date-jump-pretty-text');
+    if (!textElem) return;
+    if (!dateStr) {
+      textElem.textContent = 'Select Date';
+      return;
+    }
+    try {
+      const [y, m, d] = dateStr.split('-').map(Number);
+      const dt = new Date(y, m - 1, d);
+      const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      textElem.textContent = `${days[dt.getDay()]}, ${d} ${months[m - 1]} ${y}`;
+    } catch (e) {
+      textElem.textContent = dateStr;
+    }
+  }
+
   // --- THEME & ACCENT COLOR SYSTEM ---
 
   initTheme() {
@@ -584,13 +602,9 @@ class ClassLoggerApp {
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
                 </button>
               </div>
-              ${!isCurrentCalendarMonth ? `
-                <button type="button" class="bonus-month-today-btn" id="btn-bonus-today-month" title="Jump to Current Month">
-                  Current Month
-                </button>
-              ` : `
-                <span class="bonus-current-pip">Current</span>
-              `}
+              <button type="button" class="bonus-month-today-btn ${isCurrentCalendarMonth ? 'is-current' : ''}" id="btn-bonus-today-month" title="${isCurrentCalendarMonth ? 'Currently viewing active month' : 'Jump back to current month'}">
+                Current
+              </button>
               <span class="bonus-card-count">• ${totalSessions} class${totalSessions === 1 ? '' : 'es'}</span>
             </div>
           </div>
@@ -926,9 +940,31 @@ class ClassLoggerApp {
       this.btnCalendarJump.addEventListener('click', () => {
         if (this.rotaryPicker) {
           const currentVal = this.rotaryPicker.getValue();
-          if (this.dateJumpInput) this.dateJumpInput.value = currentVal.date;
+          if (this.dateJumpInput) {
+            this.dateJumpInput.value = currentVal.date;
+            this.updateDateJumpDisplay(currentVal.date);
+          }
         }
         this.openModal(this.modalDateJump);
+      });
+    }
+
+    if (this.dateJumpInput) {
+      const handleDateInput = (e) => {
+        this.updateDateJumpDisplay(e.target.value);
+      };
+      this.dateJumpInput.addEventListener('input', handleDateInput);
+      this.dateJumpInput.addEventListener('change', handleDateInput);
+    }
+
+    const dateFieldContainer = document.getElementById('date-jump-field-container');
+    if (dateFieldContainer && this.dateJumpInput) {
+      dateFieldContainer.addEventListener('click', () => {
+        if (typeof this.dateJumpInput.showPicker === 'function') {
+          try {
+            this.dateJumpInput.showPicker();
+          } catch (err) {}
+        }
       });
     }
 
