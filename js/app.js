@@ -33,6 +33,7 @@ class ClassLoggerApp {
     this.selectedDuration = 50;
     this.editingClassId = null;
     this.searchQuery = '';
+    this.selectedBonusMonth = null;
 
     // Scroll lock & gesture state
     this.isScrollLocked = false;
@@ -394,8 +395,8 @@ class ClassLoggerApp {
       this.mobileHistoryBadge.textContent = this.classes.length;
     }
 
-    // Update the live Monthly Manager Bonus tracker card (always reflects all logged classes)
-    this.renderMonthlyBonusCard(this.classes);
+    // Update the live Monthly Manager Bonus tracker card for the active month
+    this.renderMonthlyBonusCard();
 
     if (filtered.length === 0) {
       this.classesList.innerHTML = `
@@ -497,26 +498,51 @@ class ClassLoggerApp {
 
   // --- MONTHLY MANAGER BONUS CARD ---
 
-  renderMonthlyBonusCard(classesToSummarize = this.classes) {
+  getCurrentBonusMonth() {
+    if (this.selectedBonusMonth) return this.selectedBonusMonth;
+    const now = new Date();
+    const realCurrentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+    // If we have classes in the real current month, show real current month
+    if (this.classes.some(c => c.date && c.date.startsWith(realCurrentMonth))) {
+      return realCurrentMonth;
+    }
+    // If no classes in real current month, check if classes exist in other months
+    const datesWithClasses = this.classes.filter(c => c.date).map(c => c.date).sort().reverse();
+    if (datesWithClasses.length > 0) {
+      return datesWithClasses[0].slice(0, 7);
+    }
+    return realCurrentMonth;
+  }
+
+  shiftMonth(yearMonthStr, offset) {
+    const [y, m] = yearMonthStr.split('-').map(Number);
+    const targetDate = new Date(y, m - 1 + offset, 1);
+    return `${targetDate.getFullYear()}-${String(targetDate.getMonth() + 1).padStart(2, '0')}`;
+  }
+
+  renderMonthlyBonusCard() {
     if (!this.monthlyBonusCard) return;
 
-    const list = Array.isArray(classesToSummarize) ? classesToSummarize : this.classes;
-    const totalSessions = list.length;
-    const totalUnits = list.reduce((sum, c) => sum + getClassCreditUnits(c), 0);
+    const activeMonth = this.getCurrentBonusMonth(); // e.g. "2026-10"
+    const [activeYear, activeMonthNum] = activeMonth.split('-').map(Number);
+    const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    const monthName = monthNames[activeMonthNum - 1] || 'Current Month';
+    const periodLabel = `${monthName} ${activeYear}`;
+
+    const now = new Date();
+    const realCurrentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+    const isCurrentCalendarMonth = (activeMonth === realCurrentMonth);
+
+    // CRUCIAL: Filter strictly to classes in this specific activeMonth (YYYY-MM)
+    // Ensures a previous or future month's class NEVER leaks into the current month's earnings
+    const monthClasses = this.classes.filter(c => c.date && c.date.startsWith(activeMonth));
+
+    const totalSessions = monthClasses.length;
+    const totalUnits = monthClasses.reduce((sum, c) => sum + getClassCreditUnits(c), 0);
     const ratePerClass = this.getBaseRate();
     const baseEarnings = totalUnits * ratePerClass;
     const bonusInfo = calculateManagerBonus(totalUnits);
     const totalPayout = baseEarnings + bonusInfo.bonus;
-
-    let periodLabel = 'This Month';
-    if (list.length > 0 && list[0].date) {
-      const [y, m] = list[0].date.split('-').map(Number);
-      const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-      periodLabel = `${monthNames[m - 1] || 'Current Month'} ${y || 2026}`;
-    } else {
-      const now = new Date();
-      periodLabel = now.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-    }
 
     // Milestones progress calculation (scale 0 to 50 max)
     const progressPct = Math.min(100, Math.max(0, (totalUnits / 50) * 100));
@@ -548,7 +574,25 @@ class ClassLoggerApp {
           <span class="bonus-trophy-icon">${SVG_ICONS.award}</span>
           <div>
             <div class="bonus-card-title">Monthly Earnings & Manager Bonus</div>
-            <div class="bonus-card-period">${this.escapeHTML(periodLabel)} • ${totalSessions} class${totalSessions === 1 ? '' : 'es'}</div>
+            <div class="bonus-card-nav-row">
+              <div class="bonus-month-stepper">
+                <button type="button" class="month-stepper-btn prev" id="btn-bonus-prev-month" title="Previous month" aria-label="Previous month">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+                </button>
+                <span class="bonus-month-label">${this.escapeHTML(periodLabel)}</span>
+                <button type="button" class="month-stepper-btn next" id="btn-bonus-next-month" title="Next month" aria-label="Next month">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                </button>
+              </div>
+              ${!isCurrentCalendarMonth ? `
+                <button type="button" class="bonus-month-today-btn" id="btn-bonus-today-month" title="Jump to Current Month">
+                  Current Month
+                </button>
+              ` : `
+                <span class="bonus-current-pip">Current</span>
+              `}
+              <span class="bonus-card-count">• ${totalSessions} class${totalSessions === 1 ? '' : 'es'}</span>
+            </div>
           </div>
         </div>
         ${tierBadgeHtml}
@@ -933,6 +977,38 @@ class ClassLoggerApp {
         searchDebounceTimer = setTimeout(() => {
           this.renderClassesList();
         }, 80);
+      });
+    }
+
+    // Monthly Earnings & Bonus Month Switcher Controls
+    if (this.monthlyBonusCard) {
+      this.monthlyBonusCard.addEventListener('click', (e) => {
+        const prevBtn = e.target.closest('#btn-bonus-prev-month');
+        const nextBtn = e.target.closest('#btn-bonus-next-month');
+        const todayBtn = e.target.closest('#btn-bonus-today-month');
+
+        if (prevBtn) {
+          e.stopPropagation();
+          this.selectedBonusMonth = this.shiftMonth(this.getCurrentBonusMonth(), -1);
+          this.renderMonthlyBonusCard();
+          sound.playTick(1.1);
+          return;
+        }
+        if (nextBtn) {
+          e.stopPropagation();
+          this.selectedBonusMonth = this.shiftMonth(this.getCurrentBonusMonth(), 1);
+          this.renderMonthlyBonusCard();
+          sound.playTick(1.1);
+          return;
+        }
+        if (todayBtn) {
+          e.stopPropagation();
+          const now = new Date();
+          this.selectedBonusMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+          this.renderMonthlyBonusCard();
+          sound.playTick(1.2);
+          return;
+        }
       });
     }
 

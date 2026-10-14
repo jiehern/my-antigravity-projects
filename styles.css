@@ -2994,6 +2994,89 @@ body::after {
   margin-top: 1px;
 }
 
+.bonus-card-nav-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 3px;
+  flex-wrap: wrap;
+}
+
+.bonus-month-stepper {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  padding: 2px 4px;
+}
+
+.month-stepper-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.month-stepper-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-primary);
+}
+
+.month-stepper-btn:active {
+  transform: scale(0.92);
+}
+
+.bonus-month-label {
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  padding: 0 4px;
+  letter-spacing: -0.01em;
+}
+
+.bonus-current-pip {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 2px 6px;
+  border-radius: 999px;
+  background: rgba(var(--accent-color-rgb), 0.14);
+  color: var(--accent-color);
+  border: 1px solid rgba(var(--accent-color-rgb), 0.3);
+}
+
+.bonus-month-today-btn {
+  background: rgba(var(--accent-color-rgb), 0.15);
+  border: 1px solid rgba(var(--accent-color-rgb), 0.35);
+  color: var(--accent-color);
+  border-radius: 999px;
+  padding: 2px 8px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.bonus-month-today-btn:hover {
+  background: rgba(var(--accent-color-rgb), 0.25);
+}
+
+.bonus-card-count {
+  font-size: 0.72rem;
+  color: var(--text-tertiary);
+  font-weight: 600;
+}
+
 .bonus-tier-badge {
   font-size: 0.74rem;
   font-weight: 700;
@@ -3859,6 +3942,28 @@ body::after {
 
 [data-theme="light"] .bonus-card-period {
   color: #636366;
+}
+
+[data-theme="light"] .bonus-month-stepper {
+  background: #f0f1f5;
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="light"] .month-stepper-btn {
+  color: #636366;
+}
+
+[data-theme="light"] .month-stepper-btn:hover {
+  background: rgba(0, 0, 0, 0.08);
+  color: #1c1c1e;
+}
+
+[data-theme="light"] .bonus-month-label {
+  color: #1c1c1e;
+}
+
+[data-theme="light"] .bonus-card-count {
+  color: #8e8e93;
 }
 
 [data-theme="light"] .bonus-tier-badge.no-tier {
