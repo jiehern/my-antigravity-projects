@@ -19,6 +19,9 @@ export class RotaryDialPicker {
     };
 
     this.columns = {};
+    this.targetDate = (this.options.initialDate instanceof Date && !isNaN(this.options.initialDate.getTime()))
+      ? new Date(this.options.initialDate)
+      : new Date();
     this.currentValue = {
       date: '',
       hour: 12,
@@ -167,9 +170,9 @@ export class RotaryDialPicker {
         label: String(m).padStart(2, '0')
       });
     }
-    // Repeat 3 times for virtually infinite rotary scroll
+    // Repeat 5 times for virtually infinite rotary scroll
     const items = [];
-    for (let r = 0; r < 3; r++) {
+    for (let r = 0; r < 5; r++) {
       rawMins.forEach(m => items.push({ ...m }));
     }
 
@@ -208,6 +211,10 @@ export class RotaryDialPicker {
     colEl.appendChild(wheelEl);
     this.wrapper.appendChild(colEl);
 
+    const initialIndex = isLooping && baseCount > 0
+      ? Math.floor(items.length / (2 * baseCount)) * baseCount
+      : 0;
+
     const state = {
       id: columnId,
       colEl,
@@ -216,9 +223,9 @@ export class RotaryDialPicker {
       itemElements: Array.from(wheelEl.children),
       isLooping,
       baseCount,
-      currentIndex: 0,
-      targetY: 0,
-      currentY: 0,
+      currentIndex: initialIndex,
+      targetY: initialIndex * this.options.itemHeight,
+      currentY: initialIndex * this.options.itemHeight,
       itemHeight: this.options.itemHeight,
       isDragging: false,
       startY: 0,
@@ -226,7 +233,8 @@ export class RotaryDialPicker {
       lastDragY: 0,
       lastDragTime: 0,
       velocity: 0,
-      animationFrame: null
+      animationFrame: null,
+      lastSoundIndex: initialIndex
     };
 
     this.attachColumnEvents(state);
@@ -394,7 +402,24 @@ export class RotaryDialPicker {
     });
   }
 
-  snapToIndex(state, index, animate = true) {
+  findClosestIndex(state, targetValue) {
+    if (!state || !state.items || state.items.length === 0) return 0;
+    let bestIdx = 0;
+    let minDiff = Infinity;
+    const current = typeof state.currentIndex === 'number' ? state.currentIndex : 0;
+    for (let i = 0; i < state.items.length; i++) {
+      if (state.items[i].value === targetValue) {
+        const diff = Math.abs(i - current);
+        if (diff < minDiff) {
+          minDiff = diff;
+          bestIdx = i;
+        }
+      }
+    }
+    return bestIdx;
+  }
+
+  snapToIndex(state, index, animate = true, updateState = true) {
     if (state.animationFrame) cancelAnimationFrame(state.animationFrame);
 
     let targetIndex = index;
@@ -418,10 +443,13 @@ export class RotaryDialPicker {
     const endY = targetIndex * state.itemHeight;
     state.currentIndex = targetIndex;
 
+    if (updateState) {
+      this.updateStateValue();
+    }
+
     if (!animate) {
       state.currentY = endY;
       this.renderColumnTransform(state);
-      this.updateStateValue();
       return;
     }
 
@@ -451,10 +479,10 @@ export class RotaryDialPicker {
 
   updateStateValue() {
     // Read current snapped values
-    const dateItem = this.columns.date.items[this.columns.date.currentIndex];
-    const hourItem = this.columns.hour.items[this.columns.hour.currentIndex];
-    const minuteItem = this.columns.minute.items[this.columns.minute.currentIndex];
-    const periodItem = this.columns.period.items[this.columns.period.currentIndex];
+    const dateItem = this.columns.date?.items?.[this.columns.date.currentIndex];
+    const hourItem = this.columns.hour?.items?.[this.columns.hour.currentIndex];
+    const minuteItem = this.columns.minute?.items?.[this.columns.minute.currentIndex];
+    const periodItem = this.columns.period?.items?.[this.columns.period.currentIndex];
 
     if (!dateItem || !hourItem || !minuteItem || !periodItem) return;
 
@@ -467,8 +495,11 @@ export class RotaryDialPicker {
       period: periodItem.value
     };
 
+    const val = this.getValue();
+    this.targetDate = val.fullDate;
+
     if (this.options.onChange) {
-      this.options.onChange(this.getValue());
+      this.options.onChange(val);
     }
   }
 
@@ -506,6 +537,7 @@ export class RotaryDialPicker {
   setValue(targetDate, animate = true) {
     const d = targetDate instanceof Date ? targetDate : new Date(targetDate);
     if (isNaN(d.getTime())) return;
+    this.targetDate = new Date(d);
 
     // 1. Date column index
     const yyyy = d.getFullYear();
@@ -529,33 +561,37 @@ export class RotaryDialPicker {
     let h12 = rawH % 12;
     if (h12 === 0) h12 = 12;
 
-    // Find hour index in middle buffer of repeated list
-    const baseH = this.columns.hour.baseCount;
-    const hourOffset = h12 - 1;
-    const hourIdx = baseH * 2 + hourOffset;
+    const hourIdx = this.findClosestIndex(this.columns.hour, h12);
 
     // 3. Minute (0-59)
     const m = d.getMinutes();
-    const baseM = this.columns.minute.baseCount;
-    const minuteIdx = baseM + m;
+    const minuteIdx = this.findClosestIndex(this.columns.minute, m);
 
     // 4. Period
     const periodIdx = period === 'AM' ? 0 : 1;
 
-    // Snap all columns
-    this.snapToIndex(this.columns.date, dateIdx, animate);
-    this.snapToIndex(this.columns.hour, hourIdx, animate);
-    this.snapToIndex(this.columns.minute, minuteIdx, animate);
-    this.snapToIndex(this.columns.period, periodIdx, animate);
+    // Snap all columns without intermediate partial state callbacks
+    this.snapToIndex(this.columns.date, dateIdx, animate, false);
+    this.snapToIndex(this.columns.hour, hourIdx, animate, false);
+    this.snapToIndex(this.columns.minute, minuteIdx, animate, false);
+    this.snapToIndex(this.columns.period, periodIdx, animate, false);
+
+    // Immediately synchronize state and notify listeners
+    this.updateStateValue();
   }
 
   setNow(animate = true) {
-    this.setValue(new Date(), animate);
+    const now = new Date();
+    this.targetDate = now;
+    this.setValue(now, animate);
   }
 
   adjustHours(delta, animate = true) {
-    const current = this.getValue().fullDate;
-    const next = new Date(current.getTime() + delta * 3600 * 1000);
+    const base = (this.targetDate instanceof Date && !isNaN(this.targetDate.getTime()))
+      ? this.targetDate
+      : this.getValue().fullDate;
+    const next = new Date(base.getTime() + delta * 3600 * 1000);
+    this.targetDate = next;
     this.setValue(next, animate);
   }
 }
