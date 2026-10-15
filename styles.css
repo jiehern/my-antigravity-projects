@@ -13,6 +13,7 @@
   --accent-contrast: #000000;
   --border-focus: var(--accent-color);
   --card-accent: var(--accent-color);
+  --accent-text: var(--accent-color);
 
   /* Apple System Accent Colors */
   --apple-orange: var(--accent-color);     /* Mapped to active accent */
@@ -107,6 +108,7 @@
   --apple-yellow: #b25000;
   --apple-cyan: #0077b6;
   --apple-pink: #d70055;
+  --accent-text: var(--accent-text-light, #0077b6);
 
   color-scheme: light;
 }
@@ -159,6 +161,19 @@
 :focus-visible {
   outline: 2px solid var(--accent-color);
   outline-offset: 2px;
+}
+
+/* Screen reader / accessible hidden inputs (remains focusable & keyboard-operable) */
+.sr-only-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 /* Reduced Motion Preference (WCAG 2.2 / ui-ux-pro-max standard) */
@@ -1534,7 +1549,7 @@ body::after {
   background: var(--bg-surface-2);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
-  padding: 0 14px 0 40px;
+  padding: 0 36px 0 40px;
   color: var(--text-primary);
   font-family: var(--font-sans);
   font-size: 0.85rem;
@@ -1544,6 +1559,34 @@ body::after {
 
 .search-input:focus {
   border-color: var(--border-medium);
+}
+
+.search-clear-btn {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--bg-surface-3);
+  border: none;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  transition: all var(--transition-fast);
+}
+
+.search-clear-btn:hover {
+  background: var(--border-medium);
+  color: var(--text-primary);
+}
+
+.search-clear-btn:active {
+  transform: translateY(-50%) scale(0.9);
 }
 
 .category-filter-tabs {
@@ -2785,9 +2828,10 @@ body::after {
   }
 
   .card-action-btn {
-    width: 32px;
-    height: 32px;
-    font-size: 0.85rem;
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+    font-size: 0.9rem;
   }
 
   .toast-container {
@@ -3037,10 +3081,10 @@ body::after {
   display: inline-flex;
   align-items: center;
   justify-content: space-between;
-  width: 164px;
-  min-width: 164px;
-  max-width: 164px;
-  height: 28px;
+  width: 174px;
+  min-width: 174px;
+  max-width: 174px;
+  height: 32px;
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid var(--border-subtle);
   border-radius: 6px;
@@ -3056,8 +3100,8 @@ body::after {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 22px;
-  height: 22px;
+  width: 30px;
+  height: 30px;
   border-radius: 4px;
   cursor: pointer;
   flex-shrink: 0;
@@ -3092,12 +3136,12 @@ body::after {
 .bonus-month-today-btn {
   background: rgba(var(--accent-color-rgb), 0.15);
   border: 1px solid rgba(var(--accent-color-rgb), 0.35);
-  color: var(--accent-color);
+  color: var(--accent-text);
   border-radius: 999px;
-  width: 58px;
-  min-width: 58px;
-  max-width: 58px;
-  height: 22px;
+  width: 60px;
+  min-width: 60px;
+  max-width: 60px;
+  height: 30px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -3704,7 +3748,7 @@ body::after {
 
 [data-theme="light"] .brand-badge {
   background: rgba(var(--accent-color-rgb), 0.12);
-  color: var(--accent-color);
+  color: var(--accent-text);
   border: 1px solid rgba(var(--accent-color-rgb), 0.35);
   font-weight: 700;
 }
@@ -3725,14 +3769,14 @@ body::after {
 
 [data-theme="light"] .quick-pill-btn.primary {
   background: rgba(var(--accent-color-rgb), 0.12);
-  color: var(--accent-color);
+  color: var(--accent-text);
   border-color: rgba(var(--accent-color-rgb), 0.35);
   font-weight: 700;
 }
 
 [data-theme="light"] .quick-pill-btn.primary:hover {
   background: rgba(var(--accent-color-rgb), 0.2);
-  color: var(--accent-color);
+  color: var(--accent-text);
 }
 
 [data-theme="light"] .mobile-segmented-nav {
@@ -3790,7 +3834,7 @@ body::after {
 }
 
 [data-theme="light"] .rotary-live-time {
-  color: var(--accent-color);
+  color: var(--accent-text);
   font-weight: 800;
   text-shadow: none;
 }
@@ -3824,7 +3868,7 @@ body::after {
 }
 
 [data-theme="light"] .rotary-item.is-today {
-  color: var(--accent-color);
+  color: var(--accent-text);
   font-weight: 700;
 }
 
@@ -3900,6 +3944,16 @@ body::after {
   color: #636366;
 }
 
+[data-theme="light"] .search-clear-btn {
+  background: #e5e5ea;
+  color: #636366;
+}
+
+[data-theme="light"] .search-clear-btn:hover {
+  background: #d1d1d6;
+  color: #1c1c1e;
+}
+
 [data-theme="light"] .note-tag-chip {
   background: #ffffff;
   border-color: rgba(0, 0, 0, 0.12);
@@ -3942,7 +3996,7 @@ body::after {
 [data-theme="light"] .assist-name-row.is-selected {
   background: rgba(var(--accent-color-rgb), 0.12);
   border-color: rgba(var(--accent-color-rgb), 0.35);
-  color: var(--accent-color);
+  color: var(--accent-text);
 }
 
 [data-theme="light"] .assist-name-select-btn {
@@ -3986,7 +4040,7 @@ body::after {
 [data-theme="light"] .bonus-trophy-icon {
   background: rgba(var(--accent-color-rgb), 0.1);
   border-color: rgba(var(--accent-color-rgb), 0.25);
-  color: var(--accent-color);
+  color: var(--accent-text);
 }
 
 [data-theme="light"] .bonus-card-title {
@@ -4074,7 +4128,7 @@ body::after {
 }
 
 [data-theme="light"] .stat-val-payout {
-  color: var(--accent-color);
+  color: var(--accent-text);
   font-weight: 800;
 }
 
@@ -4143,7 +4197,7 @@ body::after {
 
 [data-theme="light"] .bonus-tier-pill.is-next .tier-pill-hours,
 [data-theme="light"] .bonus-tier-pill.is-next .tier-pill-reward {
-  color: var(--accent-color);
+  color: var(--accent-text);
   font-weight: 800;
 }
 
@@ -4174,7 +4228,7 @@ body::after {
 [data-theme="light"] .card-category-badge {
   background: rgba(var(--accent-color-rgb), 0.08);
   border-color: rgba(var(--accent-color-rgb), 0.25);
-  color: var(--accent-color);
+  color: var(--accent-text);
   font-weight: 700;
 }
 
@@ -4192,7 +4246,7 @@ body::after {
 
 [data-theme="light"] .card-units-badge.is-precomp {
   background: rgba(var(--accent-color-rgb), 0.12);
-  color: var(--accent-color);
+  color: var(--accent-text);
   border-color: rgba(var(--accent-color-rgb), 0.3);
 }
 
@@ -4217,11 +4271,11 @@ body::after {
 }
 
 [data-theme="light"] .class-type-pill.is-active .type-pill-title {
-  color: var(--accent-color);
+  color: var(--accent-text);
 }
 
 [data-theme="light"] .class-type-pill.is-active .type-pill-badge {
-  color: var(--accent-color);
+  color: var(--accent-text);
 }
 
 [data-theme="light"] .card-type-pill-badge {
@@ -4239,7 +4293,7 @@ body::after {
 [data-theme="light"] .card-type-pill-badge.is-type-squad {
   background: rgba(var(--accent-color-rgb), 0.12);
   border-color: rgba(var(--accent-color-rgb), 0.3);
-  color: var(--accent-color);
+  color: var(--accent-text);
 }
 
 [data-theme="light"] .card-type-pill-badge.is-type-baby {
@@ -4276,7 +4330,7 @@ body::after {
 
 [data-theme="light"] .card-relative-badge.is-today {
   background: rgba(var(--accent-color-rgb), 0.12);
-  color: var(--accent-color);
+  color: var(--accent-text);
   border-color: rgba(var(--accent-color-rgb), 0.35);
   font-weight: 700;
 }
@@ -4444,7 +4498,7 @@ body::after {
 [data-theme="light"] .date-jump-selected-preview {
   background: rgba(var(--accent-color-rgb), 0.1);
   border-color: rgba(var(--accent-color-rgb), 0.3);
-  color: var(--accent-color);
+  color: var(--accent-text);
 }
 
 

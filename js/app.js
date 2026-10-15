@@ -122,6 +122,7 @@ class ClassLoggerApp {
     // History & list elements
     this.classesList = document.getElementById('classes-list');
     this.searchInput = document.getElementById('history-search-input');
+    this.searchClearBtn = document.getElementById('history-search-clear');
     this.logCountTag = document.getElementById('log-count-tag');
 
     // Header buttons
@@ -334,6 +335,34 @@ class ClassLoggerApp {
     };
   }
 
+  getAccessibleLightAccent(hex) {
+    const rgb = this.hexToRgb(hex);
+    if (!rgb) return '#0077b6';
+
+    const getLum = (c) => {
+      const s = c / 255;
+      return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
+    };
+
+    const contrastAgainstWhite = (r, g, b) => {
+      const L = 0.2126 * getLum(r) + 0.7152 * getLum(g) + 0.0722 * getLum(b);
+      return (1.0 + 0.05) / (L + 0.05);
+    };
+
+    let { r, g, b } = rgb;
+    if (contrastAgainstWhite(r, g, b) >= 4.5) return hex;
+
+    for (let factor = 0.95; factor >= 0.1; factor -= 0.03) {
+      const cr = Math.floor(r * factor);
+      const cg = Math.floor(g * factor);
+      const cb = Math.floor(b * factor);
+      if (contrastAgainstWhite(cr, cg, cb) >= 4.5) {
+        return '#' + [cr, cg, cb].map(x => x.toString(16).padStart(2, '0')).join('');
+      }
+    }
+    return '#005f9e';
+  }
+
   setAccentColor(hex, save = true) {
     if (!hex || typeof hex !== 'string') return;
     let formattedHex = hex.trim();
@@ -344,11 +373,14 @@ class ClassLoggerApp {
     const luminance = (rgb.r * 299 + rgb.g * 587 + rgb.b * 114) / 1000;
     const contrastText = luminance > 140 ? '#000000' : '#ffffff';
 
+    const accessibleLightHex = this.getAccessibleLightAccent(formattedHex);
+
     const rootStyle = document.documentElement.style;
     rootStyle.setProperty('--accent-color', formattedHex);
     rootStyle.setProperty('--accent-color-rgb', `${rgb.r}, ${rgb.g}, ${rgb.b}`);
     rootStyle.setProperty('--accent-glow', `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.35)`);
     rootStyle.setProperty('--accent-contrast', contrastText);
+    rootStyle.setProperty('--accent-text-light', accessibleLightHex);
     rootStyle.setProperty('--apple-orange', formattedHex);
     rootStyle.setProperty('--apple-orange-glow', `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.35)`);
     rootStyle.setProperty('--border-focus', formattedHex);
@@ -746,16 +778,23 @@ class ClassLoggerApp {
       this.durationContainer.querySelectorAll('.duration-pill').forEach(pill => {
         const isMatch = parseInt(pill.dataset.mins, 10) === parsed;
         pill.classList.toggle('is-active', isMatch);
+        pill.setAttribute('aria-checked', isMatch ? 'true' : 'false');
         if (isMatch) matched = true;
       });
 
       const customPill = this.durationContainer.querySelector('[data-mins="custom"]');
       if (!matched) {
-        if (customPill) customPill.classList.add('is-active');
+        if (customPill) {
+          customPill.classList.add('is-active');
+          customPill.setAttribute('aria-checked', 'true');
+        }
         if (this.customDurationWrapper) this.customDurationWrapper.style.display = 'flex';
         if (this.customDurationInput) this.customDurationInput.value = parsed;
       } else {
-        if (customPill) customPill.classList.remove('is-active');
+        if (customPill) {
+          customPill.classList.remove('is-active');
+          customPill.setAttribute('aria-checked', 'false');
+        }
         if (this.customDurationWrapper) this.customDurationWrapper.style.display = 'none';
       }
     }
@@ -779,8 +818,12 @@ class ClassLoggerApp {
     if (this.durationContainer) {
       this.durationContainer.querySelectorAll('.duration-pill').forEach(pill => {
         pill.addEventListener('click', () => {
-          this.durationContainer.querySelectorAll('.duration-pill').forEach(p => p.classList.remove('is-active'));
+          this.durationContainer.querySelectorAll('.duration-pill').forEach(p => {
+            p.classList.remove('is-active');
+            p.setAttribute('aria-checked', 'false');
+          });
           pill.classList.add('is-active');
+          pill.setAttribute('aria-checked', 'true');
 
           if (pill.dataset.mins === 'custom') {
             if (this.customDurationWrapper) this.customDurationWrapper.style.display = 'flex';
@@ -1004,13 +1047,31 @@ class ClassLoggerApp {
     // 5. Search filtering
     if (this.searchInput) {
       let searchDebounceTimer = null;
+      const updateClearVisibility = () => {
+        if (this.searchClearBtn) {
+          this.searchClearBtn.style.display = this.searchInput.value.trim() ? 'flex' : 'none';
+        }
+      };
+
       this.searchInput.addEventListener('input', (e) => {
         this.searchQuery = e.target.value;
+        updateClearVisibility();
         clearTimeout(searchDebounceTimer);
         searchDebounceTimer = setTimeout(() => {
           this.renderClassesList();
         }, 80);
       });
+
+      if (this.searchClearBtn) {
+        this.searchClearBtn.addEventListener('click', () => {
+          this.searchInput.value = '';
+          this.searchQuery = '';
+          updateClearVisibility();
+          this.searchInput.focus();
+          this.renderClassesList();
+          sound.playTick(1.1);
+        });
+      }
     }
 
     // Monthly Earnings & Bonus Month Switcher Controls
@@ -1226,6 +1287,20 @@ class ClassLoggerApp {
       this.importJsonHeaderBtn.addEventListener('change', jsonChangeHandler);
     }
 
+    // Keyboard activation for accessible file import labels (Enter / Space)
+    ['label-import-json', 'label-import-excel', 'label-import-json-modal', 'label-import-excel-modal'].forEach(id => {
+      const lbl = document.getElementById(id);
+      if (lbl) {
+        lbl.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            const fileInput = lbl.querySelector('input[type="file"]');
+            if (fileInput) fileInput.click();
+          }
+        });
+      }
+    });
+
     // Drag & Drop File Import (JSON & XLSX)
     window.addEventListener('dragover', (e) => {
       e.preventDefault();
@@ -1334,7 +1409,9 @@ class ClassLoggerApp {
     this.activeMobileTab = tab;
     if (this.mobileTabLog && this.mobileTabHistory) {
       this.mobileTabLog.classList.toggle('is-active', tab === 'log');
+      this.mobileTabLog.setAttribute('aria-selected', tab === 'log' ? 'true' : 'false');
       this.mobileTabHistory.classList.toggle('is-active', tab === 'history');
+      this.mobileTabHistory.setAttribute('aria-selected', tab === 'history' ? 'true' : 'false');
     }
     if (this.mainGrid) {
       this.mainGrid.classList.remove('mobile-view-log', 'mobile-view-history');
@@ -1349,6 +1426,8 @@ class ClassLoggerApp {
     const muted = sound.isMuted();
     this.soundIcon.innerHTML = muted ? SVG_ICONS.volumeMute : SVG_ICONS.volumeOn;
     this.soundToggleBtn.title = muted ? 'Unmute Sound' : 'Mute Sound';
+    this.soundToggleBtn.setAttribute('aria-label', muted ? 'Unmute audio sound effects' : 'Mute audio sound effects');
+    this.soundToggleBtn.setAttribute('aria-pressed', muted ? 'false' : 'true');
   }
 
   // --- BASE RATE SETTINGS ---
@@ -1518,28 +1597,7 @@ class ClassLoggerApp {
     }
 
     // Set duration
-    this.selectedDuration = item.duration || 50;
-    if (this.durationLabel) {
-      this.durationLabel.textContent = this.formatDurationLabel(this.selectedDuration);
-    }
-    if (this.durationContainer) {
-      let matched = false;
-      this.durationContainer.querySelectorAll('.duration-pill').forEach(pill => {
-        const isMatch = parseInt(pill.dataset.mins, 10) === this.selectedDuration;
-        pill.classList.toggle('is-active', isMatch);
-        if (isMatch) matched = true;
-      });
-
-      const customPill = this.durationContainer.querySelector('[data-mins="custom"]');
-      if (!matched) {
-        if (customPill) customPill.classList.add('is-active');
-        if (this.customDurationWrapper) this.customDurationWrapper.style.display = 'flex';
-        if (this.customDurationInput) this.customDurationInput.value = this.selectedDuration;
-      } else {
-        if (customPill) customPill.classList.remove('is-active');
-        if (this.customDurationWrapper) this.customDurationWrapper.style.display = 'none';
-      }
-    }
+    this.selectDuration(item.duration || 50);
 
     // Set note
     if (this.notesInput) {
@@ -1701,6 +1759,38 @@ class ClassLoggerApp {
   }
 
   handleGlobalKeyDown(e) {
+    const openOverlay = document.querySelector('.modal-overlay.is-open');
+    if (!openOverlay) return;
+
+    if (e.key === 'Escape') {
+      this.closeModal(openOverlay);
+      e.preventDefault();
+      return;
+    }
+
+    if (e.key === 'Tab') {
+      const focusableSelector = 'button:not([disabled]), [href], input:not([disabled]):not([type="hidden"]):not([tabindex="-1"]), select, textarea, [tabindex]:not([tabindex="-1"])';
+      const focusables = Array.from(openOverlay.querySelectorAll(focusableSelector)).filter(el => el.offsetParent !== null || el.offsetWidth > 0 || el.offsetHeight > 0);
+      if (focusables.length > 0) {
+        const firstEl = focusables[0];
+        const lastEl = focusables[focusables.length - 1];
+        if (e.shiftKey) {
+          if (document.activeElement === firstEl || !openOverlay.contains(document.activeElement)) {
+            lastEl.focus();
+            e.preventDefault();
+          }
+        } else {
+          if (document.activeElement === lastEl || !openOverlay.contains(document.activeElement)) {
+            firstEl.focus();
+            e.preventDefault();
+          }
+        }
+      } else {
+        e.preventDefault();
+      }
+      return;
+    }
+
     if (!this.isScrollLocked) return;
     const scrollKeys = ['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End', ' '];
     if (!scrollKeys.includes(e.key)) return;
@@ -1709,9 +1799,6 @@ class ClassLoggerApp {
     if (tag === 'input' || tag === 'textarea' || tag === 'select' || e.target.isContentEditable) {
       return;
     }
-
-    const openOverlay = document.querySelector('.modal-overlay.is-open');
-    if (!openOverlay) return;
 
     const modalWindow = openOverlay.querySelector('.modal-window');
     if (!modalWindow) {
@@ -1738,6 +1825,8 @@ class ClassLoggerApp {
 
   openModal(modalEl) {
     if (!modalEl) return;
+    this.lastFocusedElement = document.activeElement;
+
     const windowEl = modalEl.querySelector('.modal-window');
     if (windowEl) {
       windowEl.style.transform = '';
@@ -1754,6 +1843,15 @@ class ClassLoggerApp {
       this.updateBaseRateUI();
     }
     sound.playTick(1.0);
+
+    // Auto-focus first interactive element inside modal for keyboard accessibility
+    requestAnimationFrame(() => {
+      const focusableSelector = 'button:not([disabled]), [href], input:not([disabled]):not([type="hidden"]):not([tabindex="-1"]), select, textarea, [tabindex]:not([tabindex="-1"])';
+      const focusables = Array.from(modalEl.querySelectorAll(focusableSelector)).filter(el => el.offsetParent !== null || el.offsetWidth > 0 || el.offsetHeight > 0);
+      if (focusables.length > 0) {
+        focusables[0].focus();
+      }
+    });
   }
 
   closeModal(modalEl) {
@@ -1772,6 +1870,12 @@ class ClassLoggerApp {
     const finalizeUnlock = () => {
       if (!document.querySelector('.modal-overlay.is-open')) {
         this.unlockBodyScroll();
+      }
+      if (this.lastFocusedElement && typeof this.lastFocusedElement.focus === 'function') {
+        try {
+          this.lastFocusedElement.focus();
+        } catch (err) {}
+        this.lastFocusedElement = null;
       }
     };
 

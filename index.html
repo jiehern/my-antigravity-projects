@@ -2,7 +2,7 @@
 <html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>AeroSplash Class Logger</title>
   <meta name="description" content="AeroSplash Class Logger • Sleek Apple Clock-style class logging tool with 3D rotary drum dial picker, bonus tracking, and local database storage.">
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
@@ -15,7 +15,7 @@
   <meta name="apple-mobile-web-app-title" content="AeroSplash">
   <link rel="apple-touch-icon" href="assets/app-icon.png">
   <link rel="icon" type="image/png" href="assets/app-icon.png">
-  <link rel="stylesheet" href="styles.css?v=8.6">
+  <link rel="stylesheet" href="styles.css?v=8.7">
   <script type="importmap">
   {
     "imports": {
@@ -42,28 +42,28 @@
       </div>
 
       <div class="header-actions">
-        <!-- Direct JSON File Import Button -->
-        <label class="quick-pill-btn" title="Import classes from .json file">
+        <!-- Direct JSON File Import Button (Accessible via Keyboard & Screen Reader) -->
+        <label class="quick-pill-btn" id="label-import-json" title="Import classes from .json file" tabindex="0" role="button" aria-label="Import classes from JSON file">
           <svg class="ui-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
           <span class="desktop-only-text">Import JSON</span>
           <span class="mobile-only-text">JSON</span>
-          <input type="file" id="import-json-header-btn" accept=".json,application/json" style="display: none;">
+          <input type="file" id="import-json-header-btn" accept=".json,application/json" class="sr-only-input" tabindex="-1">
         </label>
 
-        <!-- Direct Excel File Import Button -->
-        <label class="quick-pill-btn primary" title="Import coach timesheet Excel spreadsheet (.xlsx)">
+        <!-- Direct Excel File Import Button (Accessible via Keyboard & Screen Reader) -->
+        <label class="quick-pill-btn primary" id="label-import-excel" title="Import coach timesheet Excel spreadsheet (.xlsx)" tabindex="0" role="button" aria-label="Import coach timesheet from Excel spreadsheet">
           <svg class="ui-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/></svg>
           <span class="desktop-only-text">Import Excel (.xlsx)</span>
           <span class="mobile-only-text">Excel</span>
-          <input type="file" id="import-excel-btn" accept=".xlsx, .xls" style="display: none;">
+          <input type="file" id="import-excel-btn" accept=".xlsx, .xls" class="sr-only-input" tabindex="-1">
         </label>
 
-        <button type="button" class="quick-pill-btn" id="btn-header-export" title="Export classes and timesheets">
+        <button type="button" class="quick-pill-btn" id="btn-header-export" title="Export classes and timesheets" aria-haspopup="dialog" aria-expanded="false">
           <svg class="ui-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
           <span>Export</span>
         </button>
 
-        <button type="button" class="icon-btn" id="sound-toggle-btn" title="Toggle Sound Feedback" aria-label="Toggle Sound">
+        <button type="button" class="icon-btn" id="sound-toggle-btn" title="Toggle Sound Feedback" aria-label="Toggle Sound Feedback" aria-pressed="true">
           <span id="sound-icon"><svg class="ui-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg></span>
         </button>
 
@@ -71,20 +71,19 @@
           <span id="theme-icon"><svg class="ui-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></span>
         </button>
 
-        <button type="button" class="icon-btn" id="data-menu-btn" title="Settings & Database" aria-label="Settings and Database">
+        <button type="button" class="icon-btn" id="data-menu-btn" title="Settings & Database" aria-label="Settings and Database" aria-haspopup="dialog" aria-expanded="false">
           <svg class="ui-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
         </button>
       </div>
     </header>
 
-
     <!-- Mobile Segmented View Switcher (Visible only on mobile screens) -->
-    <nav class="mobile-segmented-nav" id="mobile-nav-tabs" aria-label="Mobile Navigation">
-      <button type="button" class="mobile-nav-pill is-active" id="mobile-tab-log" data-tab="log">
+    <nav class="mobile-segmented-nav" id="mobile-nav-tabs" aria-label="Mobile Navigation" role="tablist">
+      <button type="button" class="mobile-nav-pill is-active" id="mobile-tab-log" data-tab="log" role="tab" aria-selected="true" aria-controls="panel-log">
         <svg class="ui-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
         <span>Log Class</span>
       </button>
-      <button type="button" class="mobile-nav-pill" id="mobile-tab-history" data-tab="history">
+      <button type="button" class="mobile-nav-pill" id="mobile-tab-history" data-tab="history" role="tab" aria-selected="false" aria-controls="panel-history">
         <svg class="ui-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
         <span>Class History</span>
         <span class="mobile-nav-badge" id="mobile-history-badge">0</span>
@@ -150,7 +149,7 @@
                 <svg class="ui-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
                 <span>Class Type</span>
               </label>
-              <span id="selected-classtype-label" style="font-size: 0.75rem; color: var(--accent-color); font-weight: 600;">LTS (1.0 unit)</span>
+              <span id="selected-classtype-label" style="font-size: 0.75rem; color: var(--accent-text); font-weight: 600;">LTS (1.0 unit)</span>
             </div>
 
             <div class="class-type-pills" id="class-type-pills-container" role="radiogroup" aria-label="Class Type">
@@ -188,11 +187,11 @@
               <span id="selected-duration-label" style="font-size: 0.75rem; color: var(--text-secondary); font-weight: 600;">50 mins</span>
             </div>
 
-            <div class="duration-pills" id="duration-pills-container">
-              <button type="button" class="duration-pill" data-mins="30">30m</button>
-              <button type="button" class="duration-pill is-active" data-mins="50">50m</button>
-              <button type="button" class="duration-pill" data-mins="90">1hr 30m</button>
-              <button type="button" class="duration-pill" data-mins="custom" id="duration-pill-custom">Custom</button>
+            <div class="duration-pills" id="duration-pills-container" role="radiogroup" aria-label="Class Duration">
+              <button type="button" class="duration-pill" data-mins="30" role="radio" aria-checked="false">30m</button>
+              <button type="button" class="duration-pill is-active" data-mins="50" role="radio" aria-checked="true">50m</button>
+              <button type="button" class="duration-pill" data-mins="90" role="radio" aria-checked="false">1hr 30m</button>
+              <button type="button" class="duration-pill" data-mins="custom" id="duration-pill-custom" role="radio" aria-checked="false">Custom</button>
             </div>
 
             <!-- Custom duration input box (revealed when Custom is chosen) -->
@@ -205,6 +204,8 @@
                   placeholder="Minutes (e.g. 50)" 
                   min="1" 
                   max="1440"
+                  inputmode="numeric"
+                  aria-label="Custom class duration in minutes"
                 >
                 <span class="custom-duration-unit">mins</span>
               </div>
@@ -253,6 +254,7 @@
                         placeholder="Add name (e.g. Coach Brian)" 
                         maxlength="40"
                         autocomplete="off"
+                        aria-label="New assist coach name"
                       />
                       <button type="button" class="assist-add-btn" id="btn-add-assist-name">+ Add</button>
                     </div>
@@ -281,7 +283,7 @@
             <svg class="ui-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
             Session History
           </h2>
-          <span class="panel-tag" id="log-count-tag">0 sessions</span>
+          <span class="panel-tag" id="log-count-tag" aria-live="polite">0 sessions</span>
         </div>
 
         <!-- Monthly Bonus & Earnings Tracker Banner -->
@@ -300,6 +302,9 @@
               placeholder="Filter by note, date, or time..."
               autocomplete="off"
             >
+            <button type="button" class="search-clear-btn" id="history-search-clear" aria-label="Clear search query" style="display: none;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
           </div>
         </div>
 
@@ -312,13 +317,13 @@
   </div>
 
   <!-- Modal: Data Management & Backups -->
-  <div class="modal-overlay" id="modal-data">
+  <div class="modal-overlay" id="modal-data" role="dialog" aria-modal="true" aria-labelledby="modal-data-title">
     <div class="modal-window">
       <div class="modal-drag-handle" aria-label="Swipe down to dismiss" role="button" tabindex="0">
         <span class="modal-drag-bar"></span>
       </div>
       <div class="modal-header">
-        <h3 class="modal-title">
+        <h3 class="modal-title" id="modal-data-title">
           <svg class="ui-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
           Settings & Database
         </h3>
@@ -404,6 +409,8 @@
               value="40" 
               step="1" 
               min="0"
+              inputmode="decimal"
+              aria-label="Coach base rate in Ringgit Malaysia"
             />
             <span class="settings-rate-suffix">/ class</span>
           </div>
@@ -421,7 +428,7 @@
       </div>
 
       <div style="display: flex; flex-direction: column; gap: 10px;">
-        <button type="button" class="submit-btn" id="btn-open-export-modal" style="background: rgba(10, 132, 255, 0.15); color: var(--apple-cyan); box-shadow: none; border: 1px solid rgba(10, 132, 255, 0.35); font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px;">
+        <button type="button" class="submit-btn" id="btn-open-export-modal" aria-haspopup="dialog" aria-expanded="false" style="background: rgba(10, 132, 255, 0.15); color: var(--apple-cyan); box-shadow: none; border: 1px solid rgba(10, 132, 255, 0.35); font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px;">
           <svg class="ui-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
           Export Classes (Filter Dates & Timesheet)
         </button>
@@ -434,16 +441,16 @@
           Backup Full Database (JSON)
         </button>
         
-        <label class="submit-btn" style="background: rgba(10, 132, 255, 0.12); color: var(--apple-cyan); box-shadow: none; border: 1px solid rgba(10, 132, 255, 0.3); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;">
+        <label class="submit-btn" id="label-import-json-modal" tabindex="0" role="button" aria-label="Import classes from JSON file" style="background: rgba(10, 132, 255, 0.12); color: var(--apple-cyan); box-shadow: none; border: 1px solid rgba(10, 132, 255, 0.3); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;">
           <svg class="ui-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
           Import Classes (.json)
-          <input type="file" id="import-json-input" accept=".json,application/json" style="display: none;">
+          <input type="file" id="import-json-input" accept=".json,application/json" class="sr-only-input" tabindex="-1">
         </label>
 
-        <label class="submit-btn" style="background: rgba(100, 210, 255, 0.12); color: var(--apple-cyan); box-shadow: none; border: 1px solid rgba(100, 210, 255, 0.3); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;">
+        <label class="submit-btn" id="label-import-excel-modal" tabindex="0" role="button" aria-label="Import coach timesheet from Excel spreadsheet" style="background: rgba(100, 210, 255, 0.12); color: var(--apple-cyan); box-shadow: none; border: 1px solid rgba(100, 210, 255, 0.3); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;">
           <svg class="ui-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg>
           Import Coach Timesheet (.xlsx)
-          <input type="file" id="import-excel-modal-input" accept=".xlsx, .xls" style="display: none;">
+          <input type="file" id="import-excel-modal-input" accept=".xlsx, .xls" class="sr-only-input" tabindex="-1">
         </label>
 
         <button type="button" class="submit-btn" id="btn-clear-db" style="background: rgba(255, 69, 58, 0.12); color: var(--apple-red); box-shadow: none; border: 1px solid rgba(255, 69, 58, 0.3); display: flex; align-items: center; justify-content: center; gap: 8px;">
@@ -455,14 +462,14 @@
   </div>
 
   <!-- Modal: Filtered Export by Category & Dates -->
-  <div class="modal-overlay" id="modal-export">
+  <div class="modal-overlay" id="modal-export" role="dialog" aria-modal="true" aria-labelledby="modal-export-title">
     <div class="modal-window" style="max-width: 520px;">
       <div class="modal-drag-handle" aria-label="Swipe down to dismiss" role="button" tabindex="0">
         <span class="modal-drag-bar"></span>
       </div>
       <div class="modal-header">
         <div>
-          <h3 class="modal-title" style="display: flex; align-items: center; gap: 8px;">
+          <h3 class="modal-title" id="modal-export-title" style="display: flex; align-items: center; gap: 8px;">
             <svg class="ui-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
             Export Classes
           </h3>
@@ -517,7 +524,7 @@
             </div>
             <div>
               <label for="export-rate-per-class" style="font-size: 0.74rem;">Rate per Class (RM) <span style="color: var(--apple-red); font-weight: bold;">*</span></label>
-              <input type="number" id="export-rate-per-class" class="form-input" value="40" step="1" min="1" required style="padding: 6px 10px; font-size: 0.82rem;">
+              <input type="number" id="export-rate-per-class" class="form-input" value="40" step="1" min="1" inputmode="decimal" required style="padding: 6px 10px; font-size: 0.82rem;">
             </div>
           </div>
           <div>
@@ -553,7 +560,7 @@
             </div>
             <div style="grid-column: span 2;">
               <span style="color: var(--text-tertiary); display: block;">Total Fees to be Paid</span>
-              <strong id="export-calc-total-fees" style="color: var(--accent-color); font-size: 1.05rem;">RM 0.00</strong>
+              <strong id="export-calc-total-fees" style="color: var(--accent-text); font-size: 1.05rem;">RM 0.00</strong>
             </div>
           </div>
         </div>
@@ -566,7 +573,7 @@
           </button>
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px;">
             <button type="button" class="quick-pill-btn" id="btn-export-filtered-csv" style="justify-content: center; padding: 12px; font-weight: 600; display: flex; align-items: center; gap: 6px;">
-              <svg class="ui-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+              <svg class="ui-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/></svg>
               Export as CSV
             </button>
             <button type="button" class="quick-pill-btn" id="btn-export-filtered-json" style="justify-content: center; padding: 12px; font-weight: 600; display: flex; align-items: center; gap: 6px;">
@@ -580,10 +587,10 @@
   </div>
 
   <!-- Modal: Native Date Picker Jump -->
-  <div class="modal-overlay" id="modal-date-jump">
+  <div class="modal-overlay" id="modal-date-jump" role="dialog" aria-modal="true" aria-labelledby="modal-date-jump-title">
     <div class="modal-window modal-window-date-jump" style="max-width: 360px;">
       <div class="modal-header">
-        <h3 class="modal-title">Jump to Specific Date</h3>
+        <h3 class="modal-title" id="modal-date-jump-title">Jump to Specific Date</h3>
         <button type="button" class="modal-close-btn" id="btn-close-date-modal" aria-label="Close date picker">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
@@ -605,6 +612,6 @@
   <div class="toast-container" id="toast-container" aria-live="polite"></div>
 
   <!-- Main JavaScript App -->
-  <script type="module" src="js/app.js?v=8.6"></script>
+  <script type="module" src="js/app.js?v=8.7"></script>
 </body>
 </html>
